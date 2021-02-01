@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px 14px; background:#f6f7f8;}
+
+        .swiperbox{height:108px;}
+        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative; background:#f6f7f8;}
+        .swiperbox .swiper-container .swiper-slide{box-sizing:border-box; padding:8px 10px;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+1){background-color:#DAE6EB;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+2){background-color:#E4DEE9;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+3){background-color:#F6F0E4;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+4){background-color:#E8DAD5;}
+        .swiperbox .swiper-container .swiper-slide .img{display:block; height:100%; width:auto;}
+        .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
+        .swiperbox .swiper-container .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
+
+        .notice-bar{position:relative; height:28px; line-height:28px; background:#ffffff; border-radius:6px; overflow:hidden;}
+        .notice-bar .hot{position:absolute; z-index:1; top:0; bottom:0; left:0; width:48px; background:#FFEBEC;}
+        .notice-bar .scroll{position:absolute; top:0; left:56px; right:10px; height:100%; overflow:hidden;}
+        .notice-bar .scroll .txt{white-space:nowrap; position:absolute; top:0;}
+
+        .course .cont .img{width:116px; height:64px; border-radius:5px; margin-right:12px;}
+
+        .ad{height:40px; border-radius:6px; overflow:hidden;}
+        .ad .cont{padding:0 16px; background:#474967 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
+        .ad .cont .svip{width:18px; height:18px; margin-right:10px;}
+        .ad .arrow{position:relative; width:96px; background:#FFF2CE linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
+        .ad .arrow::before{content:" "; border:20px solid transparent; border-right-color:#FFF2CE; position:absolute; right:100%;}
+        .ad .arrow::after{content:" "; margin-left:4px; display:block; width:16px; height:16px; border-radius:50%; background:#232425 url(../../image/common/back_w.png) no-repeat center center; background-size:8px 8px; transform:rotate(180deg);}
+
+        .sort .swiper-slide{width:auto; height:36px; line-height:36px; padding:0 20px; margin-right:12px; border-radius:6px; background:#DAE6EB}
+        .sort .swiper-slide:last-child{margin-right:0;}
+
+        .pack .packswiper .swiper-slide{box-sizing:border-box; width:244px; height:236px; margin-right:12px; padding:10px; background:#ffffff; border-radius:6px;}
+        .pack .packswiper .swiper-slide:last-child{margin-right:0;}
+        .pack .packswiper .img{display:block; width:174px; height:96px; border-radius:6px; background:#f6f7f8;}
+        .pack .packswiper .num{margin-left:6px; width:40px; background:#F1F3F3; border-radius:6px;}
+        .pack .packswiper .num span{line-height:16px;}
+        .pack .packswiper .mulu{line-height:32px;}
+
+        .ques .li{height:34px;}
+        .ques .li .pt{min-width:70px;}
+
+        .vd-box{margin-left:auto; margin-right:auto;}
+        .vd-box .li{position:relative; width:48%; margin-top:10px;}
+        .vd-box .li .zhibo{position:absolute; left:6px; top:4px; display:block; height:14px; line-height:14px; padding:0 4px 0 14px; background:#FF535E url(../../image/common/zhibo.png) no-repeat 2px center; background-size:10px 10px; border-radius:2px;}
+        .vd-box .li .img{display:block; width:150px; height:84px; border-radius:6px;}
+        @media screen and (max-width:330px) {
+            .vd-box .li{width:130px;}
+            .vd-box .li .img{display:block; width:130px; height:72px; border-radius:6px;}
+        }
+    </style>
+</head>
+<body class="df df-c">
+    <!-- 轮播 -->
+    <div id="swiperbox" class="swiperbox">
+        <div id="swiper" class="swiper-container">
+            <div class="swiper-wrapper"></div>
+            <div class="dom-wrap"><i></i></div>
+        </div>
+    </div>
+    <!-- 公告栏 -->
+    <div id="notice" class="notice-bar df mt-10">
+        <div class="hot c-red fs-14 b txt-c">热讯</div>
+        <div class="scroll c-66">
+            <div class="txt">获取Zepto对象集合中每个元素的直接父元素。如果css选择器参数给出。过滤出符合条件的元素。</div>
+        </div>
+    </div>
+    <!-- 我的课程 -->
+    <div id="mylist" class="course mt-10 com-box hide">
+        <div class="com-title df ai-c just-c-bet">
+            <div class="fs-16 b">我的课程</div>
+            <div class="more fs-12 c-77" onclick="openMyList()">更多</div>
+        </div>
+    </div>
+    <!-- 广告 -->
+    <div class="ad mt-10 df fs-14" onclick="openVip()">
+        <div class="cont df ai-c fc">
+            <img src="../../image/instantly/svip.png" alt="" class="svip">
+            <span class="c-ff b">开通会员享更多权益</span>
+        </div>
+        <div class="arrow b df ai-c just-c-ct">成为会员</div>
+    </div>
+    <!-- 分类 -->
+    <div id="sortbox" class="sortbox mt-20">
+        <div class="fs-16 b">热门分类</div>
+        <div id="sort" class="mt-16 sort swiper-container">
+            <div class="swiper-wrapper fs-12 c-33"></div>
+        </div>
+    </div>
+    <!-- 课程包 -->
+    <div id="pack" class="pack mt-20">
+        <div class="com-title df ai-c just-c-bet">
+            <div class="fs-16 b">课程包</div>
+            <div class="more fs-12 c-77" onclick="openPackList()">更多</div>
+        </div>
+        <div id="packswiper" class="packswiper mt-16 swiper-container">
+            <div class="swiper-wrapper fs-12 c-33">
+                <div class="swiper-slide df df-c">
+                    <div class="df">
+                        <img src="../../image/common/test.jpg" class="img" />
+                        <div class="num df df-c ai-c just-c-ct fs-12">
+                            <span>共</span>
+                            <span>6</span>
+                            <span>节</span>
+                        </div>
+                    </div>
+                    <div class="mulu fc fs-14">
+                        <div class="one-hide">1. 新高进行志愿填报</div>
+                        <div class="one-hide">2. 9月7号专科批志愿线上填报</div>
+                        <div class="one-hide">3. 专科线上进行志愿填报</div>
+                    </div>
+                    <div class="txt-c mt-6 c-aa fs-12 lh-1">- 查看全部 -</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 咨询 -->
+    <div id="ques" class="ques com-box mt-10">
+        <div class="com-title df ai-c just-c-bet">
+            <div class="fs-16 b">大家都在问</div>
+            <div class="more fs-12 c-77" onclick="openConsult()">更多</div>
+        </div>
+        <div class="ul mt-10"></div>
+        <div class="txt-c mt-6">
+            <button type="button" class="com-button ques-btn c-red fs-12" name="button" onclick="openConsult()">发起咨询</button>
+        </div>
+    </div>
+    <!-- 分类详情 -->
+    <div id="fenlei" class="fenlei df df-c"></div>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+var category = [];
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+
+function setEvent(){
+    api.addEventListener({name:'viewappear'},function(){api.setStatusBarStyle({style: 'dark'})});
+    // 点击 Banner
+    $(document.body).on("click",".tapbanner",function(){
+        var ts = $(this);
+        myApp.openBanner(ts.data('type'), ts.data('data'))
+    });
+    // 热讯
+    $("#notice").on("click",function(){
+        var id = $(this).data('id');
+        myApp.openWin({
+            title: "教育资讯",
+            url: "/html/information/detail.html",
+            pageParam: {id:id}
+        });
+    })
+}
+
+function getData(){
+    myApp.ajax({
+        url: '/api/zhibo/home/index',
+        method: 'post',
+        success(data){
+            if(data.errcode!=200 && data.errcode!=0){return}
+            category = data.category;
+            setSwiper(data.swiper); // 轮播
+            setFenlei(); // 分类
+            setNoticeBar(data.top); // 热讯
+            setPack(data.kcb); // 课程包
+            setDayi(data.dayi); // 答疑
+        }
+    });
+
+    if(myApp.isLogin()){
+        myApp.ajax({
+            url: '/api/zhibo/home/getmyList',
+            method: 'post',
+            success(data){
+                if(data.errcode!=200 && data.errcode!=0){return}
+                if(!data.data || data.data.length==0){return}
+                var mylist = $("#mylist");
+                mylist.removeClass("hide");
+                mylist.find('.cont').remove();
+                mylist.append('<div class="cont mt-10 df" onclick="openVideo('+ data.data[0].id +')">'+
+                    '<img src="'+ data.data[0].image +'" alt="" class="img" />'+
+                    '<div class="df df-c fc">'+
+                        '<div class="three-hide fs-14">'+ data.data[0].title +'</div>'+
+                    '</div>'+
+                '</div>');
+            }
+        })
+    }
+}
+// 分类
+function setFenlei(){
+    $api[category.length?'removeCls':'addCls']($api.byId('sortbox'),'hide');
+    if(!category.length){return false}
+
+    var dom = $("#fenlei");
+    var wrap = $("#sort .swiper-wrapper");
+    wrap.empty();
+
+    for(var i in category){
+        wrap.append('<div class="swiper-slide" onclick="openList('+i+')">'+category[i].name+'</div>');
+        if(!category[i].data || category[i].data.length==0){continue}
+        var item = $('<div class="mt-10 com-box">'+
+            '<div class="com-title df ai-c just-c-bet">'+
+                '<div class="fs-16 b">'+ category[i].name +'</div>'+
+                '<div class="more fs-12 c-77" onclick="openList('+i+')">更多</div>'+
+            '</div>'+
+            '<div class="vd-box fs-14 df just-c-bet df-w-w"></div>'+
+        '</div>');
+        for(var j in category[i].data){
+            var o = category[i].data[j];
+            var vdbox = item.find(".vd-box");
+            vdbox.append('<div class="li " onclick="openVideo('+ o.id +')">'+
+                '<img src="'+ o.image +'" class="img" alt="" />'+
+                '<div class="one-hide mt-6">'+ o.title +'</div>'+
+                '<div class="fs-12 mt-4 c-aa">'+ o.buynum +'人已学习</div>'+
+                (o.type=="zhibo"?'<span class="zhibo fs-10 c-ff">直播中</span>':'')+
+            '</div>')
+        }
+        dom.append(item);
+    }
+    var mySwiper = new Swiper('#sort', {slidesPerView :'auto'});
+}
+// 轮播
+function setSwiper(arr){
+    $('#swiperbox')[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+
+    var wrap = $("#swiper .swiper-wrapper");
+    var domwrap = $("#swiper .dom-wrap i");
+    wrap.empty();
+    for(var i in arr){
+        wrap.append('<div class="tapbanner swiper-slide df just-c-bet" data-type="'+ arr[i].cktype +'" data-data="'+ arr[i].url +'">'+
+            '<div class="f1">'+
+                '<div class="fs-14 b one-hide mt-10">'+ arr[i].title +'</div>'+
+                '<div class="fs-12 c-66 mt-12 two-hide">'+ arr[i].ftitle +'</div>'+
+            '</div>'+
+            '<img src="'+ arr[i].image +'" class="img" alt=""/>'+
+        '</div>');
+    }
+    domwrap.css({width:(100/arr.length) + "%"});
+    var mySwiper = new Swiper('#swiper', {
+        autoplay: {delay:4000, stopOnLastSlide:false, disableOnInteraction:true},
+        on: {slideChange: function(swiper){domwrap.css({left:swiper.realIndex*(100/arr.length)+"%"})}}
+    });
+}
+
+// 答疑
+function setDayi(arr){
+    var dom = $("#ques");
+    if(!arr || arr.length==0){dom.addClass("hide");return}
+    dom.removeClass("hide");
+    var ul = dom.find(".ul");
+    ul.empty();
+    for(var i in arr){
+        ul.append('<div class="li df ai-c" onclick="openListen('+ arr[i].id +')">'+
+            '<div class="fc one-hide">'+ arr[i].content +'</div>'+
+            '<div class="pt fs-12 c-aa txt-r">'+ arr[i].tounum +'人旁听</div>'+
+        '</div>');
+    }
+}
+// 热讯
+function setNoticeBar(arr){
+    var notice = $("#notice");
+    var txt = notice.find(".txt");
+    if(!arr || arr.length==0){notice.addClass("hide");return}
+    notice.removeClass("hide");
+    txt.text(arr[0].title);
+    notice.data("id",arr[0].id);
+    var w = txt.width() - txt.parent().width();
+    if(w<=0){return}
+    var animate = [
+        { left: 0 },
+        { left: 0 },
+        { left: (-w/3)+'px'},
+        { left: (-w/1.5)+'px'},
+        { left: -w+'px'},
+        { left: -w+'px'}
+    ];
+    txt[0].animate(animate, {duration: w*24, iterations: Infinity});
+}
+// 课程包
+function setPack(arr){
+    var pack = $("#pack");
+    pack[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+
+    var wrap = $("#packswiper .swiper-wrapper");
+    wrap.empty();
+    for(var i in arr){
+        var o = arr[i];
+        var item = $('<div class="swiper-slide df df-c" onclick="openPack('+ o.id +')">'+
+            '<div class="df">'+
+                '<img src="'+ o.image +'" class="img" />'+
+                '<div class="num df df-c ai-c just-c-ct fs-12">'+
+                    '<span>共</span>'+
+                    '<span>'+ o.kcnum +'</span>'+
+                    '<span>节</span>'+
+                '</div>'+
+            '</div>'+
+            '<div class="mulu fc fs-14"></div>'+
+            '<div class="txt-c mt-6 c-aa fs-12 lh-1">- 查看全部 -</div>'+
+        '</div>');
+        var mulu = item.find(".mulu");
+        for(var j in o.kcdata){
+            if(Number(j)>2){break}
+            mulu.append('<div class="one-hide">'+ (Number(j)+1) + '.' + o.kcdata[j].title +'</div>');
+        }
+        wrap.append(item);
+    }
+    var mySwiper = new Swiper('#packswiper', {slidesPerView :'auto'});
+}
+// 我的课程
+function openMyList(){}
+// 课程包
+function openPack(id){myApp.openWin({title:"课程详情", url:"/html/study/pack_detail.html", pageParam:{id:id}, headColor:"#DAE6EB"})}
+// 旁听
+function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
+// 咨询
+function openConsult(id){myApp.openWin({title:"招考答疑", url:"/html/consult/index.html", pageParam: {id:id}})}
+// 课程列表
+function openList(i){myApp.openWin({title:category[i].name||"课程", url:"/html/study/list.html", headColor:"#f6f7f8", pageParam:{id:category[i].id}})}
+// 课程包列表
+function openPackList(){myApp.openWin({title:"课程包", url:"/html/study/list_pack.html", headColor:"#f6f7f8"})}
+// 视频详情
+function openVideo(id){myApp.openWin({hideHead:true, url:"/html/study/detail.html",pageParam:{id:id}})}
+// 会员
+function openVip(){myApp.openWin({title:"会员包", needLogin:true, backWhite:true, url:"/html/personal/vip.html", headTxtColor:"#ffffff", headColor:"#474967 linear-gradient(to right, #474967, #20203B)"})}
+</script>
+</body>
+</html>

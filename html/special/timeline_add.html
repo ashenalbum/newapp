@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .ul{background:#ffffff;}
+        .ul .item{padding:10px 16px; height:30px; line-height:30px; border-bottom:1px solid #F2F2F2;}
+        .ul .item:last-child{border-bottom:none;}
+        .ul .item .arrow{display:block; width:12px; height:12px;}
+        .ul .item .ipt{width:100px; height:30px; line-height:30px; border:none; outline:none;}
+
+        .btn-box{height:50px; padding:0 16px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body>
+    <div class="ul fs-16 c-33">
+        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="selDate()">
+            <span>选择日期</span>
+            <span id="date">--</span>
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="selTime()">
+            <span>选择时间段</span>
+            <span id="time">全天</span>
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>输入人数</span>
+            <input id="num" type="number" class="ipt fc txt-r" placeholder="请输入人数" />
+        </div>
+    </div>
+    <div class="btn-box df ai-c mt-20">
+        <button class="com-button submit fs-14 c-ff" onclick="submit()">确认提交</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+var time = 0;
+
+apiready = function(){
+    api.setStatusBarStyle({style: 'dark'});
+    init();
+}
+function init(){
+    var date = new Date();
+    var month = date.getMonth()+1;
+    var day = date.getDate();
+    month = month<10?'0'+month:month;
+    day = day<10?'0'+day:day;
+    $("#date").html(date.getFullYear()+"-"+month+"-"+day);
+}
+function selDate(){
+    api.openPicker({
+        type: 'date',
+        date: new Date().toLocaleDateString().replace(/\//g,"-"),
+        title: '选择时间'
+    }, function(ret, err) {
+        if (!ret) {return}
+        var month = ret.month<10?"0"+ret.month:ret.month;
+        var day = ret.day<10?"0"+ret.day:ret.day;
+        $("#date").html(ret.year+"-"+month+"-"+day);
+    });
+}
+function selTime(){
+    api.actionSheet({
+        title: '选择时间段',
+        cancelTitle: '取消',
+        buttons: ['全天', '上午', '下午']
+    }, function(ret, err) {
+        var index = ret.buttonIndex;
+        var timeDom = $("#time");
+        switch(index){
+            case 1: time = 0; timeDom.html("全天"); break;
+            case 2: time = 1; timeDom.html("上午"); break;
+            case 3: time = 2; timeDom.html("下午"); break;
+        }
+    });
+}
+function submit(){
+    var date = $("#date").html();
+    var num = $("#num").val();
+    if(!num || parseInt(num)<=0){api.toast({msg:"请输入人数"});return}
+
+    myApp.ajax({
+        url: "/api/zixun/yuyuemem/addyuyuetime",
+        method: "post",
+        data: {data:{time:date, shiduan:time, num:parseInt(num)}},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            api.toast({msg: '添加成功'});
+        }
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <style>
+        body{height:100%; background:#f6f7f8;}
+        .content{height:100%;}
+        .top{height:86px; padding:8px; background:#ffffff;}
+        .top .item{margin:0 16px; padding:8px; border-radius:6px;}
+        .top .item .img{width:44px; height:44px; border-radius:50%;}
+        .scroll-box{background:#ffffff; position:relative;}
+        .scroll-box .scroll{position:absolute; top:0; left:0; bottom:0; right:0; overflow:auto;}
+
+        .msg{padding:0 16px;}
+        .msg .border{border-bottom:1px solid #eeeeee; padding:12px 0;}
+        .msg:last-child .border{border-bottom:none;}
+        .msg .txts{box-sizing:border-box; padding:4px 0; height:44px;}
+        .msg .icon{display:block; margin-right:10px; width:44px; height:44px; border-radius:50%; background:#f6f7f8;}
+        .msg .info{min-width:70px; height:44px;}
+        .msg .point{display:inline-block; height:14px; line-height:14px; padding:0 4px; border-radius:8px; background:#FF3942;}
+    </style>
+</head>
+<body>
+    <div class="content df df-c">
+        <div class="top df just-c-bet">
+            <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openOrder()">
+                <img src="../image/message/order.png" alt="" class="img" />
+                <div class="mt-6 fs-14">订单消息</div>
+            </div>
+            <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openSystem()">
+                <img src="../image/message/system.png" alt="" class="img" />
+                <div class="mt-6 fs-14">系统消息</div>
+            </div>
+            <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openActive()">
+                <img src="../image/message/active.png" alt="" class="img" />
+                <div class="mt-6 fs-14">活动消息</div>
+            </div>
+        </div>
+        <div class="scroll-box mt-10 fc">
+            <div class="scroll">
+                <div class="msg" tapmode="touch-style1">
+                    <div class="border df ai-c">
+                        <img src="../image/index/type1.png" class="icon" />
+                        <div class="fc txts df df-c just-c-bet">
+                            <div class="fs-14 c-33 one-hide">山西工程职业技术学院</div>
+                            <div class="fs-12 c-99 one-hide">这个要看你的分数是否达标，500分以上…</div>
+                        </div>
+                        <div class="info df df-c just-c-bet txt-r ai-e">
+                            <span class="fs-10 c-aa">2020/09/23 23:30:30</span>
+                            <span class="point fs-10 c-ff ">89</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript">
+apiready = function(){
+    setEvent();
+    api.sendEvent({name: 'messageTestLogin'});
+}
+
+function setEvent(){
+    api.addEventListener({name: 'messageTestLogin'}, function(){
+
+    });
+}
+function openOrder(){myApp.openWin({title:"订单消息", url:"/html/message/order.html"})}
+function openSystem(){myApp.openWin({title:"系统消息", url:"/html/message/system.html"})}
+function openActive(){myApp.openWin({title:"活动消息", url:"/html/message/active.html"})}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8;}
+
+        .labels{position:fixed; z-index:1; top:0; left:0; right:0; background:#ffffff;}
+        .labels .label{display:block; padding:20px 0; position:relative; height:20px; line-height:20px;}
+        .labels .label.active{font-size:14px; color:#333333;}
+        .labels .label.active:after{content:" "; position:absolute; bottom:10px; left:0; right:0; margin:3px auto 0; width:16px; height:6px; background:url(../../image/instantly/active.png) no-repeat center center; background-size:100% 100%;}
+
+        .cont{margin-top:70px; padding:0 10px;}
+        .cont .kanwulist .kanwu{padding:10px; border:none; margin-bottom:10px; background:#ffffff; border-radius:6px;}
+        .cont .kanwulist .kanwu:last-child{margin-bottom:0;}
+        .cont .price{display:block; padding-left:20px; height:18px; line-height:18px; background:url(../../image/common/bei.png) no-repeat left center; background-size:18px 18px;}
+
+        .cont .kecheng .li{padding:10px; margin-bottom:10px; border-radius:6px; background:#ffffff;}
+        .cont .kecheng .li:last-child{margin-bottom:0;}
+        .cont .kecheng .li .img{display:block; width:120px; height:84px; border-radius:6px; margin-right:10px;}
+        .cont .kecheng .li .two-hide{line-height:18px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="labels txt-c df ai-c fs-16 c-99">
+        <span class="fc label active" >报刊</span>
+        <span class="fc label">课程</span>
+    </div>
+    <div class="cont">
+        <div class="kanwulist">
+            <div class="kanwu df">
+                <img src="../../image/index/type1.png" class="img" />
+                <div class="txts f1 df df-c just-c-bet">
+                    <div>
+                        <div class="one-hide fs-16 b">山西教育《一往无前》</div>
+                        <div class="mt-10 three-hide c-99 fs-12">杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等</div>
+                    </div>
+                    <div class="df ai-c just-c-bet fs-12 c-red">
+                        <span>订购成功</span>
+                        <span class="price b">99</span>
+                    </div>
+                </div>
+            </div>
+                <div class="kanwu df">
+                    <img src="../../image/index/type1.png" class="img" />
+                    <div class="txts f1 df df-c just-c-bet">
+                        <div>
+                            <div class="one-hide fs-16 b">山西教育《一往无前》</div>
+                            <div class="mt-10 three-hide c-99 fs-12">杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等</div>
+                        </div>
+                        <div class="df ai-c just-c-bet fs-12 c-red">
+                            <span>订购成功</span>
+                            <span class="price b">99</span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="kecheng fs-14 c-33">
+            <div class="li df ">
+                <img src="../../image/common/test.jpg" class="img" alt="" />
+                <div class="df df-c just-c-bet">
+                    <div class="two-hide">9月7号专科批志愿线上填报9月7号专科批志愿线上填报</div>
+                    <div class="df ai-c just-c-bet fs-12 c-red b">
+                        <span>订购成功</span>
+                        <span class="price">123贝</span>
+                    </div>
+                </div>
+            </div>
+            <div class="li df ">
+                <img src="../../image/common/test.jpg" class="img" alt="" />
+                <div class="df df-c just-c-bet">
+                    <div class="two-hide">9月7号专科批志愿线上填报9月7号专科批志愿线上填报</div>
+                    <div class="df ai-c just-c-bet fs-12 c-red b">
+                        <span>订购成功</span>
+                        <span class="price">123贝</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+apiready = function(){
+}
+
+</script>
+</body>
+</html>

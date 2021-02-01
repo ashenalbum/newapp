@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <style>
+        #footer{display: flex; padding:0 15px;position:fixed;left:0;right:0;bottom:0;overflow:hidden;margin:15px 0;}
+        #footer .btn{height:45px;border-radius:5px;background:#888;border:1px solid #fff;color:#fff;text-align:center;line-height:45px;width:50%;font-size:16px;}
+        #footer .btn.ok{background:#FF2741;border-color:#FF2741;margin-left:15px;}
+    </style>
+</head>
+<body>
+	<div id="footer" class="flex">
+		<div class="btn flex1" style="flex:1" tapmode onclick="cancel_click()">取消</div>
+		<div class="btn ok" tapmode onclick="ok_click()">确定</div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript">
+var FNImageClip = null;
+var imgName = "";
+apiready = function() {
+    imgName = api.pageParam.imgUrl.match(/^.*\/([^\/]+)$/)[1];
+    var w = api.frameWidth * 0.9;
+    var h = api.frameWidth * 0.9;
+    var x = api.frameWidth * 0.05;
+    var y = (api.frameHeight - h - 80) / 2;
+    var clip = api.pageParam.clip;
+    if(!clip.clipW || !clip.clipH){clip = {clipW:"80%",clipH:"80%"}}
+
+    var rect = /^\d+$/.test(clip.clipW)?{
+        w: clip.clipW / api.frameWidth,
+        h: clip.clipH / api.frameWidth
+    }:{
+        w: Number(clip.clipW.replace("%",""))/100,
+        h: Number(clip.clipH.replace("%",""))/100
+    };
+
+    w = api.frameWidth * rect.w;
+    h = api.frameWidth * rect.h;
+    x = api.frameWidth * (1-rect.w)/2;
+    y = (api.frameHeight - (api.frameWidth* rect.h) - 80) / 2;
+
+    FNImageClip = api.require('FNImageClip');
+    FNImageClip.open({
+        rect: {
+            x: 0,
+            y: 0,
+            w: api.frameWidth,
+            h: api.frameHeight - 80
+        },
+        srcPath: api.pageParam.imgUrl,
+        style: {
+            mask: 'rgba(0,0,0,.5)',
+            clip: {
+                w: w,
+                h: h,
+                x: x,
+                y: y,
+                borderColor: '#fff',
+                borderWidth: 1,
+                appearance: 'rectangle'
+            }
+        },
+        fixedOn: api.frameName,
+        mode:'image'
+    });
+}
+
+function ok_click(){
+	FNImageClip.save({
+	    destPath: 'fs://imageClip/'+ imgName,
+	    copyToAlbum: false,
+	    quality: 1
+	}, function(ret, err) {
+	    if (ret && ret.destPath) {
+	        var imgsrc = 'fs://imageClip/'+ imgName;
+            api.sendEvent({name: 'clipOver',extra: {imgUrl:imgsrc, imgName:imgName}});
+			cancel_click();
+	    }
+	});
+}
+
+function cancel_click(){
+	FNImageClip.close();
+    api.closeWin({name: 'common_clip_img'});
+}
+</script>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px 16px 70px; background:#ffffff;}
+        .ul .li{padding:10px 0; border-bottom:1px solid #E1E1E1;}
+        .ul .li:last-child{border-bottom:none;}
+        .ul .li .day{box-sizing:border-box; margin-left:8px; height:18px; line-height:16px; padding:0 6px; border:1px solid; border-radius:10px;}
+        .ul .li .delete{width:36px; height:36px; background:url(../../image/common/del.png) no-repeat center center; background-size:18px 18px; border-radius:4px;}
+        .ul .li.disabled{color:#999999;}
+        .ul .empty{padding:30px;}
+
+        .btn-box{position:fixed; height:70px; bottom:0; left:0; right:0; background:#ffffff; padding:0 30px;}
+        .btn-box .start-btn{width:100%; height:40px; border-radius:10px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body class="df df-c">
+    <div id="ul" class="ul lh-14 fs-14"></div>
+    <div class="btn-box df ai-c just-c-bet">
+        <button class="com-button start-btn fs-14 c-ff" onclick="openTimelineAdd()">添加排期</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var price = {};
+var sel = null;
+var selTxt = "";
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({name:'viewappear'},function(){
+        api.setStatusBarStyle({style: 'dark'});
+        getData();
+    });
+    $("#ul").on("click",".delete",function(){
+        var id = $(this).parents(".li").data('id');
+        myApp.confirm({
+            title: "",
+            content: "确定要删除该排期吗？",
+            callback(btnIndex){
+                if(btnIndex!=1){return}
+                // 1049
+            }
+        });
+    });
+}
+function getData(){
+    var ul = $("#ul").empty();
+    myApp.ajax({
+        url: "/api/zixun/yuyuemem/getzjyuyuelist",
+        method: "get",
+        data: {uid:api.pageParam.uid},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.list || !data.list.length){ul.append('<div class="empty fs-14 c-99 txt-c">暂无数据</div>'); return}
+            for(var i=0; i<data.list.length; i++){
+                var o = data.list[i];
+                ul.append('<div class="li df ai-c '+ (o.sta==1?'disabled':'') +'" data-id="'+ o.id +'" data-txt="'+ (o.time+' '+o.week) +'" tapmode="touch-style">'+
+                    '<div class="fc df df-c">'+
+                        '<div class="df ai-c">'+
+                            '<span>'+ o.time +' '+ o.week +' '+ getWord(o.shiduan) +'</span>'+
+                            (o.day?('<span class="day c-99 fs-12">'+ o.day +'</span>'):'')+
+                        '</div>'+
+                        '<div class="mt-4 c-99">已预约'+ o.ynum +'/'+ o.num +'</div>'+
+                    '</div>'+
+                    '<div class="status fs-12 c-99">'+ (o.sta==1?'已满':'可选') +'</div>'+
+                '</div>');
+            }
+        }
+    });
+}
+// 时间段
+function getWord(i){
+    switch(i){
+        case "0":return "全天";
+        case "1":return "上午";
+        case "2":return "下午";
+    }
+    return "";
+}
+// 添加排期
+function openTimelineAdd(){myApp.openWin({title:"添加排期", url:"/html/special/timeline_add.html"})}
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:20px 0; background:#f6f7f8;}
+        .form{margin-top:28px; background:#ffffff;}
+        .form .iptbox{box-sizing:border-box; border-bottom:1px solid #EFF0F1; height:50px; padding:6px 16px;}
+        .form .iptbox input{height:38px; line-height:38px; color:#333333;}
+        .form .label{width:60px;}
+        .form .codebtn{display:block; height:30px; line-height:30px;}
+        .cont .submit{display:block; width:96%; margin:30px auto 0; height:44px; line-height:44px; font-size:16px; background:#cccccc;}
+        .cont .submit.active{background:#FF3942;}
+    </style>
+</head>
+<body>
+    <div class="cont">
+        <div class="fs-16 c-33 b txt-c">验证手机号</div>
+        <div class="fs-12 c-99 mt-12 txt-c">绑定后，可以用新手机号码登录</div>
+        <div class="form">
+            <div class="iptbox df ai-c">
+                <div class="label fs-14">手机号</div>
+                <input id="phone" type="number" placeholder="请输入手机号" class="f1 fs-14" />
+            </div>
+            <div class="iptbox df ai-c mt-10">
+                <div class="label fs-14">验证码</div>
+                <input id="code" type="text" placeholder="请输入验证码" class="f1 fs-14" />
+                <span id="codebtn" class="codebtn c-red fs-14">获取验证码</button>
+            </div>
+        </div>
+        <button id="submit" class="com-button submit c-ff">确认绑定</div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var phone = $api.byId('phone');
+var code = $api.byId('code');
+var codebtn = $api.byId('codebtn');
+var submit = $api.byId('submit');
+var timeout = true;
+
+apiready = function(){
+    code.addEventListener("input",function(){
+        $api[(this.value && /^1\d{10}$/.test(phone.value))?'addCls':'removeCls'](submit, 'active');
+    });
+
+    codebtn.addEventListener("click",function(){
+        if(!timeout){return}
+        if(!/^1\d{10}$/.test(phone.value)){api.toast({msg: '请输入正确的手机号'}); return}
+        var time = 60;
+        timeout = false;
+        $api.removeCls(codebtn, 'active');
+        $api.html(codebtn,time+"秒后重新获取");
+        var interval = setInterval(function(){
+            time--;
+            $api.html(codebtn,time+"秒后重新获取");
+            if(time<=0){
+                clearInterval(interval);
+                timeout = true;
+                $api.html(codebtn,"获取验证码");
+                $api[/^1\d{10}$/.test(phone.value)?'addCls':'removeCls'](codebtn, 'active');
+            }
+        },1000);
+    });
+
+    submit.addEventListener("click",function(){
+        if(!/^1\d{10}$/.test(phone.value)){api.toast({msg: '请输入正确的手机号'}); return}
+        if(!code.value){api.toast({msg: '请输入验证码'}); return}
+
+        var o = {phone:phone.value, code:code.value};
+
+        alert(JSON.stringify(o));
+    })
+}
+</script>
+</body>
+</html>

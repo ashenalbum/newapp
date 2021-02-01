@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .ul{background:#ffffff;}
+        .ul .item{padding:10px 16px; height:30px; line-height:30px; border-bottom:1px solid #F2F2F2;}
+        .ul .item:last-child{border-bottom:none;}
+        .ul .item .arrow{display:block; width:12px; height:12px;}
+        .ul .item .ipt{width:100px; height:30px; line-height:30px; border:none; outline:none;}
+        .ul .item.noht{height:auto;}
+        .ul .item .textarea{box-sizing:border-box; width:100%; line-height:18px; border:1px solid #cccccc; border-radius:6px; padding:10px 8px; resize:none;}
+        .ul .labelbox .label{display:inline-block; box-sizing:border-box; margin:0 14px 10px 0; height:32px; line-height:32px; padding:0 10px; border:1px solid; border-radius:4px;}
+        .ul .labelbox input[name='catid[]']:checked~.label{color:#FF3942; background:#FFE2E3; border-color:#FF3942;}
+        .ul .fmbox{line-height:30px; padding:10px 16px;}
+        .ul .fmbox .fmimg{width:60px; border-radius:4px; background:#f6f7f8;}
+
+        .btn-box{height:50px; padding:0 16px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body>
+    <form id="form" class="ul fs-16 c-33">
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>真实姓名</span>
+            <input type="text" name="name" class="ipt fc txt-r" placeholder="请输入真实姓名" />
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>身份证号</span>
+            <input type="text" name="idcard" class="ipt fc txt-r" placeholder="请输入身份证号" />
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>所在单位</span>
+            <input type="text" name="school" class="ipt fc txt-r" placeholder="请输入所在单位" />
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>担任职务</span>
+            <input type="text" name="zhiwu" class="ipt fc txt-r" placeholder="请输入担任职务" />
+        </div>
+        <div class="item noht df df-c " >
+            <div>个人简介</div>
+            <textarea name="message" class="textarea mt-4 fs-14" rows="5" placeholder="请输入个人简介"></textarea>
+        </div>
+        <div class="item noht df df-c " >
+            <div>咨询分类</div>
+            <div id="labelbox" class="labelbox mt-6 c-99 fs-14"></div>
+        </div>
+        <div class="fmbox df ai-s just-c-bet">
+            <span>主页背景图</span>
+            <img src="../../image/common/bg.png" class="fmimg" alt="" onclick="addFmimg()" />
+        </div>
+    </form>
+    <div class="btn-box df ai-c mt-20">
+        <button class="com-button submit fs-14 c-ff" onclick="submit()">确认提交</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+var fmUrl = "";
+var labelArr = [];
+apiready = function(){
+    init();
+}
+// 添加标签
+function init(){
+    myApp.ajax({
+        url: "/api/zixun/member/getcatid",
+        method: "get",
+        loading: false,
+        alert: false,
+        success(data){
+            var labelbox = $("#labelbox").empty();
+            if((data.errcode!=0 && data.errcode!=200) || !data.data || !data.data.length){return}
+            for(var i in data.data){
+                labelbox.append('<label>'+
+                    '<input type="checkbox" name="catid[]" value="'+ data.data[i].id +'" class="hide" />'+
+                    '<span class="label fs-14">'+ data.data[i].name +'</span>'+
+                '</label>');
+            }
+        }
+    });
+}
+function submit(){
+    var arr = $("#form").serializeArray();
+    var obj = {catid:[]};
+    for(var i in arr){
+        if(arr[i].name=="catid[]"){
+            obj.catid.push(arr[i].value);
+        }else{
+            obj[arr[i].name] = arr[i].value;
+        }
+    }
+    obj.catid = obj.catid.join();
+    if(!obj.name){api.toast({msg:"请输入真实姓名"});return}
+    if(!obj.idcard){api.toast({msg:"请输入身份证号"});return}
+    if(!/^\d{17}(\d|x|X)$/.test(obj.idcard)){api.toast({msg:"身份证号格式有误"}); return}
+    if(!obj.school){api.toast({msg:"请输入所在单位"});return}
+    if(!obj.zhiwu){api.toast({msg:"请输入担任职务"});return}
+    if(!obj.message){api.toast({msg:"请输入个人简介"});return}
+    obj.fmUrl = fmUrl;
+    myApp.ajax({
+        url: "/api/zixun/member/applyzhuanjia",
+        method: "post",
+        data: {data: obj},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            api.toast({msg:"申请已提交,等待审核中", duration:2500, global:true});
+            api.closeWin();
+        }
+    });
+}
+// 添加封面
+function addFmimg(){myApp.upImg(false, function(url){fmUrl = url});}
+</script>
+</body>
+</html>

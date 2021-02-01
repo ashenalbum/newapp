@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .cont{margin-top:-10px; padding:10px 0; border-radius:10px 10px 0 0; background:#f6f7f8;}
+
+        .com-box{margin-left:10px; margin-right:10px; margin-bottom:10px;}
+        .com-box:first-child{box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.04);}
+        .com-box:last-child{margin-bottom:0;}
+
+        .nologin{padding:20px 0 30px; background:#f6f7f8;}
+        .nologin .info-btn{height:40px; width:140px; background:#FF3942; color:#ffffff;}
+        .nologin .editnotice{position:relative; height:32px; line-height:32px; padding:0 16px; border-radius:16px; background:#ffffff;}
+        .nologin .editnotice::before{content:" "; position:absolute; left:0; right:0; top:-6px; margin:auto; width:12px; height:12px; background:#ffffff; transform:rotate(45deg);}
+
+        .infobox{padding:0 12px 16px; height:90px; background:#f6f7f8;}
+        .infobox.svip{background:#F7D9A6 linear-gradient(to right, #F7D9A6, #E3C17B);}
+        .infobox .icon-border{border:1px solid #DEDEDE; padding:4px; width:50px; height:50px; border-radius:50%;}
+        .infobox.svip .icon-border{border-color: #ffffff;}
+        .infobox .icon-border .icon{display:block; width:100%; height:100%; border-radius:50%; background:#f6f7f8;}
+        .infobox .infodetail{margin-left:20px;}
+        .infobox .name .vipicon{margin-left:6px; width:18px; height:18px; background:url(../image/instantly/vip.png) no-repeat center center; background-size:100% 100%;}
+        .infobox.svip .name .vipicon{background-image:url(../image/instantly/svip.png)}
+        .infobox .tabs{margin-top:6px;}
+        .infobox .tabs span{display:inline-block; height:14px; line-height:14px; padding:0 5px; margin-right:6px; background:rgba(255,255,255,0.7); color:#aaaaaa; font-size:10px; border-radius:2px;}
+        .infobox.svip .tabs span{color:#D0AD65;}
+        .infobox .edit{display:block; margin-left:10px; width:32px; height:32px;}
+
+        .school .unlock{padding:40px 0;}
+        .school .unlock .btn{width:260px; height:36px; line-height:36px;}
+        .school .show-school .school-list{height:234px; overflow:hidden;}
+        .school .show-school .school-list.open{height:auto;}
+        .school .school-list .item{box-sizing:border-box; height:78px; border-bottom:1px solid #dddddd;}
+        .school .school-list .item .img{display:block; width:40px; height:40px; margin-right:12px; background:#f6f7f8; border-radius:50%;}
+        .school .school-list .item .span span{padding:0 10px; border-right:1px solid;}
+        .school .school-list .item .span span:first-child{padding-left:0;}
+        .school .school-list .item .span span:last-child{border-right:none;}
+        .school .school-list .item .more{display:inline-block; height:20px; line-height:20px; padding:0 14px 0 10px; background:url(../image/common/more.png) no-repeat right center; background-size:12px 12px;}
+        .school .show-school .openall{height:26px; line-height:26px;}
+
+        .hotlabels .labels .label{margin:0 8px; display:block; position:relative; line-height:1;}
+        .hotlabels .labels .label.active{font-size:14px; color:#333333;}
+        .hotlabels .labels .label.active:after{content:" "; position:absolute; top:100%; left:0; right:0; margin:3px auto 0; width:16px; height:6px; background:url(../image/instantly/active.png) no-repeat center center; background-size:100% 100%;}
+
+        .zixunlist .item{padding:14px 0; border-bottom:1px solid #dddddd;}
+        .zixunlist .item:last-child{border:none;}
+        .zixunlist .item .icon{display:block; margin-right:14px; width:40px; height:40px; border-radius:50%; background:#f6f7f8;}
+        .zixunlist .item .fen{padding-left:26px; line-height:14px; background:url(../../image/information/save_act.png) no-repeat 10px center; background-size:12px 12px;}
+
+    </style>
+</head>
+<body>
+    <!-- 未登录 -->
+    <div id="nologin" class="nologin hide">
+        <div class="df df-c ai-c">
+            <button class="com-button info-btn fs-14 b c-ff">填写基本信息</button>
+            <div class="editnotice mt-16 fs-12 c-99">编辑您的信息，我们将即刻为您提供精准教育服务</div>
+        </div>
+    </div>
+    <!-- 登录 -->
+    <div id="infobox" class="infobox svip df ai-c">
+        <div class="icon-border">
+            <img src="../image/index/type1.png" class="icon" />
+        </div>
+        <div class="fc infodetail df df-c just-c-ct">
+            <div class="name df ai-c">
+                <span class="b">花道常</span>
+                <div class="vipicon"></div>
+            </div>
+            <div class="tabs">
+                <span>18岁</span>
+                <span>高考</span>
+                <span>高考</span>
+            </div>
+        </div>
+        <img src="../image/instantly/edit.png" class="edit" alt="" onclick="openBaseInfo()" />
+    </div>
+    <div class="cont">
+        <!-- 理想院校 -->
+        <div id="school" class="school com-box">
+            <div class="com-title school-title fs-14 b">理想院校</div>
+            <div class="unlock df df-c ai-c hide">
+                <div class="df ai-c">
+                    <img src="../image/instantly/scrollicon.png" style="width:16px; margin-right:6px;" />
+                    <span class="fs-16 c-33 b">解锁院校</span>
+                </div>
+                <div class="mt-10 fs-12 c-66">根据您的成绩，为您筛选出18所理想院校</div>
+                <button class="mt-30 btn com-button red-btn fs-14 c-ff">立即解锁</button>
+            </div>
+            <div class="show-school">
+                <div id="school-list" class="school-list" onclick="openSchool()">
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                    <div class="item df ai-c">
+                        <img src="../image/index/type1.png" class="img" alt="" />
+                        <div class="fc">
+                            <div class="one-hide fs-14">山西工程职业技术学院</div>
+                            <div class="span mt-6 c-aa fs-12">
+                                <span>134次咨询</span>
+                                <span>121粉丝</span>
+                            </div>
+                        </div>
+                        <div class="more">查看</div>
+                    </div>
+                </div>
+                <div id="openAllBtn" onclick="openSchool()" class="openall mt-10 fs-14 c-99 txt-c">展开全部</div>
+            </div>
+        </div>
+        <!-- 资讯专家 -->
+        <div class="zixun com-box mt-16">
+            <div class="com-title df just-c-bet ai-c">
+                <span class="zixun-title fs-16 c-33 b">资讯专家</span>
+                <span tapmode="touch-style" class="fs-12 c-77 more" onclick="openExpertList()">更多</span>
+            </div>
+            <div class="zixunlist itembox fs-12">
+                <div class="item df" onclick="openExpert()">
+                    <img src="../image/index/type1.png" class="icon" />
+                    <div class="fc">
+                        <div class="df ai-c just-c-bet">
+                            <span class="fs-14 c-33 b">独角兽</span>
+                            <button class="com-button bei-btn c-red b">99资讯</button>
+                        </div>
+                        <div class="mt-6 df ai-c fs-12">
+                            <span class="c-aa">111次咨询</span>
+                            <span class="fen c-yellow">4.9</span>
+                        </div>
+                        <div class="mt-6 one-hide">山西师范大学毕业，讲师职称，CCTV（高级职称特级称特级）</div>
+                    </div>
+                </div>
+                <div class="item df">
+                    <img src="../image/index/type1.png" class="icon" />
+                    <div class="fc">
+                        <div class="df ai-c just-c-bet">
+                            <span class="fs-14 c-33 b">独角兽</span>
+                            <button class="com-button bei-btn c-red b">99资讯</button>
+                        </div>
+                        <div class="mt-6 df ai-c fs-12">
+                            <span class="c-aa">111次咨询</span>
+                            <span class="fen c-yellow">4.9</span>
+                        </div>
+                        <div class="mt-6 one-hide">山西师范大学毕业，讲师职称，CCTV（高级职称特级称特级）</div>
+                    </div>
+                </div>
+                <div class="item df">
+                    <img src="../image/index/type1.png" class="icon" />
+                    <div class="fc">
+                        <div class="df ai-c just-c-bet">
+                            <span class="fs-14 c-33 b">独角兽</span>
+                            <button class="com-button bei-btn c-red b">99资讯</button>
+                        </div>
+                        <div class="mt-6 df ai-c fs-12">
+                            <span class="c-aa">111次咨询</span>
+                            <span class="fen c-yellow">4.9</span>
+                        </div>
+                        <div class="mt-6 one-hide">山西师范大学毕业，讲师职称，CCTV（高级职称特级称特级）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 关心的问题 -->
+        <div class="question com-box mt-16">
+            <div class="com-title df just-c-bet ai-c">
+                <span class="care-title fs-16 c-33 b">你关心的问题</span>
+                <span class="fs-12 c-77 more" tapmode="touch-style">更多</span>
+            </div>
+            <div class="itembox fs-12" onclick="openListen()">
+                <div class="item df df-c just-c-bet mt-12">
+                    <div class="title two-hide">今年新高考模式，成绩385分数，我理科分数比较，英语只有20分，我应该这么选择专业呢？</div>
+                    <div class="df ai-c just-c-bet">
+                        <span class="fs-12 c-aa">1234人旁听</span>
+                        <div class="listen c-red b">旁听</div>
+                    </div>
+                </div>
+                <div class="item df df-c just-c-bet mt-12">
+                    <div class="title two-hide">今年新高考模式，成绩385分数，我理科分数比较，英语只有20分，我应该这么选择专业呢？</div>
+                    <div class="df ai-c just-c-bet">
+                        <span class="fs-12 c-aa">1234人旁听</span>
+                        <div class="listen c-red b bei">100旁听</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 热门资讯 刊物 -->
+        <div id="hotlabels" class="hotlabels com-box">
+            <div class="labels com-title hot-title df ai-c fs-12 c-99">
+                <span class="label active" onclick="hotLabel(this,'list1')">热门资讯</span>
+                <span class="label" onclick="hotLabel(this,'list2')">课程刊物</span>
+            </div>
+            <!-- 资讯 -->
+            <div class="newslist list list1 mt-10 fs-14 c-33">
+                <div class="news type1 df">
+                    <div class="df df-c just-c-bet f1">
+                        <div class="two-hide">今年新高考模式，成绩385分数我理科分数？</div>
+                        <div class="df ai-c">
+                            <span class="hot">热门</span>
+                            <span class="fs-12 c-aa">17小时前 《山西教育》编辑部</span>
+                        </div>
+                    </div>
+                    <img src="../image/index/type1.png" class="img" alt="" />
+                </div>
+                <div class="news type2">
+                    <div class="one-hide">今年新高考模式，成绩385分数我理科分数？</div>
+                    <div class="df mt-6">
+                        <img src="../image/index/type1.png" class="img fc" alt="" />
+                        <img src="../image/index/type2.png" class="img fc" alt="" />
+                        <img src="../image/index/type3.png" class="img fc" alt="" />
+                    </div>
+                    <div class="df ai-c mt-6">
+                        <span class="hot">热门</span>
+                        <span class="fs-12 c-aa">17小时前 《山西教育》编辑部</span>
+                    </div>
+                </div>
+                <div class="news type3">
+                    <div class="two-hide">今年新高考模式，成绩385分数我理科分数？</div>
+                    <img src="../image/index/type1.png" class="img mt-6" alt="" />
+                    <div class="df ai-c mt-6">
+                        <span class="hot">热门</span>
+                        <span class="fs-12 c-aa">17小时前 《山西教育》编辑部</span>
+                    </div>
+                </div>
+            </div>
+            <!-- 刊物 -->
+            <div class="kanwulist list list2 mt-16">
+                <div class="kanwu df">
+                    <img src="../image/index/type1.png" class="img" />
+                    <div class="txts f1 df df-c just-c-bet">
+                        <div>
+                            <div class="one-hide fs-16 b">山西教育《一往无前》</div>
+                            <div class="mt-10 three-hide c-99 fs-12">杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等</div>
+                        </div>
+                        <div class="df ai-c just-c-bet">
+                            <span class="tab c-aa fs-10"><span>2人购买</span><span>2323人查看</span></span>
+                            <button class="com-button read-btn fs-12 b c-red">试读</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="kanwu df">
+                    <img src="../image/index/type1.png" class="img" />
+                    <div class="txts f1 df df-c just-c-bet">
+                        <div>
+                            <div class="one-hide fs-16 b">山西教育《一往无前》</div>
+                            <div class="mt-10 three-hide c-99 fs-12">杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等</div>
+                        </div>
+                        <div class="df ai-c just-c-bet">
+                            <span class="tab c-aa fs-10"><span>2人购买</span><span>2323人查看</span></span>
+                            <button class="com-button read-btn fs-12 b c-red">试读</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end 热门资讯 刊物 -->
+    </div>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/zepto.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript">
+apiready = function(){
+    setEvent();
+    api.sendEvent({name: 'instantlyTestLogin'});
+    api.execScript({ name: 'root', script: 'setHeader2("svip")'});
+}
+
+function setEvent(){
+    api.addEventListener({name: 'instantlyTestLogin'}, function(){
+
+    });
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        setTimeout(function(){
+            api.refreshHeaderLoadDone();
+        },1500)
+    });
+}
+
+function openSchool(){
+    var list = $api.byId("school-list");
+    var btn = $api.byId("openAllBtn");
+    var hasOpen = $api.hasCls(list, 'open');
+    $api[hasOpen?'removeCls':'addCls'](list, 'open');
+    $api.html(btn,hasOpen?"展开全部":"收起");
+    window.scrollTo(0,0);
+}
+
+function hotLabel(el,ls){
+    var ts = $(el);
+    ts.addClass("active").siblings().removeClass("active");
+    ts.parent().children("."+ls).removeClass("hide").siblings().addClass("hide");
+}
+
+function openBaseInfo(){
+    myApp.openWin({
+        title: "信息",
+        url: "/html/instantly/base_info.html"
+    })
+}
+
+function openSchool(){
+    myApp.openWin({
+        url: "/html/consult/school_main.html",
+        hideHead: true
+    })
+}
+function openExpertList(){
+}
+function openExpert(uid){
+    api.openWin({
+        name: 'expert_detail',
+        url: './consult/expert_detail.html',
+        pageParam: {uid:uid}
+    });
+}
+function openListen(){
+    myApp.openWin({
+        title: "旁听",
+         needLogin:true,
+        url: "/html/consult/listen.html"
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="format-detection" content="telephone=no" />
+	<title>学生</title>
+	<link rel="stylesheet" href="../../css/api.css">
+	<link rel="stylesheet" href="../../css/style.css">
+    <style>
+        html,body{background:rgba(0,0,0,1);}
+        .btns{position:fixed; bottom:0; left:0; right:0;}
+        .btns .btn{height:100px; min-width:64px;}
+        .btns .btn .img{display:block; width:56px; height:56px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="header"></div>
+    <div class="btns df just-c-aro fs-14 c-ff">
+        <div id="btn1" class="btn fc df df-c ai-c">
+            <img src="../../image/rong/call3.png" class="img" onclick="chengeCamera()"/>
+            <div class="mt-10">转换摄像头</div>
+        </div>
+        <div id="btn2" class="btn fc df df-c ai-c">
+            <img src="../../image/rong/call2.png" class="img" onclick="" />
+        </div>
+        <div id="btn4" class="btn fc df df-c ai-c">
+            <img src="../../image/rong/call6.png" class="img" onclick="setMuted()" />
+            <div class="mt-10">静音</div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/rong.js"></script>
+<script>
+var jtTime = 0;
+
+var sound = true;
+var miantibtn = true;
+apiready = function(){
+    var header = $api.byId('header');
+    var headerH = $api.fixStatusBar(header);
+    setEvent();
+}
+function setEvent(){
+    RY.init();
+    RY.startCall(api.pageParam.ryid, api.pageParam.media, api.pageParam.yyid);
+
+    api.addEventListener({name: 'ronghangup'}, function(ret, err){
+        api.toast({msg: '通话结束',global:true});
+        api.closeWin();
+    });
+    api.addEventListener({name: 'rongacceptok'}, function(ret, err){
+        if( !ret ){api.toast({msg:JSON.stringify( err ), global:true});return}
+        jtTime = Date.now();
+        if(api.pageParam.media=='audio'){return}
+        RY.rong.setVideoView({
+            userId: api.pageParam.uid,
+            renderModel: 'adaptive',
+            bg:'#fff',
+            fixed: true
+        });
+        RY.rong.setVideoView({
+            userId: RY.uinfo.userId,
+            rect: {x:api.frameWidth-110, y:10, w:100, h:150},
+            renderModel: 'adaptive',
+            bg:'#fff',
+            fixed: true
+        });
+    });
+}
+// 挂断
+function off(){RY.rong.hangup()}
+// 静音
+function setMuted(){
+    RY.rong.setMuted({muted:sound},function(ret){ret.status && $("#btn4 .img").attr("src","../../image/rong/"+(sound?"call5.png":"call4.png"))});
+    sound = !sound;
+}
+// 切换摄像头
+function changeCamera(){rong.switchCameraMode(function(ret){ret.status && api.toast({msg:"切换成功"})})}
+</script>
+</html>

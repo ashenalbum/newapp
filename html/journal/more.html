@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/swiper.min.css" />
+	<style>
+        body{box-sizing:border-box; padding:50px 10px 10px; background:#f6f7f8;}
+        .menu{position:relative; height:36px; position:fixed; top:0; left:0; right:0; padding:4px 10px; background:#f6f7f8;}
+        .menu .swiper-slide{position:relative; z-index:2; width:auto; height:36px; line-height:36px; padding:0 16px;}
+        .menu .swiper-slide.active{font-weight:bold; color:#333333;}
+        .menu .i{position:absolute; left:0; bottom:1px; width:0; height:6px; background:url(../../image/instantly/active.png) no-repeat center bottom; background-size: 16px 6px; transition:left 0.3s;}
+    </style>
+</head>
+<body class="df df-c">
+    <!-- 分类 -->
+    <div id="menu" class="menu">
+        <div id="menuswiper" class="swiper-container">
+            <div class="swiper-wrapper fs-14 c-99"></div>
+        </div>
+    </div>
+    <div id="kwlist" class="kanwulist com-box"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script type="text/javascript">
+var searchId = null;
+var page = 1;
+var loading = false;
+var over = false;
+var dataList = [];
+var ul = $("#kwlist");
+var loadmore = $("#loadmore");
+var menuswiperSwiper = null;
+
+apiready = function(){
+    searchId = api.pageParam.id;
+    setEvent();
+    getData();
+}
+
+function setEvent(){
+    api.addEventListener({name: 'loginok'}, function(){getData()});
+
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getList();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        getData();
+    });
+
+    $("#menu").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        if(ts.hasClass("active")){return}
+        if(loading){api.toast({msg:"加载中，莫着急"});return}
+        menuswiperSwiper && menuswiperSwiper.slideTo(ts.index(),360,false);
+        ts.addClass("active").siblings().removeClass("active");
+
+        var left = ts.get(0).offsetLeft;
+        var width = ts.width();
+        ts.siblings(".i").css({left:left, width:width});
+
+        searchId = ts.data("id");
+        page = 1;
+        over = false;
+        getList();
+    });
+}
+
+function getData(){
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/baokancat",
+        method: "get",
+        loading: false,
+        success(data){
+            api.refreshHeaderLoadDone();
+            if(data.errcode!=200 && data.errcode!=0){return}
+            setMenu(data.data);
+        },
+        error(){api.refreshHeaderLoadDone();},
+    });
+}
+// 菜单
+function setMenu(arr){
+    $api[arr.length?'removeCls':'addCls']($api.byId('menu'),'hide');
+    if(!arr.length){return false}
+    var wrap = $("#menuswiper .swiper-wrapper").empty();
+    for(var i in arr){
+        wrap.append('<div class="swiper-slide '+(i=='0'?'active':'')+'" data-id="'+ arr[i].catid +'">'+ myApp.htmlEscape(arr[i].name) +'</div>');
+    }
+    wrap.append('<div class="i"></div>');
+    if(menuswiperSwiper){menuswiperSwiper.destroy(false)}
+    menuswiperSwiper = new Swiper('#menuswiper', {slidesPerView :'auto'});
+    var active = wrap.children('[data-id="'+ searchId+'"]');
+    if(searchId && active.length){
+        active.addClass("active").siblings().removeClass("active");
+        menuswiperSwiper.slideTo(active.index(),false,false);
+    }else{
+        searchId = arr[0].catid;
+    }
+
+    var ts = wrap.children(".swiper-slide.active");
+    var left = ts.get(0).offsetLeft;
+    var width = ts.width();
+    ts.siblings(".i").css({left:left, width:width});
+
+    getList();
+}
+// 获取列表
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/baokanlist",
+        method: "get",
+        loading: false,
+        data: {page:page, catid:searchId},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            ul[dataList.length?'removeClass':'addClass']("hide");
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var obj = data.list[i];
+                ul.append('<div class="kanwu df" onclick="openDetail('+ obj.id +')">'+
+                    '<img src="'+ obj.zimg +'" class="img" />'+
+                    '<div class="txts f1 df df-c just-c-bet">'+
+                        '<div>'+
+                            '<div class="one-hide fs-16 b">'+ obj.ztitle +'</div>'+
+                            '<div class="mt-10 three-hide c-66 fs-12">'+ obj.zshuoming +'</div>'+
+                        '</div>'+
+                        '<div class="df ai-c just-c-bet">'+
+                            '<span class="tab c-aa fs-12"><span>'+ obj.zlooknum +'人查看</span></span>'+
+                            '<button class="com-button read-btn fs-12 b c-red">'+ (obj.yuedu==1?"试读":"继续阅读") +'</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>');
+            }
+        }
+    })
+}
+// 报刊详情
+function openDetail(id){myApp.openWin({title:"报刊介绍", url: "/html/journal/detail.html", headColor: "#E8DAD5", pageParam:{id:id}})}
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/mobileSelect.css" />
+	<style>
+        body{box-sizing:border-box;}
+        .form{padding:0 16px;}
+        .form .input{box-sizing:border-box; padding:0 14px; width:100%; height:36px; line-height:36px; border:1px solid #979797; border-radius:2px;}
+        .form .input::-webkit-input-placeholder,
+        .form .select{color:#999999;}
+        .form .select::after{content: " "; width:22px; height:22px; position:absolute; right:6px; top:0; bottom:0; margin:auto; background:url(../../image/common/sel.png) no-repeat center center; background-size:100% 100%;}
+        .form .select.active{color:#333333;}
+        .form .label-box .label{display:inline-block; box-sizing:border-box; margin:0 10px 10px 0; white-space:nowrap; height:30px; line-height:30px; padding:0 14px; border:1px solid; border-radius:4px;}
+        .form .label-box input[type='checkbox']:checked~.label{color:#FF3942; background:#FFE2E3;}
+
+        .btn-box{height:50px; padding:0 16px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+
+    </style>
+</head>
+<body class="df df-c">
+    <form class="form df df-c">
+        <div class="fs-16 mt-10">您的姓名</div>
+        <input id="name" type="text" class="input mt-10" placeholder="请输入您的姓名" />
+        <div class="fs-16 mt-10">您的年龄</div>
+        <input id="age" type="number" class="input mt-10" placeholder="请输入您的年龄" />
+        <div class="fs-16 mt-10">您的身份</div>
+        <div id="picker" class="input pr mt-10 select">请选择您的身份</div>
+        <div class="fs-16 mt-10">关注内容（多选）</div>
+        <div id="labelbox" class="mt-10 label-box fs-14 c-99 df df-w-w">
+            <label>
+                <input type="checkbox" name="label" value="'+ labelArr[j].id +'" class="hide" />
+                <span class="label">幼教</span>
+            </label>
+        </div>
+    </form>
+    <div class="btn-box df ai-c mt-20">
+        <button class="com-button submit fs-14 c-ff" onclick="submit()">确认提交</button>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/mobileSelect.min.js"></script>
+<script type="text/javascript">
+var dataArr = [];
+var sfId = null;
+var sfPicker = null;
+apiready = function(){
+    $api.fixTabBar(document.body);
+    setEvent();
+    getData();
+}
+
+function setEvent(){}
+function getData(){
+    myApp.ajax({
+        url: "/api/member/member/obtain",
+        method: "get",
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            dataArr = data.data;
+            if(!sfPicker){
+                var sfArr = [];
+                for(var i=0; i<dataArr.length; i++){
+                    var o = dataArr[i];
+                    sfArr.push({id:o.id, value:o.title});
+                }
+                sfPicker = new MobileSelect({
+                    trigger: '#picker',
+                    title: '选择身份',
+                    wheels: [{data:sfArr}],
+                    callback:function(indexArr, data){
+                        if(data.id == sfId){return}
+                        $('#picker').addClass('active');
+                        sfId = data.id;
+                        setLabels();
+                    }
+                });
+            }
+            getFormData();
+        },
+        error(e){console.log(JSON.stringify(e))}
+    })
+}
+// 添加label
+function setLabels(){
+    var labelArr = [];
+    for(var i in dataArr){
+        if(dataArr[i].id != sfId){continue}
+        labelArr = dataArr[i].sun;
+        break;
+    }
+    var labelBox = $("#labelbox").empty();
+    for(var j in labelArr){
+        labelBox.append('<label>'+
+            '<input type="checkbox" name="label" value="'+ labelArr[j].id +'" class="hide" />'+
+            '<span class="label fs-14">'+ myApp.htmlEscape(labelArr[j].name) +'</span>'+
+        '</label>');
+    }
+}
+// 提交
+function submit(){
+    var name = $("#name").val();
+    var age = $("#age").val();
+    var sf = sfId;
+    var gzrn = [];
+    $("#labelbox input[type='checkbox']:checked").forEach(function(dom){gzrn.push(dom.value)});
+
+    myApp.ajax({
+        url: "/api/member/member/meset",
+        method: "post",
+        data: {name:name, age:age, sf:sf, gzrn:gzrn},
+        success(data){
+            console.log(JSON.stringify(data))
+            if(data.errcode!=0 && data.errcode!=200){return}
+        },
+        error(e){
+            console.log(JSON.stringify(e))
+        }
+    })
+}
+// 填充
+function getFormData(){
+    myApp.ajax({
+        url: "/api/member/member/getmeset",
+        method: "post",
+        success(data){
+            console.log(JSON.stringify(data))
+        }
+    })
+}
+</script>
+</html>

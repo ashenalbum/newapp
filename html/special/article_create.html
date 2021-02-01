@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+	<style>
+        body{box-sizing:border-box; padding:50px 10px 10px; background:#ffffff;}
+        #header{position:fixed; top:0; left:0; right:0; height:40px;}
+        #header .back{padding:10px; width:20px; height:20px;}
+        #header .title{margin-right:40px; text-align:center;}
+        #header.hideBack .back{display:none;}
+        #header.hideBack .title{margin-left:50px;}
+        #header.hideHead{height:0; overflow:hidden;}
+        #header.hideHead>*{display:none;}
+        #header .operation{height:40px; line-height:40px; padding:0 10px; position:absolute; right:0; bottom:0;}
+        .title-box{border:1px solid #f1f1f1; border-radius:4px;}
+        .title-box .title-ipt{display:block; box-sizing:border-box; padding:0 10px; width:100%; height:48px; line-height:50px;}
+        .cont{box-sizing:border-box; min-height:400px; padding:16px 10px; border:1px solid #f1f1f1; border-radius:4px;}
+    </style>
+</head>
+<body class="df df-c">
+    <header id="header" class="header fs-20 c-33 df ai-c">
+        <img src="../../image/common/back.png" class="back" onclick="api.closeWin()" />
+        <div class="fc title fs-16 one-hide">撰写文章</div>
+        <div class="operation fs-14 c-red b" onclick="next()">下一步</div>
+    </header>
+    <div class="title-box">
+        <input id="titleipt" type="text" class="title-ipt fs-14" placeholder="请输入文章标题" />
+    </div>
+    <div id="cont" class="cont mt-10"></div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.1.7.js"></script>
+<script type="text/javascript" src="../../script/eleditor/eleditor.js"></script>
+<script type="text/javascript">
+var artEditor = null;
+var udata = myApp.getUserData();
+var editObj = null;
+var saveStorageName = udata.uinfo.uid+"_save_article";
+apiready = function(){
+    var contHeight = api.frameHeight - 120;
+    $("#cont").css({minHeight:contHeight+'px'});
+    init();
+}
+function init(){
+    artEditor = new Eleditor({
+		el: '#cont',
+        uploader: function(){
+            return new Promise(function(_resolve, _reject){
+                myApp.upImg(false, function(src){
+                    _resolve(src);
+                }, function(){
+                    _reject("error");
+                });
+            })
+        },
+        changer: function(){
+            if(api.pageParam.edit){return}
+            var title = $("#titleipt").val();
+            var cont = artEditor.getContent();
+            $api.setStorage(saveStorageName, JSON.stringify({title:title, cont:cont}));
+        }
+	});
+
+    if(api.pageParam.edit){
+        myApp.ajax({
+            url: "/api/news/home/show",
+            method: 'get',
+            data: {id: api.pageParam.id},
+            success(data){
+                if(data.errcode!=0 && data.errcode!=200){return}
+                editObj = data.data;
+                $("#titleipt").val(editObj.title);
+                artEditor.append(editObj.content);
+            }
+        });
+    } else {
+        var getSave = $api.getStorage(saveStorageName);
+        if(getSave){
+            var o = JSON.parse(getSave);
+            $("#titleipt").val(o.title);
+            artEditor.append(o.cont);
+        }
+    }
+}
+function next(){
+    var titleipt = $("#titleipt");
+    var title = titleipt.val();
+    var html = artEditor.getContent();
+    if(!title){api.toast({msg:"请输入文章标题"}); titleipt.focus(); return}
+    if(!html){api.toast({msg:"请编辑文章内容"}); return}
+    myApp.openWin({title:"撰写文章", url:"/html/special/article_set.html", pageParam:{title:title, html:html, edit:api.pageParam && api.pageParam.edit, editObj:editObj}});
+}
+</script>
+</body>
+</html>

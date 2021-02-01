@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/input.css"/>
+    <style>
+        body{box-sizing:border-box; padding:50px 10px 10px; background:#ffffff;}
+        .fw-i{font-weight:lighter;}
+        #header{position:fixed; top:0; left:0; right:0; height:40px;}
+        #header .back{padding:10px; width:20px; height:20px;}
+        #header .title{margin-right:64px; text-align:center;}
+        #header.hideBack .back{display:none;}
+        #header.hideBack .title{margin-left:50px;}
+        #header.hideHead{height:0; overflow:hidden;}
+        #header.hideHead>*{display:none;}
+        #header .operation{height:28px; line-height:28px; padding:0 10px; position:absolute; right:5px; bottom:5px; background:#FF3942; border-radius:4px;}
+        .cont .textarea{box-sizing:border-box; width:100%; padding:16px 10px; resize:none; background:#f6f7f8; border-radius:6px;}
+        .cont .upimg{box-sizing:border-box; margin:0 20px 12px 0; width:96px; height:60px; border:1px dashed; border-radius:2px; overflow:hidden;}
+        .cont .upimg-box{position:relative; width:96px; height:60px; margin:0 20px 12px 0; background:#f6f7f8;}
+        .cont .upimg-box img{display:block; width:100%; height:100%; border-radius:2px;}
+        .cont .upimg-box .close{position:absolute; top:-8px; right:-10px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.5) url(../../image/common/close.png) no-repeat center center; background-size:16px 16px;}
+        .cont label{padding:6px; border-radius:4px;}
+        .cont .iconfont::before{color:#FF3942!important; margin-right:6px;}
+
+        .btn-box{height:50px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body class="df df-c">
+    <header id="header" class="header fs-20 c-33 df ai-c">
+        <img src="../../image/common/back.png" class="back" onclick="api.closeWin()" />
+        <div class="fc title fs-16 one-hide">发起咨询</div>
+        <div class="operation fs-14 c-ff b" onclick="submit()">发布</div>
+    </header>
+    <div class="cont df df-c">
+        <textarea id="textarea" class="textarea" rows="8" placeholder="请输入问题描述"></textarea>
+        <div class="mt-20 fs-16 b">上传图片<span class="fs-12 c-99 fw-i">（最多三张）</span></div>
+        <div id="upimgbox" class="mt-16 df df-w-w">
+            <div class="upimg fs-12 c-99 df df-c ai-c just-c-ct" tapmode="touch-style">
+                <span class="fs-30 lh-1">+</span>
+                <span>添加图片</span>
+            </div>
+        </div>
+        <label class="public df ai-c mt-10" tapmode="touch-style">
+            <input id="ishide" type="checkbox" checked class="ipt-radio" name="ishide" />
+            <span class="iconfont"></span>
+            <span class="fs-14 c-99">公开咨询</span>
+        </label>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var imgArr = [];
+apiready = function(){
+    setEvent();
+    init();
+}
+function setEvent(){
+    $("#upimgbox").on("click",".upimg-box .close",function(){
+        var ts = $(this).parents(".upimg-box");
+        var index = ts.index();
+        myApp.confirm({
+            title: "提示",
+            content: "确定删除该图片吗?",
+            callback(btnIndex){
+                if(btnIndex!=1){return}
+                ts.remove();
+                imgArr.splice(index,1);
+                var upimg = $("#upimgbox .upimg")
+                if(imgArr.length<3 && upimg.hasClass("hide")){upimg.removeClass("hide")}
+            }
+        });
+    }).find(".upimg").on("click",function(){
+        if(imgArr.length>=3){return}
+        var ts = $(this);
+        myApp.upImg(false,function(src){
+            imgArr.push(src);
+            ts.before('<div class="upimg-box">'+
+                '<img src="'+ src +'" alt="" />'+
+                '<i class="close"></i>'+
+            '</div>');
+            if(imgArr.length>=3){ts.addClass("hide")}
+        });
+    });
+}
+function init(){
+    api.pageParam.name && $("#header .title").text("咨询 - "+api.pageParam.name);
+}
+function submit(){
+    var val = $("#textarea").val();
+    if(!val){api.toast({msg:"请输入问题描述"});return}
+    var ishide = $("#ishide").is(":checked");
+    var url = api.pageParam.type=="school"?"/api/zixun/schoolmem/adddayimsg":"/api/zixun/zhuanjiamem/adddayizjorder";
+    myApp.ajax({
+        url: url,
+        method: "post",
+        data: {data:{content:val, images:imgArr.join(), ishide:ishide?1:0, id:api.pageParam.id, uid:api.pageParam.uid}},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(api.pageParam.type=="school" || !data.data || !data.data.id){
+                api.toast({msg:'发布成功,请耐心等待回复！', duration:3000, global:true});
+                api.closeWin();
+                return
+            }
+            var order = data.data.id;
+            myApp.inputPayPwd(function(pwd){
+                myApp.ajax({
+                    url: "/api/member/member/payorder",
+                    method: "get",
+                    data: {id:order, paypwd:pwd},
+                    success(data){
+                        if(data.errcode!=0 && data.errcode!=200){return}
+                        api.toast({msg: '发布成功'});
+                    }
+                });
+            },api.pageParam.money?"需支付"+api.pageParam.money+"教育贝":false);
+        },
+        error(e){console.log(JSON.stringify(e))}
+    });
+}
+</script>
+</body>
+</html>

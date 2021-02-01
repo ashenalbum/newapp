@@ -1,0 +1,401 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/mobileSelect.css" />
+	<style>
+        body{box-sizing:border-box; padding:0 10px 0; background:#f6f7f8;}
+
+        .topbg{position:absolute; z-index:0; top:0; left:0; right:0; height:100px; background:#E8DAD5;}
+        .info{position:relative; z-index:1;}
+        .info .cover{display:block; width:100px; height:134px; margin-right:14px; border-radius:6px; background:#f6f7f8;}
+        .info .jianjie{height:32px; line-height:16px; overflow:auto;}
+        .info .save{padding:0 12px 0 24px; border-radius:14px; background:#FFB53B url(../../image/journal/save1.png) no-repeat 8px center; background-size:12px 12px;}
+        .info .save.active{background:#f6f7f8; color:#666666; padding:0 12px;}
+        .info .data{background:#f6f7f8; border-radius:6px; padding:8px 0;}
+        .info .data>.fc{position:relative; padding:0 2px;}
+        .info .data>.fc::after{content:" "; position:absolute; right:-1px; height:24px; width:1px; background:#A4ABAF; top:0; bottom:0; margin:auto;}
+        .info .data>.fc:last-child::after{display:none;}
+
+        .btn-box{margin-bottom:10px;}
+        .btn-box .com-button{width:100%; height:46px; border-radius:10px; background:#FF3942; }
+        .btn-box .com-button .bei{width:20px; height:20px; margin-right:4px;}
+
+        .labels.com-title{height:26px; line-height:26px; position:relative;}
+        .labels .label{position:relative; z-index:2; display:block; width:80px; text-align:center;}
+        .labels .label.active{color:#333333;}
+        .labels .i{position:absolute; bottom:-2px; left:0; width:80px; height:6px; background:url(../../image/instantly/active.png) no-repeat center center; background-size:16px 100%; transition:left 0.3s;}
+        .labels .jianjie.active~.i{left:0;}
+        .labels .qikan.active~.i{left:80px;}
+
+        .sel-year{height:26px; line-height:26px; padding:0 20px 0 10px; background:url(../../image/common/sel_b.png) no-repeat right center; background-size:16px 16px;}
+
+        .detail{margin-bottom:10px;}
+        .detail .content{position:relative; min-height:300px;}
+        .detail .content .scroll{position:absolute; top:0; left:0; right:0; bottom:0; overflow:auto;}
+        .detail .html{font-size:14px; line-height:24px;}
+        .detail .mulu .li{padding:8px 0 8px 4px;}
+        .detail .mulu .li .num{box-sizing:border-box; width:64px; padding-right:10px;}
+        .detail .mulu .li.line{border-bottom:1px solid #EEEEEE;}
+        .detail .mulu .li .lock{display:block; width:18px; height:18px; padding:4px; background:url(../../image/journal/lock.png) no-repeat center center; background-size:18px 18px;}
+        .detail .mulu .li.tobook .lock{display:none;}
+        .detail .mulu .li .tryread{padding:6px 8px; line-height:14px; background:#f6f7f8; border-radius:12px;}
+
+        .mask.animate .cont{animation:upshow 0.3s linear; -webkit-animation:upshow 0.3s linear;}
+        @keyframes upshow{0%{bottom:-120px;}100% {bottom:0;}}
+        @-webkit-keyframes upshow {0%{bottom:-120px;}100%{bottom:0;}}
+        .mask .cont{position:absolute; bottom:0; left:0; right:0; z-index:9; background:#ffffff; border-radius:10px 10px 0 0;}
+        .mask .cont .itm{position:relative; height:72px; margin:4px 0;}
+        .mask .cont .itm::after{content:" "; height:40px; width:1px; background:#e1e1e1; position:absolute; right:-1px; top:16px;}
+        .mask .cont .itm:last-child::after{display:none;}
+        .mask .cont .itm .img{display:block; width:36px; height:36px;}
+        .mask .cont .esc{height:54px; width:100%; border-top:1px solid #e1e1e1;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="topbg"></div>
+    <div class="com-box info mt-10">
+        <div id="info" class="df fs-12 c-33">
+            <img src="" alt="" class="fmimg cover" />
+            <div class="fc df df-c">
+                <div class="title fs-14"></div>
+                <div class="text fc jianjie c-99 mt-6"></div>
+                <div class="df ai-c just-c-bet mt-4">
+                    <span class="c-red"><span class="jiang"></span>讲 | <span class="price"></span>贝</span>
+                    <button type="button" class="com-button save c-ff fs-12">收藏</button>
+                </div>
+            </div>
+        </div>
+        <div id="data" class="data mt-16 fs-12 c-66 df">
+            <div class="fc df df-c ai-c">
+                <span>杂志类型</span>
+                <span class="leixing c-33 fs-10 b mt-4"></span>
+            </div>
+            <div class="fc df df-c ai-c">
+                <span>购买人数</span>
+                <span class="buy c-33 fs-10 b mt-4"></span>
+            </div>
+            <div class="fc df df-c ai-c">
+                <span>查看人数</span>
+                <span class="see c-33 fs-10 b mt-4"></span>
+            </div>
+            <div class="fc df df-c ai-c">
+                <span>发行日期</span>
+                <span class="date c-33 fs-10 b mt-4"></span>
+            </div>
+        </div>
+    </div>
+    <div id="detail" class="fc detail com-box mt-10 df df-c">
+        <div id="labels" class="df ai-c just-c-bet">
+            <div class="labels com-title df ai-c fs-14 c-99">
+                <span class="label jianjie active" tapmode="touch-style">报刊介绍</span>
+                <span class="label qikan" tapmode="touch-style">期刊</span>
+                <i class="i"></i>
+            </div>
+            <div id="selyear" class="sel-year hide"></div>
+        </div>
+
+        <div class="fc content mt-10">
+            <div class="scroll">
+                <div class="html"></div>
+                <div class="mulu fs-12 hide"></div>
+                <!-- 加载提示 -->
+                <div id="loadmore" class="load-more loading mt-6 df ai-c just-c-ct c-99 fs-14 hide">
+                    <img src="../../image/common/loading_more.gif" class="img" alt="" />
+                    <span class="loadtxt">加载中……</span>
+                    <span class="overtxt">没有更多数据了</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="btnbox" class="btn-box">
+        <button id="dybtn" class="com-button fs-14 c-ff df ai-c just-c-ct" onclick="dyAll()">
+            <img src="../../image/common/bei_w.png" class="bei" />
+            <span><span class="price"></span>订阅全刊</span>
+        </button>
+    </div>
+    <div id="mask" class="mask hide">
+        <div class="bg" onclick="closeMask()"></div>
+        <div class="cont">
+            <div class="df fs-12 c-66">
+                <div class="itm fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="fenxiang('session')">
+                    <img src="../../image/information/wx.png" alt="" class="img" />
+                    <div class="mt-6 lh-1">微信好友</div>
+                </div>
+                <div class="itm fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="fenxiang('timeline')">
+                    <img src="../../image/information/wx_pyq.png" alt="" class="img" />
+                    <div class="mt-6 lh-1">朋友圈</div>
+                </div>
+            </div>
+            <div class="esc df ai-c just-c-ct fs-16" onclick="closeMask()">取 消</div>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/mobileSelect.min.js"></script>
+<script type="text/javascript">
+var baseData = {};
+var searchYear = new Date().getFullYear();
+var page = 1;
+var loading = false;
+var over = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var selyear = $("#selyear");
+var yearPicker = null;
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({name: 'loginok'}, function(){getData()});
+    // 分享
+    api.execScript({name:api.winName, script: 'setTopBtn({img:"../../image/information/share.png", event:"journalShare"});'});
+    api.addEventListener({name: 'journalShare'}, share);
+    // 收藏
+    $("#info .save").on("click",setSave);
+    // 切换选项卡
+    $("#labels .jianjie").on("click",function(){
+        var ts = $(this);
+        var detail = $("#detail");
+        if(ts.hasClass("active")){return}
+        ts.addClass("active").siblings().removeClass("active");
+        detail.find(".html").removeClass("hide").siblings().addClass("hide");
+        selyear.addClass("hide");
+        detail.find(".scroll").scrollTop(0).unbind("scroll");
+    });
+    $("#labels .qikan").on("click",function(){
+        var ts = $(this);
+        var detail = $("#detail");
+        if(ts.hasClass("active")){return}
+        ts.addClass("active").siblings().removeClass("active");
+        detail.find(".mulu").removeClass("hide").siblings().addClass("hide");
+        selyear.removeClass("hide");
+        loadmore.removeClass("hide");
+        detail.find(".scroll").bind("scroll",function(e){
+            var ts = $(this);
+            var viewH = ts.height();//可见高度
+            var contentH = ts.get(0).scrollHeight;//内容高度
+            var scrollTop = ts.scrollTop();//滚动高度
+            if(contentH - viewH - scrollTop <= 10) {getList()}
+        });
+    });
+    // 点击期刊
+    $("#detail .mulu").on("click",".tobook",function(){
+        var ts = $(this);
+        toBook(ts.data('id'),ts.data('title'),ts.data('pid'));
+    }).on("click",".needpay",function(){
+        var ts = $(this);
+        // toBook(ts.data('id'),ts.data('title'),ts.data('pid'));
+        var money = ts.data("money");
+        myApp.confirm({
+            title: "此期刊未购买",
+            content: '要花费'+money+'教育贝购买此期刊吗',
+            callback(btnIndex){
+                if(btnIndex!=1){return}
+                dyQikan(ts);
+            }
+        });
+    });
+}
+
+function getData(){
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/baokandetails",
+        method: "get",
+        data: {id: api.pageParam.id},
+        success(data){
+            // console.log(JSON.stringify(data))
+            baseData = data.data;
+            api.refreshHeaderLoadDone();
+            if(data.errcode!=200 && data.errcode!=0){return}
+            var info = $("#info");
+            var doms = $("#data");
+            var detail = $("#detail");
+            info.find(".fmimg").attr("src",data.data.zimg);
+            info.find(".title").text(data.data.ztitle);
+            info.find(".text").text(data.data.zshuoming);
+            info.find(".jiang").html(data.data.num);
+            info.find(".price").html(data.data.zxprice);
+            doms.find(".leixing").html(data.data.catname);
+            doms.find(".buy").html(data.data.zbuynum);
+            doms.find(".see").html(data.data.zlooknum);
+            doms.find(".date").html(data.data.zaddtime);
+            detail.find(".html").html(data.data.zdescribe || '<div class="txt-c mt-30 c-99">暂无介绍</div>');
+            $("#dybtn .price").html(data.data.zxprice);
+            data.data.paysta==1 && $("#btnbox").addClass("hide");
+            if(data.data.scsta==1){
+                info.find(".save").html("已收藏").addClass("active")
+            }else{
+                info.find(".save").html("收藏").removeClass("active")
+            }
+            if(!data.data.year || data.data.year.length==0){return}
+            var years = [];
+            for(var i in data.data.year){years.push({id:data.data.year[i].year, value:data.data.year[i].year})}
+            searchYear = years[0].value;
+            selyear.html(years[0].value);
+            if(!yearPicker){
+                yearPicker = new MobileSelect({
+                    trigger: '#selyear',
+                    wheels: [{data:years}],
+                    callback(indexArr, data){
+                        if(data.id == searchYear){return}
+                        page = 1;
+                        over = false;
+                        searchYear = data.id;
+                        getList();
+                    }
+                });
+            }
+            page = 1;
+            getList();
+        }//,
+        // error(e){console.log(JSON.stringify(e))}
+    })
+}
+// 加载刊期
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zazhi/qikan/qikanlist",
+        method: "get",
+        loading: false,
+        data: {page:page, year:searchYear, id:api.pageParam.id},
+        success(data){
+            loading = false;
+            var ul = $("#detail .mulu");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.removeClass("load").addClass("over");
+            }
+            for(var i in data.list){
+                var obj = data.list[i];
+                ul.append('<div class="li line df ai-c '+ (obj.qstuct==1?'tobook':'needpay') +'" data-id="'+obj.id+'" data-title="'+ obj.qtitle +'" data-money="'+ obj.qmonery +'"  tapmode="touch-style">'+
+                    '<div class="df df-c fc">'+
+                        '<div class="two-hide">'+ obj.qtitle +'</div>'+
+                        '<div class="mt-6 c-99">'+ obj.qstart +'</div>'+
+                    '</div>'+
+                    (obj.qstuct==1?"":'<div class="lock fs-12 c-66"></div>')+
+                '</div>')
+            }
+            api.parseTapmode();
+            if(!over && dataList.length<30){getList()}
+        }
+    })
+}
+// 收藏
+function setSave(){
+    if(!myApp.login()){api.toast({msg:"请先登录账号",global:true});return}
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/baokansc",
+        method: "get",
+        data: {id: api.pageParam.id},
+        loading: false,
+        success(data){
+            if(data.errcode!=200 && data.errcode!=0){return}
+            if(data.scsta==1){
+                $("#info .save").html("已收藏").addClass("active");
+                api.toast({msg:"已收藏"});
+            }else{
+                $("#info .save").html("收藏").removeClass("active");
+                api.toast({msg:"已取消收藏"});
+            }
+        }
+    })
+}
+// 订阅期刊
+function dyQikan(dom){
+    var id = dom.data("id");
+    var money = dom.data("money");
+    subscribe(id,2,Number(money),function(){
+        dom.removeClass("needpay").addClass("tobook");
+    });
+}
+// 订阅全部
+function dyAll(){subscribe(baseData.id,1,Number(baseData.zxprice),getData)}
+// 订阅
+function subscribe(id,type,money,callback){
+    if(!myApp.login()){api.toast({msg:"请先登录账号",global:true});return}
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/addbaokanorder",
+        method: "get",
+        data:{id:id, type:type, money:money},
+        success(data){
+            if(data.errcode==201){setTimeout(openWallet,300)}
+            if(data.errcode!=200 && data.errcode!=0){return}
+            var orderId = data.data.id;
+            myApp.inputPayPwd(function(password){
+                myApp.ajax({
+                    url: "/api/member/member/payorder",
+                    method: "get",
+                    data: {id:orderId, paypwd:password},
+                    success(data){
+                        if(data.errcode!=200 && data.errcode!=0){return}
+                        api.toast({msg: '支付成功', global:true});
+                        api.sendEvent({name: 'moneyChange'});
+                        callback && callback();
+                    },
+                    error(){api.toast({msg:"请求发生错误，请稍候重试"})}
+                })
+            });
+        },
+        error(){api.toast({msg:"error"})}
+    })
+}
+// 分享
+function fenxiang(scene){
+    myApp.alert({content:"分享功能正在开发中"});
+    return
+    if(!fxdata){return}
+    var wxPlus = api.require('wxPlus');
+    wxPlus.isInstalled(function(ret, err) {
+        if (!ret.installed) {api.toast({msg:"请先安装微信"});return}
+        return
+        var name = fxdata.imgsrc.match(/^.*\/([^\/]+)$/)[1];
+        api.download({
+            url:fxdata.imgsrc,
+            savePath: 'fs://download/'+name,
+            report: true,
+            cache: true,
+            allowResume: true
+        },function(ret, err){
+            if(!ret || ret.state!=1){api.toast({msg:"error"});return}
+            // 分享测试 1049
+            wxPlus.shareWebpage({
+                scene: scene || 'session',
+                title: fxdata.title,
+                description: fxdata.message,
+                thumb: 'fs://download/'+name,
+                contentUrl: fxdata.url
+            }, function(ret, err) {
+                if (ret.status) {
+                    myApp.alert({content:"分享成功"});
+                } else {
+                    myApp.alert({content:err.code});
+                }
+            });
+        });
+    });
+}
+// 我的钱包
+function openWallet(){myApp.openWin({title:"我的钱包", needLogin:true, url:"/html/personal/wallet.html", headColor:"#f6f7f8"})}
+// 刊物阅读
+function toBook(id,title,pid){myApp.openWin({title:title, url:"/html/journal/book.html", pageParam:{id:id, pid:pid||0}})}
+// 显示分享
+function share(){$("#mask").removeClass("hide").addClass("animate")}
+function closeMask(){$("#mask").addClass("hide").removeClass("animate")}
+</script>
+</body>
+</html>

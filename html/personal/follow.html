@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8;}
+
+        .labels{position:fixed; z-index:1; top:0; left:0; right:0; background:#ffffff;}
+        .labels .label{position:relative; z-index:2; display:block; padding:20px 0; height:20px; line-height:20px;}
+        .labels .label.active{color:#333333; font-weight:bold;}
+        .labels .i{position:absolute; left:0; bottom:10px; width:50%; height:6px; background:url(../../image/instantly/active.png) no-repeat center bottom; background-size: 16px 6px; transition:left 0.3s;}
+        .labels .label1.active~.i{left:0;}
+        .labels .label2.active~.i{left:50%;}
+
+        .cont{margin-top:70px; padding:0 10px;}
+
+        .zixunlist .item{padding:14px 10px; margin-bottom:10px; background:#ffffff; border-radius:6px;}
+        .zixunlist .item:last-child{margin-bottom:0;}
+        .zixunlist .item .icon{display:block; margin-right:14px; width:40px; height:40px; border-radius:50%; background:#f6f7f8;}
+        .zixunlist .item .fen{padding-left:26px; line-height:14px; background:url(../../image/information/save_act.png) no-repeat 10px center; background-size:12px 12px;}
+
+        .school .item{padding:14px 10px; margin-bottom:10px; background:#ffffff; border-radius:6px;}
+        .school .item:last-child{margin-bottom:0;}
+        .school .item .icon{display:block; margin-right:14px; width:46px; height:46px; border-radius:50%; background:#f6f7f8;}
+        .school .label span{padding:0 10px; border-right:1px solid;}
+        .school .label span:first-child{padding-left:0;}
+        .school .label span:last-child{border:none;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="menu" class="labels txt-c df ai-c fs-16 c-99">
+        <span class="fc label label1 active" data-type="1">院校</span>
+        <span class="fc label label2" data-type="2">专家</span>
+        <span class="i"></span>
+    </div>
+    <div class="cont">
+        <!-- 学院 -->
+        <div id="school" class="school fs-12 hide"></div>
+        <!-- 专家 -->
+        <div id="expert" class="zixunlist itembox fs-12 hide"></div>
+    </div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var typeId = 1;
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var ul = $("#school").removeClass("hide").empty();
+var loadmore = $("#loadmore");
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        loading = false;
+        page = 1;
+        getData();
+    });
+    // 切换
+    $("#menu").on("click",".label",function(){
+        var ts = $(this);
+        if(ts.hasClass("active")){return}
+        typeId = ts.data('type');
+        ts.addClass("active").siblings().removeClass("active");
+        over = false;
+        loading = false;
+        page = 1;
+        if(typeId==1){
+            ul = $("#school").removeClass("hide").empty();
+        }else{
+            ul = $("#expert").removeClass("hide").empty();
+        }
+        getData();
+    });
+    $("#school").on("click",".item",function(){
+        var id = $(this).data("id");
+        myApp.openWin({hideAll:true, url:"/html/consult/school_main.html", pageParam:{id:id}})
+    });
+    $("#expert").on("click",".item",function(){
+        var ts = $(this);
+        myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{id:ts.data('id'), uid:ts.data('uid')}})
+    })
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    ul.siblings().addClass("hide");
+    myApp.ajax({
+        url: "/api/member/member/getfollowlist",
+        method: "get",
+        loading: false,
+        data: {page:page, type:typeId},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            var arr = data.list;
+            dataList = dataList.concat(arr || []);
+            if(!arr || arr.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in arr){
+                if(typeId==1){
+                    ul.append('<div class="item df ai-c" data-id="'+ arr[i].id +'">'+
+                        '<img src="'+ arr[i].logo +'" class="icon" />'+
+                        '<div class="fc df df-c">'+
+                            '<div class="fs-14 c-33 b one-hide">'+ arr[i].title +'</div>'+
+                            '<div class="label c-aa mt-6">'+
+                                '<span>'+ arr[i].dyznum +'次咨询</span>'+
+                                '<span>'+ arr[i].scnum +'粉丝</span>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>');
+                }else{
+                    ul.append('<div class="item df" data-id="'+ arr[i].id +'" data-uid="'+ arr[i].uid +'">'+
+                        '<img src="'+ arr[i].avatar +'" class="icon" />'+
+                        '<div class="fc">'+
+                            '<span class="fs-14 c-33 b">'+ myApp.htmlEscape(arr[i].name) +'</span>'+
+                            '<div class="mt-6 df ai-c fs-12">'+
+                                '<span class="c-aa">'+ arr[i].dyznum +'次咨询</span>'+
+                                '<span class="fen c-yellow">'+ (arr[i].pingfen=='0'?'<span class="fs-12">暂无评分</span>':arr[i].pingfen) +'</span>'+
+                            '</div>'+
+                            '<div class="mt-6 one-hide">'+ myApp.htmlEscape(arr[i].message) +'</div>'+
+                        '</div>'+
+                    '</div>');
+                }
+            }
+        },
+        error(e){
+            api.refreshHeaderLoadDone();
+            loadmore.removeClass("load").addClass("over");
+        }
+    })
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/input.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px 16px; background:#f6f7f8;}
+        .card{position:relative; height:140px; padding:0 30px; background:#FF3942; border-radius:10px; overflow:hidden;}
+        .card::before{content:" "; position:absolute; width:200px; height:200px; border-radius:50%; right:-30px; top:-80px; background:linear-gradient(rgba(255,255,255,1), rgba(255,255,255,0)); opacity:0.6;}
+        .card>*{position:relative; z-index:1;}
+        .card .bei{display:block; width:18px; height:18px; margin-right:14px;}
+        .card .num{margin-right:4px;}
+        .card .recharge{height:36px; line-height:36px; border-radius:18px; background:#ffffff; padding:0 24px;}
+
+        .details .nodata{padding:30px 0;}
+        .details .nodata .img{display:block; width:150px; height:150px;}
+
+        .ul{padding:0 4px;}
+        .ul .li{padding:10px 0;}
+        .ul .li .add{color:#FF3942;}
+        .ul .li .num{margin-left:10px;}
+
+        .mask.animate .cont{animation:upshow 0.3s linear; -webkit-animation:upshow 0.3s linear;}
+        @keyframes upshow{0%{transform:translateY(100%);}100% {transform:translateY(0);}}
+        @-webkit-keyframes upshow {0%{transform:translateY(100%);}100% {transform:translateY(0);}}
+        .mask .cont{position:absolute; bottom:0; left:0; right:0; padding:10px 0 0; background:#ffffff; border-radius:10px 10px 0 0; overflow:hidden;}
+        .mask .cont .config{padding:0 10px; line-height:16px;}
+        .mask .cont .czlist{max-height:280px; overflow:auto;}
+        .mask .cont .czlist .li{box-sizing:border-box; border:1px solid #FF3942; width:28%; height:60px; padding:8px 4px; margin:0 2.6% 10px; border-radius:4px;}
+        .mask .cont .czlist .li.active{background:#FF3942; color:#ffffff;}
+        .mask .cont .type{padding:10px 0; background:#f6f7f8;}
+        .mask .cont .type .item{height:50px; padding:0 12px; border-bottom:1px solid #f6f7f8; background:#ffffff;}
+        .mask .cont .type .item .icon{display:block; width:28px; margin-right:10px;}
+        .mask .cont .type .item .ipt-radio~.iconfont::before{color:#FF3942; font-size:22px;}
+        .mask .cont .btn-box{padding:4px 10px 14px; background:#f6f7f8;}
+        .mask .cont .pay-btn{width:100%; height:42px; line-height:42px; background:#ff3942;}
+    </style>
+</head>
+<body>
+    <div class="card df ai-c just-c-bet">
+        <div class="df ai-c c-ff">
+            <img src="../../image/common/bei_w.png" class="bei" alt="" />
+            <span id="yue" class="num fs-30 b">--</span>
+            <span class="fs-12 mt-6">教育贝</span>
+        </div>
+        <button class="com-button recharge c-red fs-14" onclick="showMask()">充值</div>
+    </div>
+    <div class="df df-c details com-box mt-16">
+        <div class="com-title detail-title">交易明细</div>
+        <div id="list" class="mt-10 ul"></div>
+        <!-- 加载提示 -->
+        <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+            <img src="../../image/common/loading_more.gif" class="img" alt="" />
+            <span class="loadtxt">加载中……</span>
+            <span class="overtxt">没有更多数据了</span>
+            <span class="scrollbtm">上拉加载更多</span>
+        </div>
+    </div>
+    <div id="mask" class="mask hide">
+        <div class="bg" onclick="hideMask()"></div>
+        <div class="cont df df-c">
+            <div class="fs-16 txt-c b">充值教育贝</div>
+            <div class="config mt-10 fs-12 c-99"></div>
+            <div class="czlist mt-10 df df-w-w"></div>
+            <form class="type">
+                <label class="wx item df ai-c just-c-bet" tapmode="touch-style">
+                    <div class="df ai-c">
+                        <img src="../../image/common/wxpay.png" class="icon" alt="" />
+                        <span>微信支付</span>
+                    </div>
+                    <div>
+                        <input type="radio" class="ipt-radio" checked name="paytype" value="wxpay" />
+                        <i class="iconfont"></i>
+                    </div>
+                </label>
+                <label class="ljpg item df ai-c just-c-bet hide" tapmode="touch-style">
+                    <div class="df ai-c">
+                        <img src="../../image/common/iospay.png" class="icon" alt="" />
+                        <span>apple pay支付</span>
+                    </div>
+                    <div>
+                        <input type="radio" class="ipt-radio" name="paytype" value="iospay" />
+                        <i class="iconfont"></i>
+                    </div>
+                </label>
+            </form>
+            <div class="btn-box">
+                <button class="com-button pay-btn fs-16 c-ff" onclick="createOrder()">充值</button>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var payObj = null;
+var payType = "wxpay";
+var wxPayPlus = null;
+var iap = null;
+
+apiready = function(){
+    wxPayPlus = api.require('wxPayPlus');
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getList();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+
+    $("#mask").on("click",".li",function(){
+        var ts = $(this);
+        payObj = ts.data("id");
+        ts.addClass("active").siblings().removeClass("active");
+    });
+
+    if(api.systemType.toUpperCase() =="IOS"){
+        // iap = api.require('iap'); // 苹果支付 1049
+        // var ljpg = $("#mask form .ljpg").removeClass("hide");
+    }
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/member/member/getmoney",
+        method: "get",
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(data.money){$("#yue").html(data.money)}
+            page = 1;
+            over = false;
+            getList();
+        }
+    });
+    myApp.ajax({
+        url: "/api/member/member/chongzhi",
+        method: "get",
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var cont = $("#mask .cont");
+            var config = cont.find(".config").empty();
+            var ul = cont.find(".czlist").empty();
+            if(data.config && data.config.content){config.text(data.config.content)}
+            if(!data.list || data.list.length==0){return}
+            for(var i=0; i<data.list.length; i++){
+                if(i==0){payObj = data.list[0].id}
+                var zs = Number(data.list[i].song)>0?'<div class="fs-12">赠送:'+ data.list[i].song +'</div>':'';
+                ul.append('<div class="li c-red df ai-c df-c just-c-bet '+(i==0?'active':'')+'" data-id="'+ data.list[i].id +'">'+
+                    '<div class="fs-16">面额:'+ data.list[i].jiage +'</div>'+zs+
+                '</div>');
+            }
+        }
+    })
+}
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/member/member/moneylog",
+        method: "get",
+        loading: false,
+        data: {page:page},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            var ul = $("#list");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                ul.append('<div class="li">'+
+                    '<div class="df ai-c just-c-bet">'+
+                        '<div class="fc three-hide c-33">'+ o.note +'</div>'+
+                        '<div class="num add b">'+ (Number(o.type)==0?'+':'-') + o.value +'</div>'+
+                    '</div>'+
+                    '<div class="mt-6 fs-12">'+ o.addtime +'</div>'+
+                '</div>');
+            }
+        },
+        error(){api.refreshHeaderLoadDone()}
+    })
+}
+// 创建订单
+function createOrder(){
+    if(!payObj){api.toast({msg:"请选择面额"});return}
+    myApp.ajax({
+        url: "/api/member/member/czorder",
+        method: "get",
+        data: {id:payObj},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            getOrder(data);
+        }
+    })
+}
+// 获取订单
+function getOrder(obj){
+    payType = $("#mask input[name='paytype']:checked").val() || "wxpay";
+    myApp.ajax({
+        url: "/api/member/member/czpay",
+        method: "get",
+        data: {id:obj.ids, paytype:payType},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(payType=="wxpay"){
+                wxPay(data.str);
+            }else{
+                iospay();
+            }
+        }
+    })
+}
+// 微信支付 1049
+function wxPay(orderObj){
+    wxPayPlus.payOrder({
+        apiKey: orderObj.appid,
+        orderId: orderObj.prepayid,
+        mchId: "1483571312",
+        nonceStr: orderObj.noncestr,
+        timeStamp: orderObj.timestamp,
+        package: orderObj.package,
+        sign: orderObj.sign
+    }, function(retp, err) {
+        hideMask();
+        if (retp && retp.status) {
+            api.toast({msg:'支付成功', global:true});
+            getData();
+        } else {
+            if(err.code == -2){
+                api.toast({msg: "已取消支付"})
+            }else{
+                api.toast({msg:"支付失败"});
+            }
+        }
+    });
+}
+// 苹果支付
+function iospay(){
+    iap.getProducts({productIds:[ chong_iosid ]}, function(retget, err){
+        if(!retget){return}
+        iap.purchase({
+            productId: chong_iosid,
+            applicationUsername:order_id
+        }, function(ret, err) {
+            if(!ret){return}
+        });
+    })
+}
+// 显示
+function showMask(){$("#mask").removeClass("hide").addClass("animate");$(document.body).css("overflow","hidden")}
+// 隐藏
+function hideMask(){$("#mask").addClass("hide").removeClass("animate");$(document.body).css("overflow","auto")}
+</script>
+</body>
+</html>

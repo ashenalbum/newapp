@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .ul{background:#ffffff;}
+        .ul .item{padding:10px 16px; height:30px; line-height:30px; border-bottom:1px solid #F2F2F2;}
+        .ul .item:last-child{border-bottom:none;}
+        .ul .item .arrow{display:block; width:12px; height:12px;}
+    </style>
+</head>
+<body>
+    <div class="ul fs-16 c-33">
+        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="toChangePhone()">
+            <span>更换手机号</span>
+            <img src="../../image/common/more.png" class="arrow" alt="" />
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="setPayPwd()">
+            <span>设置支付密码</span>
+            <img src="../../image/common/more.png" class="arrow" alt="" />
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+apiready = function(){}
+// 设置密码
+function setPayPwd(){myApp.setPayPwd()}
+// 更换手机号
+function toChangePhone(){myApp.openWin({url:"/html/personal/change_phone.html"})}
+</script>
+</body>
+</html>

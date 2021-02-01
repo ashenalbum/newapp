@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px 16px; background:#f6f7f8;}
+
+        .swiperbox{height:108px;}
+        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative; background:#f6f7f8;}
+        .swiperbox .swiper-container .swiper-slide{box-sizing:border-box; padding:8px 10px;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+1){background-color:#DAE6EB;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+2){background-color:#E4DEE9;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+3){background-color:#F6F0E4;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+4){background-color:#E8DAD5;}
+        .swiperbox .swiper-container .swiper-slide .img{display:block; height:100%; width:auto;}
+        .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
+        .swiperbox .swiper-container .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
+
+        .search{background:#f6f7f8;}
+        .search .input-box{position:relative;}
+        .search .input-box .button{position:absolute; right:0; top:0; height:34px; line-height:36px; padding:0 12px;}
+        .search .input{box-sizing:border-box; width:200px; height:36px; line-height:36px; padding:0 10px 0 34px; background:#ffffff url(../../image/information/search.png) no-repeat 10px center; background-size:18px 18px; border-radius:18px; font-size:14px; outline:none;}
+        .search .area{margin-left:6px; min-width:80px; padding:6px 0;}
+        .search .area::after{content:" "; display:inline-block; width:16px; height:16px; margin-left:2px; background:url(../../image/common/sel_b.png) no-repeat center center; background-size:16px 16px;}
+
+        .select{height:34px; white-space:nowrap; overflow:hidden;}
+        .select::after{flex-shrink:0; content:" "; display:inline-block; width:16px; height:16px; margin-left:4px; background:url(../../image/common/sel_b.png) no-repeat center center; background-size:100% 100%;}
+
+        .list .item{padding:14px 0; border-bottom:1px solid #dddddd;}
+        .list .item:last-child{border:none;}
+        .list .item .icon{display:block; margin-right:14px; width:46px; height:46px; border-radius:50%; background:#f6f7f8;}
+
+        .list .label span{display:inline-block; height:18px; line-height:20px; border-radius:10px; margin-right:4px; padding:0 8px; border:thin solid;}
+    </style>
+</head>
+<body class="df df-c">
+    <!-- 轮播 -->
+    <div id="swiperbox" class="swiperbox hide">
+        <div id="swiper" class="swiper-container">
+            <div class="swiper-wrapper"></div>
+            <div class="dom-wrap"><i></i></div>
+        </div>
+    </div>
+    <!-- 搜索 -->
+    <div class="search df df-c">
+        <div id="search" class="input-box fc df">
+            <input type="text" class="input fc" placeholder="搜索院校" onkeypress="search()" />
+            <div class="fs-14 button c-66" onclick="search()">搜索</div>
+        </div>
+        <div class="sel-box df mt-10">
+            <div class="select fc df ai-c just-c-ct" tapmode="touch-style2">地区</div>
+            <div class="select fc df ai-c just-c-ct" tapmode="touch-style2">院校层次</div>
+            <div class="select fc df ai-c just-c-ct" tapmode="touch-style2">类型</div>
+        </div>
+    </div>
+    <!-- list -->
+    <div id="list" class="list com-box fs-12 mt-10"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+var cityPicker = null;
+var city = "";
+var keyword = "";
+
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var ul = $("#list");
+
+apiready = function(){
+    setEvent();
+    init();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 50}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+    api.setFrameAttr({name:api.frameName, bounces:true});
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+    // 点击 Banner
+    $("#swiperbox").on("click",".tapbanner",function(){
+        var ts = $(this);
+        myApp.openBanner(ts.data('type'), ts.data('data'))
+    });
+}
+function init(){
+    $(document.body).on("click",".to-detail",function(e){
+        var ts = $(this);
+        var id = ts.data("id");
+        if($(e.target).hasClass("to-launch")){toLaunch(id,ts.data("name")); return}
+        toDetail(id);
+    });
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/school/schoollist",
+        method: "get",
+        loading: page==1,
+        data: {city_str:city, page:page, keyword:keyword},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            ul[dataList.length?'removeClass':'addClass']("hide");
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                ul.append('<div class="item df ai-c to-detail" data-id="'+ o.id +'" data-name="'+ o.title +'">'+
+                    '<img src="'+ o.logo +'" class="icon" />'+
+                    '<div class="fc df df-c">'+
+                        '<div class="fs-14 c-33 b one-hide">'+ o.title +'</div>'+
+                        '<div class="label one-hide c-aa mt-6">'+
+                            '<span>'+ o.dyznum +'次咨询</span>'+
+                            '<span>'+ o.scnum +'粉丝</span>'+
+                        '</div>'+
+                    '</div>'+
+                    '<button class="to-launch com-button c-red b">发起资讯</button>'+
+                '</div>');
+            }
+        },
+        error(){api.refreshHeaderLoadDone()}
+    })
+}
+function search(){
+    var input = $("#search .input");
+    keyword = input.val();
+    page = 1;
+    getData();
+    input.blur();
+}
+// 轮播
+function setSwiper(arr){
+    $api[arr.length?'removeCls':'addCls']($api.byId('swiperbox'),'hide');
+    if(!arr.length){return false}
+
+    var wrap = $api.dom("#swiper .swiper-wrapper");
+    var domwrap = $api.dom("#swiper .dom-wrap i");
+    $api.html(wrap,"");
+    for(var i in arr){
+        $api.append(wrap,'<div class="swiper-slide tapbanner df ai-c just-c-bet" data-type="'+ arr[i].cktype +'" data-data="'+ arr[i].url +'" >'+
+            '<div class="f1">'+
+                '<div class="fs-14 b">'+ arr[i].title +'</div>'+
+                '<div class="fs-12 c-66 mt-12">'+ arr[i].ftitle +'</div>'+
+            '</div>'+
+            '<img src="'+ arr[i].image +'" class="img" alt=""/>'+
+        '</div>');
+    }
+    domwrap.style.width = (100/arr.length) + "%";
+    if(topSwiper){topSwiper.destroy(false)}
+    topSwiper = new Swiper('#swiper', {
+        autoplay: {delay:4000, stopOnLastSlide:false, disableOnInteraction:true},
+        on:{slideChange: function(swiper){domwrap.style.left = swiper.realIndex*(100/arr.length)+"%"}}
+    });
+}
+// 发起咨询
+function toLaunch(id,name){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:"school", id:id, name:name}})}
+// 院校详情
+function toDetail(id){myApp.openWin({hideAll:true, url:"/html/consult/school_main.html", pageParam:{id:id}})}
+</script>
+</body>
+</html>

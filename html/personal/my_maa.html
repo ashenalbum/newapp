@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px; background:#f6f7f8; }
+        .lh-20{line-height:20px;}
+        .pr-10{padding-right:10px;}
+        .pd-20{padding:20px;}
+
+        .cont .timeline .node{height:68px;}
+        .cont .timeline .node .line{position:relative; margin:0 12px; width:2px; height:100%; background:#CECECE;}
+        .cont .timeline .node .line::after{position:absolute; top:50%; left:-3px; margin-top:-4px; content:" "; width:8px; height:8px; border-radius:50%; background:#CECECE;}
+        .cont .timeline .node.red .line::after{background:#FF3942;}
+        .cont .timeline .node.blue .line::after{background:#3098F1;}
+        .cont .timeline .node .txt{padding:0 10px; height:58px; background:#ffffff; border-radius:6px;}
+        .cont .timeline .node .icon{width:34px; height:34px; border-radius:50%; margin-right:10px; background-repeat:no-repeat; background-position:center center; background-size:20px 20px;}
+        .cont .timeline .node.red .icon{background-color:#FFE2E3; background-image:url(../../image/special/video.png);}
+        .cont .timeline .node.blue .icon{background-color:#DFF0FD; background-image:url(../../image/special/audio.png);}
+        .cont .timeline .node .callbox .status{color:#333333;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="cont" class="cont">
+        <div class="yuyue">
+            <div id="timelinebox" class="df df-c"></div>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+
+</script>
+</body>
+</html>

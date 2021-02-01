@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:20px; background:#ffffff;}
+        .icon{display:block; width:36px; height:36px; border-radius:50%; margin-right:10px;}
+        .txt{line-height:20px;}
+        .txt img{display:block; width:100%; height:auto;}
+
+        .com-button{width:100%; height:46px; border-radius:10px; background:#FF3942; }
+        .com-button .bei{width:20px; height:20px; margin-right:4px;}
+
+        .line{height:1px; background:#cccccc;}
+        .m-20{margin:0 20px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="ques" class="df df-c">
+        <div class="df ai-c">
+            <img src="" alt="" class="icon">
+            <div class="title fs-16 c-33"></div>
+        </div>
+        <div class="txt mt-16 fs-14"></div>
+    </div>
+    <button id="btn" class="com-button mt-50 fs-14 c-ff df ai-c just-c-ct hide" onclick="createOrder()">
+        <img src="../../image/common/bei_w.png" class="bei" />
+        <span> <span class="money"></span> 旁听</span>
+    </button>
+
+    <div id="callback" class="df df-c mt-50 hide">
+        <div class="fs-14 c-cc df ai-c">
+            <div class="line fc"></div>
+            <div class="m-20">回答</div>
+            <div class="line fc"></div>
+        </div>
+        <div class="df ai-c mt-20">
+            <img src="../../image/common/test.jpg" alt="" class="icon">
+            <div class="title fs-16 c-33"></div>
+        </div>
+        <div class="txt mt-16 fs-14"></div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+apiready = function(){
+    getData();
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/zixun/dayimem/pangtin",
+        method: "get",
+        data: {id:api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.data || !data.data.wenti){return}
+            var ques = $("#ques");
+            ques.find(".title").text(data.data.wenti.username+"的咨询");
+            ques.find(".icon").attr("src",data.data.wenti.avatar);
+            ques.find(".txt").text(data.data.wenti.content);
+
+            var callback = $("#callback");
+            var btn = $("#btn");
+            if(data.data.ptsta==1){
+                btn.addClass("hide");
+                callback.removeClass("hide");
+                callback.find(".title").text(data.data.huifu.hfusername);
+                callback.find(".icon").attr("src",data.data.huifu.hfavatar);
+                callback.find(".txt").text(data.data.huifu.hfcontent);
+            }else{
+                callback.addClass("hide");
+                btn.removeClass("hide");
+                btn.find(".money").text(data.data.money);
+            }
+        }
+    })
+}
+// 创建订单
+function createOrder(){
+    myApp.ajax({
+        url: "/api/zixun/dayimem/pangtinorder",
+        method: "get",
+        data: {id:api.pageParam.id},
+        success(data){
+            if(data.errcode==201){setTimeout(openWallet,300)}
+            if(data.errcode!=0 && data.errcode!=200){return}
+            pay(data.data.id);
+        }
+    })
+}
+function pay(orderid){
+    myApp.inputPayPwd(function(pwd){
+        myApp.ajax({
+            url: "/api/member/member/payorder",
+            method: "get",
+            data: {id:orderid, paypwd:pwd},
+            success(data){
+                if(data.errcode!=0 && data.errcode!=200){return}
+                api.toast({msg: '旁听成功'});
+                getData();
+            }
+        })
+    })
+}
+// 我的钱包
+function openWallet(){myApp.openWin({title:"我的钱包", needLogin:true, url:"/html/personal/wallet.html", headColor:"#f6f7f8"})}
+</script>
+</body>
+</html>

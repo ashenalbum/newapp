@@ -1,0 +1,400 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+	<style>
+        html,body{width:100%; height:100%;}
+        .fl{float:left;}
+        .fr{float:right;}
+
+        .bookbox{width:100%; height:100%;}
+        .book{width:100%; height:100%;}
+        .book .page{position:relative; display:flex; align-items:center; justify-content:center; background:#f6f7f8 url(../../image/common/loading_more.gif) no-repeat center center; background-size:32px 32px;}
+        .book .page .img{display:block; max-width:100%; max-height:100%; background:#ffffff;}
+
+        .help{position:fixed; top:0; left:0; z-index:9999; width:100%; height:100%; background:rgba(0,0,0,0.5);}
+        .help .fc{border-right:2px solid rgba(255,255,255,0.5);}
+        .help .fc:last-child{border-right:none;}
+        .help .img{display:block; width:36px; height:auto;}
+
+        .mask.animate .cont{animation:upshow 0.3s linear; -webkit-animation:upshow 0.3s linear;}
+        @keyframes upshow{0%{bottom:-110px;}100% {bottom:0;}}
+        @-webkit-keyframes upshow {0%{bottom:-110px;}100%{bottom:0;}}
+        .mask{z-index:9999;}
+        .mask .cont{position:absolute; z-index:9999; bottom:0; left:0; right:0; height:110px; border-radius:6px 6px 0 0; background:#ffffff;}
+        .mask .cont .top{padding-top:1px;}
+        .mask .cont .top:after{content:" ";display:block;clear:both;}
+        .mask .cont .barbox{height:40px;}
+        .mask .cont .r1{width:50px;line-height:40px;font-size:14px;color:#aaa;}
+        .mask .cont .r2{width:50px;line-height:40px;font-size:14px;color:#aaa;}
+        .mask .cont .barbg{padding:4px;margin:14px 50px 0;border-radius:6px; background:#eaeceb linear-gradient(#fff, #eaeceb); box-shadow: 0 1px 12px #ccc;}
+        .mask .cont .bar{position:relative;height:4px;background:#ccc;cursor:pointer;background:#ccc;}
+        .mask .cont .bar i{display:block;height:100%;width:0; background:#FF3942 linear-gradient(to right,#FF3942 ,#fcb5b8);}
+        .mask .cont .bar img{position:absolute;width:30px;height:30px;margin:-15px; top:50%;left:0;border-radius:50%; box-shadow:2px 2px 10px #aaa;}
+        .fdbtn{width:40px; height:40px; background:url(../../image/journal/fangda.png) no-repeat 0 0; background-size:100% 100%; position:fixed; z-index:9998; right:10px; bottom:20px; opacity:0.6; }
+        .fdbtn.zoom{background-image:url(../../image/journal/suoxiao.png);}
+
+        .mask.animate .fxcont{animation:upshow 0.3s linear; -webkit-animation:upshow 0.3s linear;}
+        @keyframes upshow{0%{bottom:-120px;}100% {bottom:0;}}
+        @-webkit-keyframes upshow {0%{bottom:-120px;}100%{bottom:0;}}
+        .mask .fxcont{position:absolute; bottom:0; left:0; right:0; z-index:9; background:#ffffff; border-radius:10px 10px 0 0;}
+        .mask .fxcont .itm{position:relative; height:72px; margin:4px 0;}
+        .mask .fxcont .itm::after{content:" "; height:40px; width:1px; background:#e1e1e1; position:absolute; right:-1px; top:16px;}
+        .mask .fxcont .itm:last-child::after{display:none;}
+        .mask .fxcont .itm .img{display:block; width:36px; height:36px;}
+        .mask .fxcont .esc{height:54px; width:100%; border-top:1px solid #e1e1e1;}
+    </style>
+</head>
+<body>
+    <div id="bookbox" class="bookbox pr">
+        <div id="flipbook" class="book"></div>
+    </div>
+    <div id="help" class="help df fs-20 c-ff b hide">
+        <div class="fc df df-c ai-c just-c-ct">
+            <img src="../../image/journal/right.png" class="img" />
+            <div class="mt-16">上一页</div>
+        </div>
+        <div class="fc df df-c ai-c just-c-ct">
+            <img src="../../image/journal/dianji.png" class="img" />
+            <div class="mt-16">菜 单</div>
+        </div>
+        <div class="fc df df-c ai-c just-c-ct">
+            <img src="../../image/journal/left.png" class="img" />
+            <div class="mt-16">下一页</div>
+        </div>
+    </div>
+    <div id="slidbox" class="mask hide">
+        <div class="bg" onclick="hideMask()"></div>
+        <div class="cont fs-12 c-66">
+            <div class="top mt-30">
+    			<div class="nowpage fl r1 txt-c">1</div>
+    			<div class="maxpage fr r2 txt-c"></div>
+    			<div class="barbg">
+                    <div class="bar">
+                        <i></i>
+                        <img src="../../image/journal/icon.png" class="img" />
+                    </div>
+                </div>
+    		</div>
+        </div>
+    </div>
+    <div id="fdbtn" class="fdbtn"></div>
+    <div id="mask" class="mask hide">
+        <div class="bg" onclick="closeMask()"></div>
+        <div class="fxcont">
+            <div class="df fs-12 c-66">
+                <div class="itm fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="fenxiang('session')">
+                    <img src="../../image/information/wx.png" alt="" class="img" />
+                    <div class="mt-6 lh-1">微信好友</div>
+                </div>
+                <div class="itm fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="fenxiang('timeline')">
+                    <img src="../../image/information/wx_pyq.png" alt="" class="img" />
+                    <div class="mt-6 lh-1">朋友圈</div>
+                </div>
+            </div>
+            <div class="esc df ai-c just-c-ct fs-16" onclick="closeMask()">取 消</div>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.1.7.js"></script>
+<script type="text/javascript" src="../../script/turn.min.js"></script>
+<script type="text/javascript" src="../../script/touch.min.js"></script>
+<script type="text/javascript" src="../../script/zoom.min.js"></script>
+<script type="text/javascript">
+var bookList = [];
+var flipbook = null;
+var nowPage = 1;
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.pageParam.title && $("#topheader .title").text(api.pageParam.title);
+    if(!$api.getStorage("bookHelp")){
+        $("#help").removeClass("hide").on("click",function(){$(this).addClass("hide")});
+        $api.setStorage('bookHelp','true');
+    }
+    touch.on($api.byId("flipbook"), "swipeleft", next);
+    touch.on($api.byId("flipbook"), "swiperight", prev);
+    // 分享
+    api.execScript({name:api.winName, script: 'setTopBtn({img:"../../image/information/share.png", event:"bookShare"});'});
+    api.addEventListener({name: 'bookShare'}, share);
+}
+// 初始
+function getData(){
+    myApp.ajax({
+        url: "/api/zazhi/page/baokanpagelist",
+        method: "get",
+        data: {id:api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            bookList = data.list;
+            nowPage = api.pageParam.pid || 1;
+            sliderInit();
+            bookInit();
+        },
+        error(e){console.log(JSON.stringify(e))}
+    });
+}
+// 初始化
+function bookInit(){
+    if(flipbook){flipbook.turn("destroy")}
+    flipbook = $("#flipbook");
+
+    for(var i=0; i<10; i++){
+        if(!bookList[i]){break}
+        flipbook.append(creatPage(bookList[i]));
+    }
+    flipbook.turn({
+        display: "single",
+        width: api.frameWidth,
+        height: api.frameHeight,
+        pages: bookList.length
+    }).bind("turning",function(event,page){
+        nowPage = page;
+        saveProgress();
+        changeSlider();
+    }).bind("missing", function(event, pages) {
+        for (var i = 0; i < pages.length; i++) {
+            var index = pages[i];
+            flipbook.turn("addPage", creatPage(bookList[index-1]), index);
+        }
+    }).on("click",function(e){
+        var p = parseInt(e.clientX / api.frameWidth * 3);
+        switch(p){
+            case 0:prev();break;
+            case 1:showMenu();break;
+            case 2:next();break;
+        }
+    });
+    $('#fdbtn').on("click",function(){
+        if (bookbox.hasClass("zoom")) {
+            $(this).removeClass("zoom");
+            bookbox.removeClass("zoom").zoom("zoomOut");
+        } else {
+            $(this).addClass("zoom");
+            bookbox.addClass("zoom").zoom("zoomIn");
+        }
+    });
+
+    var bookbox = $("#bookbox");
+    bookbox.zoom({
+        flipbook: flipbook,
+        max: function(){return 1400/api.winHeight}
+    });
+
+    if(api.pageParam.pid){
+        nowPage = api.pageParam.pid+1;
+        flipbook.turn("page",nowPage);
+        api.toast({msg:"上次阅读到这里"});
+        changeSlider();
+    }
+}
+// 保存进度
+function saveProgress(){
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/jixuyuedu",
+        method: "get",
+        data: {pid:bookList[nowPage-1].id, qid:api.pageParam.id},
+        loading: false,
+        alert: false
+    });
+}
+// 创建页面
+function creatPage(obj){
+    return $('<div class="page">'+
+        '<img src="'+ obj.pimg +'" class="img fc" alt=""/>'+
+    '</div>');
+}
+// 下一页
+function next(){
+    if(nowPage==bookList.length){api.toast({msg:"已经是最后一页了",duration:1500});return}
+    flipbook && flipbook.turn("next");
+}
+// 上一页
+function prev(){
+    if(nowPage==1){api.toast({msg:"已经是第一页了",duration:1500});return}
+    flipbook && flipbook.turn("previous");
+}
+//显示菜单
+function showMenu(){
+    api.actionSheet({
+        cancelTitle: '取消',
+        buttons: ['下载此页','阅读进度']
+    }, function(ret, err) {
+        var index = ret.buttonIndex;
+        switch(true){
+            case index==1: downLoad(); break;
+            case index==2: showSlider(); break;
+        }
+    });
+}
+// 点击下载
+function downLoad(){
+    var page = bookList[nowPage-1];
+    if(page.stuta==1){
+        saveAlbum(page.id);
+    }else{
+        myApp.confirm({
+            title: "该页面未购买",
+            content: '是否花费'+page.pmonery+'贝购买该页面？',
+            callback(btnIndex){
+                if(btnIndex!=1){return}
+                subscribe(page.id,3,page.pmonery,function(){
+                    page.stuta = 1;
+                    saveAlbum(page.id);
+                });
+            }
+        });
+    }
+}
+// 保存相册
+function saveAlbum(id){
+    myApp.showLoading("下载中...");
+    myApp.ajax({
+        url: "/api/zazhi/page/downloadpage",
+        method: "get",
+        data: {id: id},
+        alert: false,
+        success(data){
+            if(data && data.url){src = data.url;}
+            myApp.downImg(src);
+        },
+        error(e){myApp.hideLoading()}
+    })
+}
+// 购买
+function subscribe(id,type,money,callback){
+    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/addbaokanorder",
+        method: "get",
+        data:{id:id, type:type, money:money},
+        success(data){
+            if(data.errcode==201){setTimeout(openWallet,300)}
+            if(data.errcode!=200 && data.errcode!=0){return}
+            var orderId = data.data.id;
+            myApp.inputPayPwd(function(password){
+                myApp.ajax({
+                    url: "/api/member/member/payorder",
+                    method: "get",
+                    data: {id:orderId, paypwd:password},
+                    success(data){
+                        if(data.errcode!=200 && data.errcode!=0){return}
+                        api.toast({msg: '支付成功', global:true});
+                        api.sendEvent({name: 'moneyChange'});
+                        callback && callback();
+                    },
+                    error(){api.toast({msg:"请求发生错误，请稍候重试"})}
+                });
+            });
+        },
+        error(){api.toast({msg:"error"})}
+    });
+}
+// 进度初始化
+function sliderInit(){
+    var slider = $("#slidbox");
+    slider.find(".img").on("touchstart", moveProgress);
+    slider.find(".maxpage").html(bookList.length);
+    slider.find(".nowpage").html(nowPage);
+    var left = parseInt((nowPage-1)/bookList.length*100);
+    slider.find("i").css("width",left+"%");
+    slider.find(".img").css("left",left+"%");
+}
+// 显示进度
+function showSlider(){
+    $("#slidbox").removeClass("hide").addClass("animate");
+}
+// 修改进度
+function changeSlider(){
+    var slider = $("#slidbox");
+    var left = (nowPage-1) / (bookList.length-1) * 100;
+    slider.find(".nowpage").html(nowPage);
+    slider.find("i").css("width",left+"%");
+    slider.find(".img").css("left",left+"%");
+}
+// 拖动滑块
+function moveProgress(e){
+    var start = e.originalEvent.targetTouches[0].clientX;
+	var k = $(this);
+	var kleft = k.css("left").replace("px","")*1;
+    var slidbox = $("#slidbox");
+    var bar = slidbox.find(".bar");
+	var barwidth = bar[0].offsetWidth;
+    var jd = parseInt((nowPage-1)/(bookList.length-1)*100);
+
+    $(document.body).on("touchmove",function(e){
+        var pst = e.originalEvent.targetTouches[0];
+        var clientX = pst.clientX;
+        var p = kleft + (clientX-start);
+		p = p<=0?0:(p>=barwidth?barwidth:p);
+        k.css("left",p+"px");
+        bar.find('i').css("width",p+"px");
+        jd = parseInt(p/barwidth*(bookList.length-1))+1;
+        slidbox.find(".nowpage").html(jd);
+	});
+
+    $(document.body).one("touchend",function(){
+        flipbook && flipbook.turn("page",jd);
+        $(this).off("touchmove");
+    });
+}
+// 显示分享
+function share(){
+
+}
+// 隐藏mask
+function hideMask(){
+    $("#slidbox").addClass("hide").removeClass("slidbox");
+    $(document.body).off("touchmove");
+}
+// 分享
+function fenxiang(scene){
+    myApp.alert({content:"分享功能正在开发中"});
+    return
+    if(!fxdata){return}
+    var wxPlus = api.require('wxPlus');
+    wxPlus.isInstalled(function(ret, err) {
+        if (!ret.installed) {api.toast({msg:"请先安装微信"});return}
+        var name = fxdata.imgsrc.match(/^.*\/([^\/]+)$/)[1];
+        api.download({
+            url:fxdata.imgsrc,
+            savePath: 'fs://download/'+name,
+            report: true,
+            cache: true,
+            allowResume: true
+        },function(ret, err){
+            if(!ret || ret.state!=1){api.toast({msg:"error"});return}
+            // 分享测试 1049
+            wxPlus.shareWebpage({
+                scene: scene || 'session',
+                title: fxdata.title,
+                description: fxdata.message,
+                thumb: 'fs://download/'+name,
+                contentUrl: fxdata.url
+            }, function(ret, err) {
+                if (ret.status) {
+                    myApp.alert({content:"分享成功"});
+                } else {
+                    myApp.alert({content:err.code});
+                }
+            });
+        });
+    });
+}
+// 显示分享
+function share(){$("#mask").removeClass("hide").addClass("animate")}
+function closeMask(){$("#mask").addClass("hide").removeClass("animate")}
+// 我的钱包
+function openWallet(){myApp.openWin({title:"我的钱包", needLogin:true, url:"/html/personal/wallet.html", headColor:"#f6f7f8"})}
+</script>
+</body>
+</html>

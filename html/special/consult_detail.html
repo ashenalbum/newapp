@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8; padding:10px;}
+        .lh-20{line-height:20px;}
+        .lh-18{line-height:18px;}
+        .com-box{padding-bottom:4px;}
+        .com-box .img{width:33%;}
+        .pt{border-top:1px solid #979797; height:42px; line-height:42px; padding-left:30px; background:url(../../image/personal/ic3.png) no-repeat 4px center; background-size:18px 18px;}
+    </style>
+</head>
+<body>
+    <div class="item com-box">
+        <div id="cont" class="fs-14 lh-20"></div>
+        <div id="hfcont" class="fs-12 mt-12 c-66 lh-18"></div>
+        <div id="addtime" class="mt-12 c-aa fs-12"></div>
+        <div id="listen" class="mt-12 pt fs-12 c-66"></div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $(".item").on("click",".img",function(){myApp.showImg(this.src)});
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getdayidetails",
+        method: "get",
+        data: {id:api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.data){return}
+            for(var img in data.data.images){
+                if(Number(img)==0){imgs='<div class="fs-0">'}
+                imgs += '<img src="'+data.data.images[img]+'" class="img"/>';
+                if(Number(img)+1==data.data.images.length){imgs+='</div>'}
+            }
+            $("#cont").html(data.data.content + imgs);
+            $("#hfcont").html(data.data.hfcontent);
+            $("#addtime").html(data.data.addtime);
+            $("#listen").html("已有"+(data.data.tounum||0)+"人旁听");
+        }
+    });
+}
+</script>
+</body>
+</html>

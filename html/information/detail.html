@@ -1,0 +1,249 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+	<style>
+        body{box-sizing:border-box; padding-top:4px; background:#ffffff;}
+        .margin{margin-left:16px; margin-right:16px;}
+        .title{line-height:32px; font-weight:500;}
+        .info .infoicon{display:block; margin-right:14px; width:46px; height:46px; border-radius:50%; background:#f6f7f8;}
+        .info .com-button{background:#FF3942; }
+        .info .com-button.active{background:#f6f7f8; color:#666666; transition:background 1s;}
+        .htmlscroll{position:absolute; top:0; bottom:0; left:0; right:0; overflow:auto;}
+        .html{line-height:24px; padding-bottom:10px; overflow-x:auto;}
+        .html img{display:block!important; width:100%!important; height:auto!important; float:none!important; background:#f6f7f8;}
+
+        .bottom{height:50px; padding:0 10px; border-top:1px solid #F6F7F8;}
+        .bottom .ic{position:relative; width:46px; height:36px; background:url() no-repeat center center; background-size:24px 24px;}
+        .bottom .ic.ic-comment{background-image:url(../../image/information/comment.png);}
+        .bottom .ic.ic-save{background-image:url(../../image/information/save.png);}
+        .bottom .ic.ic-save.active{background-image:url(../../image/information/save_act.png);}
+        .bottom .ic.ic-share{background-image:url(../../image/information/share.png);}
+        .bottom .ic .badge{position:absolute; top:2px; left:24px; border:1px solid #ffffff; min-width:6px; height:12px; line-height:12px; padding:0 3px; border-radius:8px; background:#ffffff; color:#999999; font-size:10px; font-style:normal; text-align:center;}
+        .bottom .ipt{display:block; box-sizing:border-box; height:36px; padding:8px 16px; border-radius:18px; background:#f6f7f8;}
+        .bottom .ipt .textarea{box-sizing:border-box; padding:0; width:100%; height:20px; line-height:20px; resize:none;}
+        .bottom .send{display:none;}
+        .bottom.focus .ic{display:none;}
+        .bottom.focus .send{display:block; height:32px; line-height:32px; padding:0 8px;}
+
+        .mask.animate .cont{animation:upshow 0.3s linear; -webkit-animation:upshow 0.3s linear;}
+        @keyframes upshow{0%{bottom:-120px;}100% {bottom:0;}}
+        @-webkit-keyframes upshow {0%{bottom:-120px;}100%{bottom:0;}}
+        .mask .cont{position:absolute; bottom:0; left:0; right:0; z-index:9; background:#ffffff; border-radius:10px 10px 0 0;}
+        .mask .cont .itm{position:relative; height:72px; margin:4px 0;}
+        .mask .cont .itm::after{content:" "; height:40px; width:1px; background:#e1e1e1; position:absolute; right:-1px; top:16px;}
+        .mask .cont .itm:last-child::after{display:none;}
+        .mask .cont .itm .img{display:block; width:36px; height:36px;}
+        .mask .cont .esc{height:54px; width:100%; border-top:1px solid #e1e1e1;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="fc pr">
+        <div class="htmlscroll">
+            <div id="title" class="title fs-24 margin"></div>
+            <div id="info" class="info mt-12 df ai-c margin">
+                <img id="icon" src="../../image/common/head.png" alt="" class="infoicon" />
+                <div class="fc fs-14">
+                    <div id="author" class="one-hide"></div>
+                    <div id="addtime" class="c-99 fs-12 mt-6"></div>
+                </div>
+                <button class="com-button guanzhu color-animate c-ff fs-12"> + 关注</button>
+            </div>
+            <div id="html" class="html fs-16 mt-16 margin"></div>
+        </div>
+    </div>
+    <div id="bottom" class="bottom df ai-c">
+        <!-- <input id="plinput" type="text" class="fc ipt" placeholder="我来说两句"/> -->
+        <div class="fc ipt">
+            <textarea id="plinput" name="name" rows="1" class="textarea" placeholder="我来说两句"></textarea>
+        </div>
+        <div class="send fs-16" onclick="comment()">发送</div>
+        <div class="ic ic-comment" onclick="openComment()"><i id="plnum" class="badge" data-num=""></i></div>
+        <div id="save" class="ic ic-save"></div>
+        <div class="ic ic-share" onclick="openMask()"></div>
+    </div>
+    <div id="mask" class="mask hide">
+        <div class="bg" onclick="closeMask()"></div>
+        <div class="cont">
+            <div class="df fs-12 c-66">
+                <div class="itm fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="fenxiang('session')">
+                    <img src="../../image/information/wx.png" alt="" class="img" />
+                    <div class="mt-6 lh-1">微信好友</div>
+                </div>
+                <div class="itm fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="fenxiang('timeline')">
+                    <img src="../../image/information/wx_pyq.png" alt="" class="img" />
+                    <div class="mt-6 lh-1">朋友圈</div>
+                </div>
+            </div>
+            <div class="esc df ai-c just-c-ct fs-16" onclick="closeMask()">取 消</div>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+var groupid = null;
+var authorid = null;
+var fxdata = null;
+var wxPlus = null;
+
+apiready = function(){
+    $api.fixTabBar($api.byId('bottom'));
+    $api.fixTabBar($(".mask .cont").get(0));
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({name: 'loginok'},getData);
+    $("#bottom .textarea").on("focus",function(){
+        $(this).parents(".bottom").addClass("focus");
+    }).on("blur",function(){
+        var ts = $(this);
+        setTimeout(function(){
+            ts.parents(".bottom").removeClass("focus");
+        },300);
+    });
+    $("#save").on("click",function(){
+        if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+        var ts = $(this);
+        myApp.ajax({
+            url: "/api/home/Common/collection",
+            method: "get",
+            data: {id:api.pageParam.id, type:3},
+            loading: false,
+            success(data){
+                if(data.errcode!=200 && data.errcode!=0){return}
+                ts[data.scsta==1?'addClass':'removeClass']("active scale-animate");
+                api.toast({msg: data.scsta==1?"已收藏":"已取消收藏"});
+            }
+        })
+    });
+
+    $("#info").on("click",function(e){
+        if($(e.target).hasClass("guanzhu")){
+            if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+            var ts = $(this);
+            myApp.ajax({
+                url: "/api/home/Common/follow",
+                method: "get",
+                loading: false,
+                data: {id:authorid, type:groupid},
+                success(data){
+                    if(data.errcode!=200 && data.errcode!=0){return}
+                    $(e.target)[data.scsta==1?'addClass':'removeClass']("active").html(data.scsta==1?"已关注":" + 关注");
+                    api.toast({msg: data.scsta==1?"已关注":"已取消关注"});
+                }
+            });
+            return
+        }
+        openExpertDetail(false,authorid);
+    });
+    // 点击显示图片
+    $("#html").on("click","img",function(){myApp.showImg(this.src)});
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/news/home/show",
+        method: 'get',
+        data: {id: api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(Number(data.count)>0){
+                var num = Number(data.count);
+                if(num>=1000 && num<10000){num = parseInt(num/1000)+"k"}
+                else if(parseInt(num/10000)>0){num = parseInt(num/10000)+"w"}
+                $("#plnum").text(num).data("num",data.count);
+            }else{
+                $("#plnum").addClass("hide")
+            }
+            $("#title").text(data.data.title);
+            $("#icon").attr({src:data.data.author.avatar});
+            $("#author").text(data.data.author.nickname);
+            $("#addtime").text(data.data.addtime);
+            $("#html").html(data.data.content);
+            groupid = data.data.author.groupid;
+            authorid = data.data.author.uid;
+            fxdata = data.data.fxdata;
+            data.data.scsta==1 && $("#save").addClass('active');
+            data.data.author.is_true==1 && $("#info .guanzhu").addClass("active").html("已关注");
+        }
+    });
+}
+// 评论列表
+function openComment(){
+    myApp.openWin({
+        title: "评论",
+        url: "/html/information/detail_comment.html",
+        pageParam: {id: api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+        }
+    });
+}
+// 评论
+function comment(){
+    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+    var val = $("#plinput").val();
+    if(!val){setTimeout(function(){api.toast({msg:"请输入评论内容"})},300);return}
+    myApp.ajax({
+        url: "/api/news/news/newspl",
+        method: "post",
+        data: {data:{message:val, id:api.pageParam.id}},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            setTimeout(function(){
+                api.toast({msg: '评论成功'});
+                $("#plinput").val("");
+                var plum = $("#plnum");
+                var num = Number(plum.data('num')) + 1;
+                plum.removeClass("hide").html(num).data("num",num);
+            },300);
+        }
+    });
+}
+// 分享
+function fenxiang(scene){
+    if(!fxdata){api.toast({msg:"error"});return}
+    if(!wxPlus){wxPlus = api.require('wxPlus')}
+    wxPlus.isInstalled(function(ret, err) {
+        if (!ret.installed) {api.toast({msg:"请先安装微信"});return}
+        if(fxdata.imgsrc){
+            var name = fxdata.imgsrc.match(/^.*\/([^\/]+)$/)[1];
+            api.download({
+                url:fxdata.imgsrc,
+                savePath: 'fs://download/'+name,
+                report: true,
+                cache: true,
+                allowResume: true
+            },function(ret, err){
+                if(!ret || ret.state!=1){api.toast({msg:"error"});return}
+                wxfx({scene:scene, title:fxdata.title, description:fxdata.message, thumb: 'fs://download/'+name, contentUrl:fxdata.url});
+            });
+        } else {
+            wxfx({scene:scene, title:fxdata.title, description:fxdata.message, contentUrl:fxdata.url});
+        }
+    });
+}
+// 微信分享
+function wxfx(data){
+    wxPlus.shareWebpage(data, function(ret, err) {
+        if (ret.status) {
+            myApp.alert({content:"分享成功"});
+        } else {
+            myApp.alert({content:err.code});
+        }
+    });
+}
+// 显示分享
+function openMask(){$("#mask").removeClass("hide").addClass("animate")}
+function closeMask(){$("#mask").addClass("hide").removeClass("animate")}
+// 专家详情
+function openExpertDetail(id,uid){myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{id:id, uid:uid}})}
+</script>
+</body>
+</html>

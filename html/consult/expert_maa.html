@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#ffffff;}
+        .combox{padding:20px;}
+        .top{border-bottom:10px solid #f6f7f8;}
+        .top .img{display:block; width:46px; height:46px; border-radius:50%; margin-right:10px;}
+
+        .type{margin-right:16px;}
+        .type:last-child{margin-right:0;}
+        .type .typebtn{box-sizing:border-box; width:100%; padding:0 14px; height:40px; border:1px solid #979797; border-radius:20px;}
+        .type .typebtn i{display:block; width:16px; height:16px; margin-right:6px; background-position:0 0; background-size:100% 100%; background-repeat:no-repeat;}
+        .type input[name='type']:checked~.typebtn{color:#FF1C3A; border-color:#FF1C3A; font-weight:bold;}
+        .type.type1 .typebtn i{background-image:url(../../image/consult/video.png);}
+        .type.type2 .typebtn i{background-image:url(../../image/consult/audio.png);}
+        .type.type1 input[name='type']:checked~.typebtn i{background-image:url(../../image/consult/video-act.png);}
+        .type.type2 input[name='type']:checked~.typebtn i{background-image:url(../../image/consult/audio-act.png);}
+
+        .item{height:48px; border-bottom:1px solid #E1E1E1;}
+        .item input{box-sizing:border-box; padding:6px; width:280px; height:48px; border:none; outline:none;}
+        .item .arrow{width:36px; height:36px; background:url(../../image/common/arrow_right.png) no-repeat center center; background-size:18px 18px;}
+
+        .submit-btn{box-sizing:border-box; height:42px; width:100%; background:#FF1C3A;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="combox top df ai-c just-c-bet">
+        <div class="df ai-c">
+            <img id="icon" src="../../image/common/test.jpg" class="img shadow1" />
+            <span id="name" class="fs-14 b"></span>
+        </div>
+        <div id="showprice" class="fs-14"></div>
+    </div>
+    <div class="combox">
+        <div class="fs-14 b">咨询方式</div>
+        <div class="mt-16 df ai-c just-c-bet">
+            <label class="fc type type1">
+                <input type="radio" name="type" class="hide" checked value="1" />
+                <span class="typebtn df ai-c just-c-ct">
+                    <i></i>
+                    <span class="fs-12">视频预约通话</span>
+                </span>
+            </label>
+            <label class="fc type type2">
+                <input type="radio" name="type" class="hide" value="2" />
+                <span class="typebtn df ai-c just-c-ct">
+                    <i></i>
+                    <span class="fs-12">预约语音通话</span>
+                </span>
+            </label>
+        </div>
+        <div class="mt-20 fs-14 b">咨询时间</div>
+        <div class="item mt-10 df ai-c" onclick="openSelTime()">
+            <input id="seltime" type="text" readonly class="fc" placeholder="请选择咨询时间" />
+            <div class="arrow"></div>
+        </div>
+        <div class="mt-20 fs-14 b">咨询时长</div>
+        <div class="item mt-10 df ai-c">
+            <input id="timelog" type="number" class="fc" placeholder="请咨询时间时长(分钟)" />
+        </div>
+        <div class="mt-20 fs-12 c-66 lh-14">咨询须知：专家咨询按分钟收费，需要您的钱包内有充足的教育贝才能发起预约咨询，通话结束后，根据实际通话分钟多退少补</div>
+        <div class="mt-30">
+            <button type="button" class="com-button submit-btn fs-16 c-ff" onclick="submit()">预 约</button>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/rong.js"></script>
+<script>
+var price = {}; // 音视频单价 1视频，2音频
+var selTimeId = null; // 排时id
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    RY.requestPermission();
+    api.addEventListener({name: 'selMaaTime'}, function(ret, err){
+        if(!ret || !ret.value){return}
+        selTimeId = ret.value.id;
+        $("#seltime").val(ret.value.selTxt);
+    });
+    $("input[name='type']").change(function(){$("#showprice").text(price[this.value]+"教育贝/分钟")});
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/zixun/zhuanjia/homeshow",
+        method: "get",
+        data: {uid: api.pageParam.uid},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            $("#icon").attr("src",data.zhuanjia && data.zhuanjia.avatar);
+            $("#name").text(data.zhuanjia && data.zhuanjia.name);
+            price = {1:data.zhuanjia.pricevideo, 2:data.zhuanjia.priceaudio};
+            $("#showprice").html(price[1]+"教育贝/分钟");
+        }
+    });
+}
+function submit(){
+    var id = selTimeId;
+    var type = $("input[name='type']").val();
+    var timelog = $("#timelog").val();
+    console.log(JSON.stringify(price))
+    var jg = price[type];
+
+    if(!id){api.toast({msg:"请选择咨询时间"});return}
+    if(!timelog){api.toast({msg:"请输入咨询时长"});return}
+
+    myApp.ajax({
+        url: "/api/zixun/yuyue/addyuyueorder",
+        method: "post",
+        data: {data:{uid:api.pageParam.uid, id:id, type:type, timelog:timelog, price:price}},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var order = data.data.id;
+            myApp.inputPayPwd(function(pwd){
+                myApp.ajax({
+                    url: "/api/member/member/payorder",
+                    method: "get",
+                    data: {id:order, paypwd:pwd},
+                    success(data){
+                        if(data.errcode!=0 && data.errcode!=200){return}
+                        api.toast({msg:'预约成功，请耐心等待专家给你答复！'});
+                    }
+                });
+            });
+        }
+    });
+}
+// 选择日期
+function openSelTime(){myApp.openWin({title:"咨询时间", url:"/html/consult/expert_maa_time.html", pageParam:{uid:api.pageParam.uid}})}
+</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/input.css" />
+	<style>
+        body{box-sizing:border-box; padding:10px; background:#ffffff;}
+
+        .bs-box .item{margin:0 20px 12px 0;}
+        .bs-box .type{width:96px; height:50px; background:#EFEFEF; background-repeat:no-repeat; background-size:100% 100%; border-radius:4px; overflow:hidden;}
+        .bs-box .type.active{background-color:#FFF0F0;}
+        .bs-box .type.type0{background-image:url(../../image/special/type0.png);}
+        .bs-box .type.type1{background-image:url(../../image/special/type1.png);}
+        .bs-box .type.type2{background-image:url(../../image/special/type2.png);}
+        .bs-box .type.type3{background-image:url(../../image/special/type3.png);}
+        .bs-box .ipt-radio-o:checked~.type.type0{background-image:url(../../image/special/type0-act.png);}
+        .bs-box .ipt-radio-o:checked~.type.type1{background-image:url(../../image/special/type1-act.png);}
+        .bs-box .ipt-radio-o:checked~.type.type2{background-image:url(../../image/special/type2-act.png);}
+        .bs-box .ipt-radio-o:checked~.type.type3{background-image:url(../../image/special/type3-act.png);}
+
+        .labelbox .label{display:inline-block; box-sizing:border-box; margin:0 14px 10px 0; height:32px; line-height:32px; padding:0 10px; border:1px solid; border-radius:4px;}
+        .labelbox input[name='catid']:checked~.label{color:#FF3942; background:#FFE2E3; border-color:#FF3942;}
+
+        .upimg{box-sizing:border-box; margin:0 20px 12px 0; width:96px; height:60px; border:1px dashed; border-radius:2px; overflow:hidden;}
+        .upimg-box{position:relative; width:96px; height:60px; margin:0 20px 12px 0; background:#f6f7f8;}
+        .upimg-box img{display:block; width:100%; height:100%; border-radius:2px;}
+        .upimg-box .close{position:absolute; top:-8px; right:-10px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.5) url(../../image/common/close.png) no-repeat center center; background-size:16px 16px;}
+
+        .btn-box{height:50px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body class="df df-c just-c-bet">
+    <div class="df df-c">
+        <div class="fs-16 b">请选择文章分类</div>
+        <div id="labelbox" class="labelbox mt-6 c-99 fs-14"></div>
+        <div class="mt-20 fs-16 b">请选择展示版式</div>
+        <form id="form" class="bs-box mt-10 df df-w-w">
+            <div class="item">
+                <label>
+                    <input type="radio" class="ipt-radio-o" checked name="banshi" value="0" />
+                    <span class="iconfont"></span>
+                    <div class="type type0 mt-6"></div>
+                </label>
+            </div>
+            <div class="item">
+                <label>
+                    <input type="radio" class="ipt-radio-o" name="banshi" value="1" />
+                    <span class="iconfont"></span>
+                    <div class="type type1 mt-6"></div>
+                </label>
+            </div>
+            <div class="item">
+                <label>
+                    <input type="radio" class="ipt-radio-o" name="banshi" value="2" />
+                    <span class="iconfont"></span>
+                    <div class="type type2 mt-6"></div>
+                </label>
+            </div>
+            <div class="item">
+                <label>
+                    <input type="radio" class="ipt-radio-o" name="banshi" value="3" />
+                    <span class="iconfont"></span>
+                    <div class="type type3 mt-6"></div>
+                </label>
+            </div>
+        </form>
+        <div class="mt-20 fs-16 b">上传图片</div>
+        <div id="upimgbox" class="mt-16 df df-w-w">
+            <div class="upimg fs-12 c-99 df df-c ai-c just-c-ct">
+                <span class="fs-30 lh-1">+</span>
+                <span>添加图片</span>
+            </div>
+        </div>
+    </div>
+    <div class="btn-box df ai-c mt-20">
+        <button id="submit" class="com-button submit fs-14 c-ff">确认提交</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+var title = "";
+var html = "";
+var type = 0;
+var imgArr = [];
+var udata = myApp.getUserData();
+var saveStorageName = udata.uinfo.uid+"_save_article";
+apiready = function(){
+    title = api.pageParam.title;
+    html = api.pageParam.html;
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $("#submit").on("click",submit);
+    $("#upimgbox").on("click",".upimg-box .close",function(){
+        var ts = $(this).parents(".upimg-box");
+        var index = ts.index();
+        myApp.confirm({
+            title: "提示",
+            content: "确定删除该图片吗",
+            callback(btnIndex){
+                if(btnIndex!=1){return}
+                ts.remove();
+                imgArr.splice(index,1);
+                var upimg = $("#upimgbox .upimg")
+                if(imgArr.length<3 && upimg.hasClass("hide")){upimg.removeClass("hide")}
+            }
+        });
+    }).find(".upimg").on("click",function(){
+        if(imgArr.length>=3){return}
+        var ts = $(this);
+        myApp.upImg({clip:true, clipW:"90%", clipH:"60%"},function(src){
+            imgArr.push(src);
+            ts.before('<div class="upimg-box">'+
+                '<img src="'+ src +'" alt="" />'+
+                '<i class="close"></i>'+
+            '</div>');
+            if(imgArr.length>=3){ts.addClass("hide")}
+        });
+    });
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/zixun/member/getcatid",
+        method: "get",
+        loading: false,
+        alert: false,
+        success(data){
+            var labelbox = $("#labelbox").empty();
+            if((data.errcode!=0 && data.errcode!=200) || !data.data || !data.data.length){return}
+            for(var i in data.data){
+                labelbox.append('<label>'+
+                    '<input type="radio" name="catid" value="'+ data.data[i].id +'" '+ (i=='0'?'checked':'') +' class="hide" />'+
+                    '<span class="label fs-14">'+ myApp.htmlEscape(data.data[i].name) +'</span>'+
+                '</label>');
+            }
+        }
+    });
+    if(api.pageParam.edit && api.pageParam.editObj){
+        var type = api.pageParam.editObj.show_mode; // 1049 没有显示方式
+        var imgs = api.pageParam.editObj.image;
+        var upimg = $("#upimgbox .upimg");
+        if(typeof imgs == "string"){
+            imgArr.push(imgs);
+            upimg.before('<div class="upimg-box">'+
+                '<img src="'+ imgs +'" alt="" />'+
+                '<i class="close"></i>'+
+            '</div>');
+        }
+        if(imgs instanceof Array){
+            for(var i in imgs){
+                imgArr.push(imgs[i]);
+                upimg.before('<div class="upimg-box">'+
+                    '<img src="'+ imgs[i] +'" alt="" />'+
+                    '<i class="close"></i>'+
+                '</div>');
+                if(imgArr.length>=3){upimg.addClass("hide")}
+            }
+        }
+    }
+}
+function submit(){
+    type = $("#form input[name='banshi']:checked").val();
+    if((type==1||type==2) && imgArr.length<1){api.toast({msg:"该版式需上传一张图片"}); return}
+    if(type==3 && imgArr.length<3){api.toast({msg:"该版式需上传三张图片"}); return}
+    var catid = $("#labelbox input[name='catid']:checked").val();
+
+    var url = api.pageParam.edit?"":"/api/zixun/member/addnews";
+
+    myApp.ajax({
+        url: url,
+        method: "post",
+        data: {data:{title:title, show_mode:type, catid:catid, images:imgArr.join(), content:html}},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            api.toast({msg:"发布成功",global:true});
+            api.sendEvent({name:'reload'});
+            api.closeWin({name:'article_create'});
+            $api.rmStorage(saveStorageName);
+            api.closeWin();
+        }
+    })
+}
+</script>
+</body>
+</html>

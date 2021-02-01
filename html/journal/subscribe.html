@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/swiper.min.css" />
+	<style>
+        body{box-sizing:border-box; padding:10px; background:#f6f7f8;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="ul" class="kanwulist com-box"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script type="text/javascript">
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+
+    $("#ul").on("click",".kanwu",function(){
+        var ts = $(this);
+        openBook(ts.data('id'),ts.data('title'),ts.data('pid'));
+    });
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/baokandy",
+        method: "get",
+        data: {page:page},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            var ul = $("#ul");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.data || []);
+            if(!data.data || data.data.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.data){
+                var o = data.data[i];
+                ul.append('<div class="kanwu df" data-id="'+ o.qid+'" data-title="'+ o.ztitle +'" data-pid="'+ o.page +'">'+
+                    '<img src="'+ o.zimg +'" class="img" />'+
+                    '<div class="txts f1 df df-c just-c-bet">'+
+                        '<div>'+
+                            '<div class="one-hide fs-16 b">'+ o.ztitle +'</div>'+
+                            '<div class="mt-10 three-hide c-99 fs-12">'+ o.zshuoming +'</div>'+
+                        '</div>'+
+                        '<div class="df ai-c just-c-bet">'+
+                            '<span class="tab c-aa fs-12"><span>读到第'+ (Number(o.page)+1) +'页</span></span>'+
+                            '<button class="com-button read-btn fs-12 b c-red">继续阅读</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>');
+            }
+        }
+    })
+}
+// 报刊
+function openBook(id,title,pid){myApp.openWin({title:title, url:"/html/journal/book.html", pageParam:{id:id, pid:pid||0, title:title}})}
+</script>
+</body>
+</html>

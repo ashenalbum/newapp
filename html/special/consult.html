@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding-bottom:54px; background:#f6f7f8; }
+        .lh-20{line-height:20px;}
+        .pr-10{padding-right:10px;}
+        .pd-20{padding:20px;}
+
+        .top{position:relative; padding:14px 14px 20px; background:#474967 linear-gradient(to right, #474967, #20203B);}
+        .top .line{position:absolute; width:60px; height:4px; background:#FF3942; left:25%; margin-left:-30px; bottom:0; transition:left 0.3s;}
+        .top .tab1.active~.line{left:25%;}
+        .top .tab2.active~.line{left:75%;}
+
+        .cont{padding:10px;}
+        .cont .item{margin-bottom:10px;}
+        .cont .item:last-child{margin-bottom:0;}
+        .cont .item .hd-btn{padding-left:28px; background:#FFF0F0 url(../../image/common/ques.png) no-repeat 8px center; background-size:14px 14px;}
+        .cont .item .img{width:33%;}
+
+        .cont .yuyue{padding:6px 0;}
+        .cont .yuyue .sel{padding:0 10px; height:24px; line-height:24px; background:#ffffff; border-radius:6px;}
+        .cont .yuyue .sel::after{content:" "; display:inline-block; margin-left:12px; width:12px; height:12px; background:url(../../image/common/sel.png) no-repeat 0 0; background-size:100% 100%;}
+        .cont .timeline .node{height:68px;}
+        .cont .timeline .node .line{position:relative; margin:0 12px; width:2px; height:100%; background:#CECECE;}
+        .cont .timeline .node .line::after{position:absolute; top:50%; left:-3px; margin-top:-4px; content:" "; width:8px; height:8px; border-radius:50%; background:#CECECE;}
+        .cont .timeline .node.red .line::after{background:#FF3942;}
+        .cont .timeline .node.blue .line::after{background:#3098F1;}
+        .cont .timeline .node .txt{padding:0 10px; height:58px; background:#ffffff; border-radius:6px;}
+        .cont .timeline .node .icon{width:34px; height:34px; border-radius:50%; margin-right:10px; background-repeat:no-repeat; background-position:center center; background-size:20px 20px;}
+        .cont .timeline .node.red .icon{background-color:#FFE2E3; background-image:url(../../image/special/video.png);}
+        .cont .timeline .node.blue .icon{background-color:#DFF0FD; background-image:url(../../image/special/audio.png);}
+        .cont .timeline .node .callbox .status{color:#333333;}
+
+        .bottom-box{position:fixed; height:50px; bottom:0; left:0; right:0; background:#ffffff;}
+        .bottom-box .btn{width:100%; height:100%;}
+        .bottom-box .more{height:30px; line-height:28px; padding-right:16px; background:url(../../image/common/arrow_right.png) no-repeat right center; background-size:16px 16px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="top" class="top df df-r c-ff">
+        <div class="fc tab tab1 active df df-c ai-c" data-id="1">
+            <div class="dfnum fs-26 lh-1">0</div>
+            <div class="fs-12 mt-12">待答复</div>
+        </div>
+        <div class="fc tab tab2 df df-c ai-c" data-id="2">
+            <div class="thnum fs-26 lh-1">0</div>
+            <div class="fs-12 mt-12">今日视频通话预约</div>
+        </div>
+        <div class="line"></div>
+    </div>
+    <div id="cont" class="cont">
+        <div class="tab1 dafu">
+            <div id="ul" class="ul"></div>
+            <!-- 加载提示 -->
+            <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+                <img src="../../image/common/loading_more.gif" class="img" alt="" />
+                <span class="loadtxt">加载中……</span>
+                <span class="overtxt">没有更多数据了</span>
+                <span class="scrollbtm">上拉加载更多</span>
+            </div>
+        </div>
+        <div class="tab2 yuyue hide">
+            <div class="df just-c-end">
+                <div id="seltime" class="sel"></div>
+            </div>
+            <div id="timelinebox" class="df df-c"></div>
+        </div>
+    </div>
+    <div id="bottom" class="bottom-box shadow">
+        <div class="btn btn1 df df-c ai-c just-c-ct" onclick="openConsultOver()">
+            <div class="more">查看已回答内容</div>
+        </div>
+        <div class="btn btn2 df df-c ai-c just-c-ct" onclick="openTimeLine()">
+            <div class="more">设置通话排期</div>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var pageTab = null;
+//咨询
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var ul = $("#ul");
+var loadmore = $("#loadmore");
+// 选择日期
+var selTime = new Date().toISOString().substr(0,10);
+
+apiready = function(){
+    init();
+}
+// 初始化
+function init(){
+    api.addEventListener({name:'viewappear'},function(){api.setStatusBarStyle({style: 'light'})});
+    chengeTab(api.pageParam.tab || 1);
+    $("#top").on("click",".tab",function(){
+        var ts = $(this);
+        ts.addClass("active").siblings().removeClass("active");
+        chengeTab(ts.data('id'));
+    });
+    // 回答
+    $("#ul").on("click",".item",function(){
+        var id = $(this).data("id");
+        myApp.openWin({title:"回答", url:"/html/special/consult_reply.html", pageParam:{id:id}});
+    });
+    // 通话
+    $("#timelinebox").on("click",".callbox",function(){
+        var node = $(this).parents(".node");
+        var id = node.data('id');
+        var name = node.data('name');
+        var type = node.data('type');
+        var ryuid = node.data('ryuid');
+        myApp.confirm({
+            title: "提示",
+            content: '现在要与 '+ name + ' ' + (type=='1'?'视频':'音频') + '通话吗',
+            callback(btnIndex){
+                if(btnIndex!=1){return}
+                myApp.openWin({hideAll:true, url:"/html/common/ry_video.html", pageParam:{media:type, media:'call', ryid:ryuid, yyid:id}});
+            }
+        });
+    });
+    // 选择时间
+    (function(){
+        $("#seltime").html(selTime).on("click",function(){
+            var ts = $(this);
+            api.openPicker({
+                type: 'date',
+                date: new Date().toLocaleDateString().replace(/\//g,"-"),
+                title: '选择时间'
+            }, function(ret, err) {
+                if (!ret) {return}
+                var month = ret.month<10?"0"+ret.month:ret.month;
+                var day = ret.day<10?"0"+ret.day:ret.day;
+                var time = ret.year+"-"+month+"-"+day;
+                ts.html(time);
+                selTime = time;
+                getTimeline();
+            });
+        });
+    })();
+    // 获取数量
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getdayilist",
+        method: "get",
+        data: {type:0},
+        loading: false,
+        alert: false,
+        success(data){
+            if(!data.count){return}
+            $("#top .dfnum").html(data.count);
+        }
+    });
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getyuyuelist",
+        method: "get",
+        data: {time:new Date().toISOString().substr(0,10)},
+        loading: false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ,
+        alert: false,
+        success(data){
+            if(!data.list){return}
+            var all = 0;
+            var over = 0;
+            for(var i in data.list){
+                for(var j in data.list[i]){
+                    var o = data.list[i][j];
+                    all++;
+                    o.status=="0"?over++:'';
+                }
+            }
+            var overSpan = over==0?'':'<span class="fs-16 fw-i c-99">'+ over +' / </span>';
+            $("#top .thnum").html(overSpan + all);
+        }
+    });
+}
+// 滚动加载
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getList();
+    });
+    api.setFrameAttr({name:api.frameName, bounces:true});
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getList();
+    });
+}
+// 切换选项卡
+function chengeTab(tab){
+    if(pageTab == tab){return}
+    pageTab = tab;
+    $("#top").children(".tab"+tab).addClass("active").siblings().removeClass("active");
+    $("#cont").children(".tab"+tab).removeClass("hide").siblings().addClass("hide");
+    $("#bottom").children(".btn"+tab).removeClass("hide").siblings().addClass("hide");
+    if(tab==1){
+        setEvent();
+        over = false;
+        page = 1;
+        getList();
+    } else {
+        api.removeEventListener({name: 'addEventListener'});
+        api.setFrameAttr({name:api.frameName, bounces:false});
+        getTimeline();
+    }
+}
+// 待答复
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getdayilist",
+        method: "get",
+        loading: false,
+        data: {type:0, page:page},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                var imgs = "";
+                for(var img in o.images){
+                    if(Number(img)==0){imgs='<div class="fs-0">'}
+                    imgs += '<img src="'+o.images[img]+'" class="img"/>';
+                    if(Number(img)+1==o.images.length){imgs+='</div>'}
+                }
+                ul.append('<div class="item com-box" data-id="'+ o.id +'">'+
+                    '<div class="fs-14 lh-20">'+ o.content + imgs +'</div>'+
+                    '<div class="mt-6 df ai-c just-c-bet">'+
+                        '<span class="fs-12 c-aa">'+ o.addtime +'</span>'+
+                        '<button class="com-button hd-btn c-red fs-12">回答</button>'+
+                    '</div>'+
+                '</div>');
+            }
+        }
+    })
+}
+// 今日通话预约
+function getTimeline(){
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getyuyuelist",
+        method: "get",
+        data: {time:selTime},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var dom = $("#timelinebox").empty();
+            for(var i in data.list){
+                if(!data.list[i].length){continue}
+                var sd = "";
+                switch(i){
+                    case "qt": sd="全天"; break;
+                    case "sw": sd="上午"; break;
+                    case "xw": sd="下午"; break;
+                }
+                dom.append('<div class="mt-12 fs-16 b">'+ sd +'</div>');
+                var timeline = $('<div class="timeline mt-12"></div>');
+                for(var j in data.list[i]){
+                    var o = data.list[i][j];
+                    timeline.append('<div class="node df ai-c '+(o.type=="1"?'red':'blue')+'"  data-name="'+ myApp.htmlEscape(o.name) +'" data-type="'+ (o.type==1?"video":"audio") +'" data-id="'+o.id+'" data-ryuid="'+o.ryuid+'" >'+
+                        '<div class="line"></div>'+
+                        '<div class="txt fc df ai-c '+ (o.status=="0"?'callbox':'') +'">'+
+                            '<div class="icon"></div>'+
+                            '<div class="df df-c fc pr-10">'+
+                                '<div class="name fs-16 b lh-1 one-hide">'+ myApp.htmlEscape(o.name) +'</div>'+
+                                '<div class="mt-6 fs-12 lh-1 c-99 one-hide">'+ (o.timelog?'预约咨询时长'+o.timelog+'分钟':'') +'</div>'+
+                            '</div>'+
+                            '<div class="status fs-12 c-99">'+ (o.status=="0"?'未通话':'已通话') +'</div>'+
+                        '</div>'+
+                    '</div>');
+                }
+                dom.append(timeline);
+            }
+            if(dom.html()==""){dom.append('<div class="fs-14 pd-20 txt-c c-99">没有更多数据了</div>')}
+        },
+        error(e){console.log(JSON.stringify(e))}
+    });
+}
+// 排期
+function openTimeLine(){myApp.openWin({title:"通话排期", url:"/html/special/timeline.html"})}
+// 已回答
+function openConsultOver(){myApp.openWin({title:"已回答内容", url:"/html/special/consult_over.html"})}
+</script>
+</body>
+</html>

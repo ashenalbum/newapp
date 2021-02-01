@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:0 10px; background:#ffffff;}
+        .zixunlist .item{padding:14px 0; border-bottom:1px solid #dddddd;}
+        .zixunlist .item:last-child{border:none;}
+        .zixunlist .item .icon{display:block; margin-right:14px; width:44px; height:44px; border-radius:50%; background:#f6f7f8;}
+        .zixunlist .com-button{height:28px; line-height:28px; padding:0 12 px;}
+    </style>
+</head>
+<body class="df df-c">
+    <!-- 资讯专家 -->
+    <div class="zixun">
+        <div id="list" class="zixunlist itembox fs-12"></div>
+    </div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+    // 旁听
+    $("#list").on("click",".item",function(){openListen($(this).data('id'))});
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/home/zixunlist",
+        method: "get",
+        loading: false,
+        data: {page:page},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            var ul = $("#list");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.data.list || []);
+            if(!data.data || !data.data.list || data.data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.data.list){
+                var o = data.data.list[i];
+                ul.append('<div class="item df" data-id="'+ o.id +'">'+
+                    '<img src="'+ o.avatar +'" class="icon" />'+
+                    '<div class="fc">'+
+                        '<div class="df ai-c just-c-bet">'+
+                            '<span class="fs-14 c-33 b">'+ o.title +'【回答】</span>'+
+                            '<button class="com-button c-red b">旁听</button>'+
+                        '</div>'+
+                        '<div class="df ai-c fs-12">'+
+                            '<span class="c-aa">'+ o.tounum +'人旁听</span>'+
+                        '</div>'+
+                        '<div class="mt-10 one-hide">'+ o.content +'</div>'+
+                    '</div>'+
+                '</div>');
+            }
+        },
+        error(){api.refreshHeaderLoadDone()}
+    })
+}
+// 旁听
+function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
+</script>
+</body>
+</html>

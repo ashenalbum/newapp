@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .ul{background:#ffffff;}
+        .ul .item{padding:10px 16px; height:30px; line-height:30px; border-bottom:1px solid #F2F2F2;}
+        .ul .item:last-child{border-bottom:none;}
+        .ul .item .arrow{display:block; width:12px; height:12px;}
+        .ul .item .ipt{width:100px; height:30px; line-height:30px; border:none; outline:none;}
+
+        .btn-box{height:50px; padding:0 16px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+        .toast{padding:0 20px; line-height:16px;}
+    </style>
+</head>
+<body>
+    <div class="ul fs-14 c-33">
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>问题咨询收费</span>
+            <input name="pricemsg" type="number" class="ipt fc txt-r" placeholder="请输入咨询收费" />
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>问题旁听收费</span>
+            <input name="pricepantin" type="number" class="ipt fc txt-r" placeholder="请输入旁听收费" />
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>语音通话（/分钟）</span>
+            <input name="priceaudio" type="number" class="ipt fc txt-r" placeholder="请输入语音通话收费" />
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+            <span>视频通话（/分钟）</span>
+            <input name="pricevideo" type="number" class="ipt fc txt-r" placeholder="请输入视频通话收费" />
+        </div>
+    </div>
+    <div class="btn-box df ai-c mt-20">
+        <button class="com-button submit fs-14 c-ff" onclick="submit()">确认提交</button>
+    </div>
+    <div class="toast mt-10 fs-12 c-99">提交后，后台管理员会进行审核，审核通过后，将按照你设定的收费标准</div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+apiready = function(){
+    getData();
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/zixun/yuyuemem/getsetting",
+        method: "get",
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            for(var i in data.data){$("input[name='"+ i +"']").attr("placeholder","建议"+data.data[i]+"贝")}
+        }
+    })
+}
+function submit(){
+    var pricemsg = $("input[name='pricemsg']").val();
+    var pricepantin = $("input[name='pricepantin']").val();
+    var priceaudio = $("input[name='priceaudio']").val();
+    var pricevideo = $("input[name='pricevideo']").val();
+
+    if(!pricemsg){api.toast({msg:"请输入咨询收费"});return}
+    if(!pricepantin){api.toast({msg:"请输入旁听收费"});return}
+    if(!priceaudio){api.toast({msg:"请输入语音通话收费"});return}
+    if(!pricevideo){api.toast({msg:"请输入视频通话收费"});return}
+
+    myApp.ajax({
+        url: "/api/zixun/yuyuemem/setmoney",
+        method: "post",
+        data: {data:{pricemsg:pricemsg, pricepantin:pricepantin, priceaudio:priceaudio, pricevideo:pricevideo}},
+        success(data){
+            console.log(JSON.stringify(data))
+            if(data.errcode!=0 && data.errcode!=200){return}
+            api.toast({msg:'设置成功', global:true});
+            setTimeout(function(){api.closeWin()},300);
+        }
+    });
+}
+</script>
+</body>
+</html>

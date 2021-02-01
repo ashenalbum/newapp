@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .form{background:#ffffff;}
+        .form .item{padding:10px 16px; border-bottom:1px solid #F2F2F2;}
+        .form .item:last-child{border-bottom:none;}
+        .form .icon{display:block; width:36px; height:36px; border-radius:50%; background:#f6f7f8;}
+        .form .ipt{width:100px; height:30px; line-height:30px; border:none; outline:none; color:#777777; font-weight:100;}
+
+        .btn-box{height:50px; padding:0 16px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body>
+    <form class="form fs-16 c-33">
+        <div class="item df ai-c just-c-bet">
+            <span>头像</span>
+            <img id="icon" src="../../image/common/head.png" class="icon" />
+        </div>
+        <div class="item df ai-c just-c-bet">
+            <span>姓名</span>
+            <input id="name" type="text" class="ipt fc txt-r" placeholder="请输入姓名" />
+        </div>
+        <div class="item df ai-c just-c-bet">
+            <span>昵称</span>
+            <input id="nickname" type="text" class="ipt fc txt-r" placeholder="请输入昵称" />
+        </div>
+        <!-- <div class="item df ai-c just-c-bet">
+            <span>手机号</span>
+            <input id="phone" type="number" class="ipt fc txt-r" placeholder="请输入手机号" />
+        </div> -->
+    </form>
+    <div class="btn-box df ai-c mt-20">
+        <button id="submit" class="com-button submit fs-14 c-ff" >确认提交</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var icon = "";
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $("#icon").on("click",function(){
+        var ts = $(this);
+        myApp.upImg({clip:true},function(src){ts.attr("src",src); icon = src;})
+    });
+    $("#submit").on("click",function(){
+        var data = {
+            avatar: icon,
+            name: myApp.htmlEscape($("#name").val()),
+            nickname: myApp.htmlEscape($("#nickname").val()),
+            phone: $("#phone").val()
+        };
+        myApp.ajax({
+            url: "/api/member/member/upd_mem",
+            method: "post",
+            data: {data:data},
+            success(data){
+                if(data.errcode!=0 && data.errcode!=200){return}
+                api.toast({msg:'修改成功'});
+                if(data.udata){
+                    $api.rmStorage('userData');
+                    $api.setStorage('userData', data.udata);
+                    api.sendEvent({name: 'personalTestLogin'});
+                    api.closeWin();
+                }
+            }
+        })
+    });
+}
+function getData(){
+    if(!myApp.isLogin()){return}
+    var userInfo = myApp.getUserData().uinfo;
+    $("#icon").attr('src',userInfo.avatar||'../../image/common/head.png');
+    $("#name").val(userInfo.name||'');
+    $("#nickname").val(userInfo.nickname||'');
+}
+</script>
+</body>
+</html>

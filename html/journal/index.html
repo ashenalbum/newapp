@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px; background:#f6f7f8;}
+        .abook .img{display:block; margin-right:14px; width:100px; height:133px; border-radius:6px;}
+        .abook .conts{padding:6px 0;}
+
+        .dylist .swiper-slide{width:108px; margin-right:10px;}
+        .dylist .swiper-slide:last-child{margin-right:0;}
+        .dylist .img{display:block; width:104px; height:140px; border-radius:6px; background:#f6f7f8;}
+        .dylist .txt{height:40px; line-height:20px;}
+
+
+        .books .swiper-slide{width:110px; margin-right:20px;}
+        .books .img{display:block; margin:auto; width:105px; height:140px; border-radius:6px; background:#f6f7f8;}
+        .books .title{height:36px; line-height:18px;}
+
+        .hotqs .item{box-sizing:border-box; width:48%; margin-bottom:10px; background:#F7F8F9; border-radius:6px; border:1px solid #EBEBEB; padding:10px 4px 10px 6px;}
+        .hotqs .item .icons{margin-right:6px;}
+        .hotqs .item .icons .icon{display:block; width:16px; height:16px; margin-left:-5px; border-radius:50%; border:1px solid #ffffff;}
+        .hotqs .item .icons .icon:first-child{margin-left:0;}
+        .hotqs .item .pt{line-height:14px; padding:2px 0;}
+
+        .zixun{height:90px;}
+        .zixun .swiper-slide{width:140px; border-radius:6px; position:relative; margin-right:10px; overflow:hidden;}
+        .zixun .swiper-slide .bg{position:absolute; top:0; left:0; width:100%; height:100%;}
+        .zixun .swiper-slide .cont{position:relative; box-sizing:border-box; width:100%; height:100%; padding:10px 6px; background: rgba(0,0,0,0.4);}
+        .zixun .swiper-slide .time{line-height:20px; padding:0 8px; border-radius:4px; background:rgba(255,255,255,0.5);}
+
+        .menu .swiper-slide{position:relative; z-index:2; width:auto; height:20px; line-height:20px; padding:0 16px 8px;}
+        .menu .swiper-slide.active{font-weight:bold; color:#333333;}
+        .menu .i{position:absolute; left:0; bottom:1px; width:0; height:6px; background:url(../../image/instantly/active.png) no-repeat center bottom; background-size: 16px 6px; transition:left 0.3s;}
+
+    </style>
+</head>
+<body class="df df-c">
+    <div id="dingyue" class="com-box">
+        <div class="com-title df ai-c just-c-bet">
+            <span class="fs-16 b">我的订阅</span>
+            <span class="fs-12 c-77 more" onclick="openSubscribe()">更多</span>
+        </div>
+        <div class="abook df just-c-bet mt-10">
+            <img src="" alt="" class="img" />
+            <div class="conts df df-c just-c-bet">
+                <div>
+                    <div class="title fs-14 b"></div>
+                    <div class="ftitle mt-6 fs-12 c-99 two-hide"></div>
+                </div>
+                <div class="df ai-c just-c-bet">
+                    <span class="page fs-12"></span>
+                    <button class="btn com-button read-btn fs-12 c-red">继续阅读</button>
+                </div>
+            </div>
+        </div>
+        <div id="dylist" class="mt-10 dylist swiper-container">
+            <div class="swiper-wrapper"></div>
+        </div>
+    </div>
+    <!-- 热门问答 -->
+    <div id="hotqs" class="hotqs com-box mt-10">
+        <div class="com-title df ai-c just-c-bet">
+            <span class="fs-16 b">热门问答</span>
+            <span class="fs-12 c-77 more" onclick="openConsult()">更多</span>
+        </div>
+        <div class="mt-10 fs-12 c-33">
+            <div class="df just-c-bet ul df-w-w"></div>
+        </div>
+        <div class="mt-10 df just-c-ct">
+            <button class="com-button c-red b ques-btn fs-12" onclick="openConsult()">发起资讯</button>
+        </div>
+    </div>
+    <!-- 热门视频 -->
+    <div id="hotvideo" class="hotvideo com-box mt-10">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="c-33 fs-16 b">热门视频</span>
+            <span class="fs-12 c-77 more" onclick="openVideoList()">更多</span>
+        </div>
+        <div class="videolist mt-10">
+            <div id="videos" class="swiper-container">
+                <div class="swiper-wrapper fs-12 c-33"></div>
+            </div>
+        </div>
+    </div>
+    <!-- 热门资讯 -->
+    <div id="hotnews" class="hotvideo com-box mt-10">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="c-33 fs-16 b">热门资讯</span>
+            <span class="fs-12 c-77 more" onclick="openInformation()">更多</span>
+        </div>
+        <div class="zxlist mt-10">
+            <div id="zixun" class="zixun swiper-container">
+                <div class="swiper-wrapper fs-14 c-ff"></div>
+            </div>
+        </div>
+    </div>
+    <!-- 热门刊物 -->
+    <div class="magazine com-box mt-10">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="c-33 fs-16 b">热门报刊</span>
+            <span class="fs-12 c-77 more" onclick="openMore()">更多</span>
+        </div>
+        <!-- 分类 -->
+        <div id="menu" class="menu mt-10">
+            <div id="menuswiper" class="swiper-container">
+                <div class="swiper-wrapper fs-14 c-99"></div>
+            </div>
+        </div>
+        <div id="kwlist" class="kanwulist mt-10"></div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script type="text/javascript">
+var reload = false;
+var dingyueSwiper = null;
+var menuswiperSwiper = null;
+var videosSwiper = null;
+var zixunSwiper = null;
+var loading = false;
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+
+function setEvent(){
+    api.addEventListener({name: 'loginok'}, function(){getData()});
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        reload = true;
+        getData();
+    });
+
+    $("#menu").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        var id = ts.data("id");
+        if(ts.hasClass("active")){return}
+        if(loading){api.toast({msg:"加载中，莫着急"});return}
+        menuswiperSwiper && menuswiperSwiper.slideTo(ts.index(),360,false);
+        ts.addClass("active").siblings().removeClass("active");
+
+        var left = ts.get(0).offsetLeft;
+        var width = ts.width();
+        ts.siblings(".i").css({left:left, width:width});
+
+        getList(id);
+    });
+    $("#dingyue .abook").on("click",function(){
+        var ts = $(this);
+        openBook(ts.data('id'),ts.data('title'),ts.data("pid"));
+    });
+    $("#dylist").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        openBook(ts.data('id'),ts.data('title'),ts.data('pid'));
+    });
+}
+// 初始
+function getData(){
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/homepage",
+        method: "get",
+        loading: !reload,
+        success(data){
+            api.refreshHeaderLoadDone();
+            if(data.errcode!=0 && data.errcode!=200){return}
+            setDingyue(data.data.dingyue);
+            setHotVideo(data.data.hotkc);
+            setZixun(data.data.hotzx);
+            setQues(data.data.hotdy);
+        },
+        error(){api.refreshHeaderLoadDone();}
+    });
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/baokancat",
+        method: "get",
+        loading: false,
+        success(data){
+            if(data.errcode!=200 && data.errcode!=0){return}
+            setMenu(data.data);
+        }
+    });
+}
+// 订阅
+function setDingyue(arr){
+    var box = $("#dingyue");
+    if(!arr || !arr.length){
+        box.children(".abook").addClass("hide");
+        box.children(".dylist").addClass("hide");
+        return;
+    }else if(arr.length==1){
+        box.children(".abook").removeClass("hide");
+        box.children(".dylist").addClass("hide");
+        var o = arr[0];
+        var abook = box.children(".abook");
+        abook.find(".img").attr({src:o.zimg});
+        abook.find(".title").text(o.ztitle);
+        abook.find(".ftitle").text(o.zshuoming);
+        abook.find(".page").html(Number(o.page)>0?'读到：第'+ (Number(o.page)+1) +'页':'');
+        abook.data("id",o.qid);
+        abook.data("title",o.ztitle);
+        abook.data("pid",o.page);
+    }else{
+        arr = arr.slice(0,8);
+        box.children(".abook").addClass("hide");
+        box.children(".dylist").removeClass("hide");
+        var wrap = box.find(".dylist .swiper-wrapper").empty();
+        for(var i in arr){
+            wrap.append('<div class="swiper-slide" data-id="'+ arr[i].qid +'" data-title="'+ arr[i].ztitle +'" data-pid="'+ arr[i].page +'">'+
+                '<img src="'+ arr[i].zimg +'" class="img" alt="" />'+
+                '<div class="txt mt-10 fs-14 b two-hide">'+ arr[i].ztitle +'</div>'+
+                '<div class="mt-10 fs-12 c-99">读到第'+ (Number(arr[i].page)+1) +'页</div>'+
+            '</div>');
+        }
+        if(dingyueSwiper){dingyueSwiper.destroy(false)}
+        dingyueSwiper = new Swiper('#dylist', {slidesPerView:'auto'});
+    }
+}
+// 菜单
+function setMenu(arr){
+    $api[arr.length?'removeCls':'addCls']($api.byId('menu'),'hide');
+    if(!arr.length){return false}
+    var wrap = $("#menuswiper .swiper-wrapper").empty();
+    for(var i in arr){
+        wrap.append('<div class="swiper-slide '+(i=='0'?'active':'')+'" data-id="'+ arr[i].catid +'">'+ myApp.htmlEscape(arr[i].name) +'</div>');
+    }
+    wrap.append('<div class="i"></div>');
+    if(menuswiperSwiper){menuswiperSwiper.destroy(false)}
+    menuswiperSwiper = new Swiper('#menuswiper', {slidesPerView :'auto'});
+
+    var ts = wrap.children(".swiper-slide.active");
+    var left = ts.get(0).offsetLeft;
+    var width = ts.width();
+    ts.siblings(".i").css({left:left, width:width});
+
+    getList(arr[0].catid);
+}
+// 获取列表
+function getList(id){
+    if(loading){return}
+    loading = true;
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/baokanlist",
+        method: "get",
+        loading: false,
+        data: {page:1, catid:id},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            var ul = $("#kwlist").empty();
+            for(var i in data.list){
+                var obj = data.list[i];
+                ul.append('<div class="kanwu df" onclick="openDetail('+ obj.id +')">'+
+                    '<img src="'+ obj.zimg +'" class="img" />'+
+                    '<div class="txts f1 df df-c just-c-bet">'+
+                        '<div>'+
+                            '<div class="one-hide fs-16 b">'+ obj.ztitle +'</div>'+
+                            '<div class="mt-10 three-hide c-66 fs-12">'+ obj.zshuoming +'</div>'+
+                        '</div>'+
+                        '<div class="df ai-c just-c-bet">'+
+                            '<span class="tab c-aa fs-12"><span>'+ obj.zlooknum +'人查看</span></span>'+
+                            '<button class="com-button read-btn fs-12 b c-red">'+ (obj.yuedu==1?"试读":"继续阅读") +'</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>')
+            }
+        }
+    })
+}
+// 热门资讯
+function setZixun(arr){
+    $api[arr.length?'removeCls':'addCls']($api.byId('hotnews'),'hide');
+    if(!arr.length){return false}
+    var wrap = $api.dom("#zixun .swiper-wrapper");
+    $api.html(wrap,"");
+    for(var i in arr){
+        $api.append(wrap,'<div class="swiper-slide" onclick="openNews('+ arr[i].id +')">'+
+            '<img src="'+ arr[i].fximg +'" class="bg" />'+
+            '<div class="cont df df-c just-c-bet ai-s">'+
+                '<div class="two-hide">'+ arr[i].title +'</div>'+
+                '<span class="time fs-12">'+ arr[i].addtime +'</span>'+
+            '</div>'+
+        '</div>');
+    }
+    if(zixunSwiper){zixunSwiper.destroy(false)}
+    zixunSwiper = new Swiper('#zixun', {slidesPerView :'auto'});
+}
+// 热门问答
+function setQues(arr){
+    $("#hotqs")[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+    var ul = $("#hotqs .ul").empty();
+    for(var i in arr){
+        var o = arr[i];
+        var imgs = "";
+        if(o.avatar && o.avatar.length){
+            for(var j in o.avatar){
+                if(Number(j)>2){break}
+                if(!o.avatar[j]){continue}
+                imgs += '<img src="'+ o.avatar[j] +'" alt="" class="icon" />'
+            }
+        }
+        ul.append('<div class="item" onclick="openListen('+ o.id +')">'+
+            '<div class="title one-hide">'+ o.content +'</div>'+
+            '<div class="mt-6 c-66 df">'+
+                '<div class="icons df">'+ imgs +'</div>'+
+                '<span class="pt">'+ (o.tounum || 0) +'人在旁听</span>'+
+            '</div>'+
+        '</div>');
+    }
+}
+// 热门视频
+function setHotVideo(arr){
+    $api[arr.length?'removeCls':'addCls']($api.byId('hotvideo'),'hide');
+    if(!arr.length){return false}
+    var wrap = $api.dom("#videos .swiper-wrapper");
+    $api.html(wrap,"");
+    for(var i in arr){
+        $api.append(wrap,'<div class="swiper-slide" onclick="openVideo('+ arr[i].id +')">'+
+            '<img src="'+arr[i].image+'" class="img" />'+
+            '<div class="title mt-10 one-hide txt-c">'+ arr[i].title +'</div>'+
+        '</div>');
+    }
+    if(videosSwiper){videosSwiper.destroy(false)}
+    videosSwiper = new Swiper('#videos', {slidesPerView :'auto'});
+}
+// 报刊
+function openBook(id,title,pid){myApp.openWin({title:title, url:"/html/journal/book.html", pageParam:{id:id, pid:pid||0, title:title}})}
+// 更多报刊
+function openMore(){myApp.openWin({title:"教育报刊", url: "/html/journal/more.html", headColor:"#f6f7f8"})}
+// 我的订阅
+function openSubscribe(){myApp.openWin({title:"我的订阅", needLogin:true, url: "/html/journal/subscribe.html"})}
+// 报刊详情
+function openDetail(id){myApp.openWin({title:"报刊介绍", url: "/html/journal/detail.html", headColor: "#E8DAD5", pageParam:{id:id}})}
+// 视频详情
+function openVideo(id){myApp.openWin({hideHead: true, url: "/html/study/detail.html", pageParam:{id:id}})}
+// 视频列表
+function openVideoList(){myApp.openWin({title:"学习视频", url:"/html/study/index.html"})}
+// 旁听
+function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
+// 答疑首页
+function openConsult(){myApp.openWin({title:"招考答疑", url:"/html/consult/index.html"})}
+// 资讯首页
+function openInformation(id){myApp.openWin({title:"教育资讯", url:"/html/information/list.html", headColor:"#f6f7f8", pageParam:{id:id}})}
+// 资讯详情
+function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id}})}
+</script>
+</body>
+</html>

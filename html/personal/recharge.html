@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/input.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .lh-36{line-height:36px;}
+        .pl-2{padding-left:2px;}
+        .pl-6{padding-left:6px;}
+
+        .viplist{padding:20px 14px; background:#ffffff;}
+        .viplist .swiper-slide{box-sizing:border-box; margin-right:10px; padding:20px 0; width:100px; height:120px; border:1px solid #E9EAEB; border-radius:10px;}
+        .viplist .swiper-slide.active{border-color:#F3D49E; background:rgba(243, 212, 158, 0.3);}
+        .viplist .swiper-slide:last-child{margin-right:0;}
+
+        .paysel{padding:20px 14px; background:#ffffff;}
+        .paysel .bei{display:block; width:24px; height:24px; border-radius:50%; margin-right:10px; background:#FF6976 url(../../image/common/bei_w.png) no-repeat center center; background-size:18px 18px;}
+        .paysel .wxpay{display:block; width:24px; height:24px; border-radius:50%; margin-right:10px; background:url(../../image/common/wxpay.png) no-repeat center center; background-size:100% 100%;}
+
+        .btm{padding:14px; background:#ffffff;}
+        .btm .paybox{padding:0 10px 0 16px; height:58px; line-height:58px; border-radius:30px; background:#2A2B46;}
+        .btm .paybox .submit{height:44px; line-height:44px; padding:0 30px; border-radius:22px; background:#FBF1D5 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="viplist">
+        <div class="fs-16 b">充值金额</div>
+        <div id="vipswiper" class="swiper-container mt-16">
+            <div class="swiper-wrapper fs-12 c-33">
+                <div class="swiper-slide df df-c ai-c active">
+                    <div class="fc fs-14 c-66 mt-6">30教育贝</div>
+                    <div class="fs-16 b c-yellow">￥<span class="fs-24">30</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="paysel mt-10">
+        <div class="li df ai-c just-c-bet">
+            <div class="fc df ai-c">
+                <i class="wxpay"></i>
+                <span class="fs-14">微信支付</span>
+            </div>
+            <label>
+                <input type="radio" class="ipt-radio" checked name="" value="" />
+                <i class="iconfont"></i>
+            </label>
+        </div>
+    </div>
+    <div class="btm mt-10 fc df df-c just-c-end">
+        <div class="paybox df ai-c just-c-bet">
+            <div class="df df-c">
+                <div class="df ai-c lh-1">
+                    <span class="c-ff fs-16 mt-4">合计：</span>
+                    <span class="fs-12 c-yellow mt-6">￥</span>
+                    <span class="fs-24 c-yellow">36</span>
+                </div>
+                <div class="fs-12 mt-2 c-77 lh-1">充值50教育贝</div>
+            </div>
+            <button class="com-button submit b" type="button" name="button">立即支付</button>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+apiready = function(){
+
+}
+setSwiper([1,3,3]);
+
+function setSwiper(arr){
+    var wrap = $api.dom("#vipswiper .swiper-wrapper");
+    // $api.html(wrap,"");
+    for(var i in arr){
+        $api.append(wrap,'<div class="swiper-slide df df-c ai-c">'+
+            '<div class="fc fs-14 c-66 mt-6">30教育贝</div>'+
+            '<div class="fs-16 b c-yellow">￥<span class="fs-24">30</span></div>'+
+        '</div>');
+    }
+    var mySwiper = new Swiper('#vipswiper', {slidesPerView :'auto'});
+}
+</script>
+</body>
+</html>

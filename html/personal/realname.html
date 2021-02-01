@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px; background:#ffffff;}
+
+        .form .item{padding:10px 16px; border-bottom:1px solid #e0e0e0;}
+        .form .item:last-child{border-bottom:none;}
+        .form .icon{display:block; width:36px; height:36px; border-radius:50%; background:#f6f7f8;}
+        .form .ipt{width:100px; height:30px; line-height:30px; border:none; outline:none;}
+        .form .sfz{position:relative; box-sizing:border-box; border-radius:8px; padding:31.542% 0; border:1px dashed #979797;}
+        .form .sfz .placeholder{position:absolute; width:100%; height:30px; top:0; bottom:0; margin:auto;}
+        .form .sfz .placeholder .cardimg{display:block; width:28px; height:28px; margin-right:10px;}
+        .form .sfz .photo{position:absolute; z-index:9; width:100%; height:100%; top:0; left:0;}
+
+        .alert{padding:0 16px; line-height:16px;}
+
+        .btn-box{height:50px; padding:0 16px; margin-bottom:10px;}
+        .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body>
+    <form class="form fs-16 c-33">
+        <div class="item df ai-c just-c-bet">
+            <span>真实姓名</span>
+            <input id="name" type="text" class="ipt fc txt-r" placeholder="请输入姓名" />
+        </div>
+        <div class="item df ai-c just-c-bet">
+            <span>身份证号</span>
+            <input id="idcard" type="text" class="ipt fc txt-r" placeholder="请输入身份证号" />
+        </div>
+        <div class="item df df-c">
+            <div>身份证照</div>
+            <div id="sfz1" class="sfz mt-10">
+                <div class="placeholder df ai-c just-c-ct">
+                    <img src="../../image/consult/card.png" class="cardimg" alt="" />
+                    <span class="fs-16 c-99">上传身份证正面图片</span>
+                </div>
+            </div>
+            <div id="sfz2" class="sfz mt-10">
+                <div class="placeholder df ai-c just-c-ct">
+                    <img src="../../image/consult/card.png" class="cardimg" alt="">
+                    <span class="fs-16 c-99">上传身份证背面图片</span>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="alert fs-12 c-99 mt-10">要求：照片清晰可见，信息完整无缺，身份照片严禁经过ps处理</div>
+    <div class="btn-box df ai-c mt-10">
+        <button class="com-button submit fs-14 c-ff" onclick="submit()">确认提交</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var img1 = "";
+var img2 = "";
+apiready = function(){
+    init();
+    setEvent();
+}
+function init(){
+    if(!myApp.login()){api.toast({msg:"请先登录", global:true});return}
+    var userData = myApp.getUserData().uinfo;
+    if(userData.smshsta==1){
+        myApp.alert({
+            content: "您已通过实名审核",
+            callback(){api.closeWin()}
+        });
+    }
+}
+function setEvent(){
+    $("#sfz1").on("click",function(){
+        var ts = $(this);
+        myApp.upImg({clip:true, clipW:"85.6%", clipH:"54%"},function(url){
+            ts.find(".photo").length == 0 && ts.append('<img class="photo" />');
+            ts.find(".photo").attr("src",url);
+            img1 = url;
+        });
+    });
+    $("#sfz2").on("click",function(){
+        var ts = $(this);
+        myApp.upImg({clip:true, clipW:"85.6%", clipH:"54%"},function(url){
+            ts.find(".photo").length == 0 && ts.append('<img class="photo" />');
+            ts.find(".photo").attr("src",url);
+            img2 = url;
+        });
+    });
+}
+function submit(){
+    var name = $("#name").val();
+    var idcard = $("#idcard").val();
+    if(!name){api.toast({msg:"请输入真实姓名"}); return}
+    if(!idcard){api.toast({msg:"请输入身份证号"}); return}
+    if(!/^\d{17}(\d|x|X)$/.test(idcard)){api.toast({msg:"身份证号格式有误"}); return}
+    if(!img1){api.toast({msg:"请上传身份证正面照"}); return}
+    if(!img2){api.toast({msg:"请上传身份证反面照"}); return}
+
+    myApp.ajax({
+        url: "/api/member/member/smtijiao",
+        method: "post",
+        data:{data:{name:name, idcard:idcard, zimage:img1, fimage:img2}},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            api.toast({msg:"提交成功,等待后台审核中", global:true});
+            api.closeWin();
+        },
+        error(e){console.log(JSON.stringify(e))}
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8; padding-bottom:10px;}
+
+        .com-box{padding:12px; margin-left:16px; margin-right:16px;}
+
+        .top{height:160px;}
+        .top.svip{background:#F7D9A6 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03)); box-shadow: 0px 0px 6px 0px rgba(187, 187, 187, 0.8);}
+        .top .info{height:92px; padding:0 16px;}
+        .top .info .icon{display:block; width:50px; height:50px; margin-right:16px; border-radius:50%; background:#f6f7f8;}
+        .top .info .vipicon{margin-left:6px; width:18px; height:18px; background:url(../image/instantly/vip.png) no-repeat center center; background-size:100% 100%;}
+        .top.svip .vipicon{background-image:url(../image/instantly/svip.png)}
+        .top .more{display:inline-block; height:20px; line-height:22px; padding:0 14px 0 10px; background:url(../image/common/more.png) no-repeat right center; background-size:12px 12px;}
+        .top .vipbox{position:relative; height:68px; margin:0 16px; padding:0 16px; border-radius:10px 10px 0 0; background:#474967 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
+        .top .vipbox::before{position:absolute; right:100%; bottom:0; content:" "; padding:5px; background:#cccccc; border-radius:6px 0 0 6px;}
+        .top .vipbox::after{position:absolute; left:100%; bottom:0; content:" "; padding:5px; background:#cccccc; border-radius:0 6px 6px 0;}
+        .top.svip .vipbox::before,
+        .top.svip .vipbox::after{display:none;}
+        .top .tovipbtn{padding:0 4px; background:#FBF1D5 linear-gradient(90deg, #FBF1D5 0%, #F6DEB6 100%);}
+        .top.svip .tovipbtn{background:transparent; color:#F6D8A4;}
+        .top.svip .tovipbtn .more{background-image:url(../image/common/more_w.png);}
+
+        .orderls .itm{padding:4px 0; border-radius:6px;}
+        .orderls .icon{display:block; width:30px; height:30px;}
+
+        .wallet .tt{white-space: pre;}
+        .wallet .bei{display:block; width:18px; height:18px; margin-right:6px;}
+        .wallet .money{margin-left:8px;}
+        .wallet .see{width:24px; height:24px; padding:10px; background:url(../image/personal/eye2.png) no-repeat center center; background-size:24px 24px;}
+        .wallet .see.active{background-image:url(../image/personal/eye1.png);}
+        .wallet .wallet-box{width:80px; padding:2px 0; border-radius:6px;}
+        .wallet .wallet-box .qb{display:block; width:30px; height:30px;}
+        .wallet .full-box{margin:0 6px; padding:6px 0; border-radius:6px;}
+        .wallet .full-box .qb{display:block; width:30px; height:30px;}
+
+        .zixunyy .lh-36{line-height:36px;}
+        .zixunyy .item{height:80px; position:relative; border-radius:4px; margin:0 6px;}
+        .zixunyy .item::after{content:" "; width:1px; height:40px; background:#e1e1e1; position:absolute; right:-6px; top:50%; transform: translateY(-50%);}
+        .zixunyy .item:last-child::after{display:none;}
+
+        .menu.com-box{padding-left:0; padding-right:0;}
+        .menu .item{width:28%; margin:0 2.6%; padding:8px 0; border-radius:4px;}
+        .menu .item .img{display:block; width:24px; height:24px;}
+        .fw-i{font-weight:400;}
+    </style>
+</head>
+<body>
+    <div id="top" class="top">
+        <div class="info df ai-c">
+            <div class="df ai-c fc" onclick="openLogin()">
+                <img src="../image/common/head.png" class="icon" alt="" />
+                <div class="txts">
+                    <div class="df ai-c">
+                        <div class="username fs-16 b c-33">请登录</div>
+                        <div class="vipicon"></div>
+                    </div>
+                    <div class="phone mt-6 fs-12 c-77 hide"></div>
+                </div>
+            </div>
+            <div class="more c-33 fs-12" onclick="openInforForm()">编辑信息</div>
+        </div>
+        <div class="vipbox df ai-c just-c-bet" onclick="openVip()">
+            <div class="fc df df-c just-c-bet c-ff">
+                <div class="b fs-14">VIP 尊享会员</div>
+                <div class="viptxt mt-6 fs-12 c-aa">开通课程VIP  购买课程更多优惠</div>
+            </div>
+            <button class="com-button tovipbtn fs-12"><span class="vipbtn more b">立即开通<span></button>
+        </div>
+    </div>
+    <div class="mt-12 com-box">
+        <div class="com-title df ai-c just-c-bet">
+            <span class="fs-14 c-33 b">我的订单</span>
+            <span class="more fs-12 c-77" onclick="openOrder(0)">全部</span>
+        </div>
+        <div class="df mt-10 orderls fs-12 c-77">
+            <div class="itm fc df df-c ai-c" tapmode="touch-style" onclick="openOrder(1)">
+                <img src="../image/personal/i1.png" class="icon" />
+                <div class="mt-6">我的预约</div>
+            </div>
+            <div class="itm fc df df-c ai-c" tapmode="touch-style" onclick="openOrder(2)">
+                <img src="../image/personal/i2.png" class="icon" />
+                <div class="mt-6">待付款</div>
+            </div>
+            <div class="itm fc df df-c ai-c" tapmode="touch-style" onclick="openOrder(4)">
+                <img src="../image/personal/i3.png" class="icon" />
+                <div class="mt-6">已完成</div>
+            </div>
+            <!-- <div class="itm fc df df-c ai-c" tapmode="touch-style" onclick="openOrder(3)">
+                <img src="../image/personal/i4.png" class="icon" />
+                <div class="mt-6">待评价</div>
+            </div> -->
+        </div>
+    </div>
+    <div class="expert-hide mt-12 wallet com-box df ai-c">
+        <div class="fc df ai-c just-c-bet">
+            <div class="df ai-c">
+                <img src="../image/common/bei.png" class="bei" alt="" />
+                <span class="fs-14">教育贝</span>
+                <span id="yue" class="money fs-20 b" data-money="--">--</span>
+            </div>
+            <div id="seemoney" class="see active"></div>
+        </div>
+        <img src="../image/personal/kuohao.png" style="width:16px;" />
+        <div class="wallet-box df df-c ai-c just-c-ct" tapmode="touch-style" onclick="openWallet()">
+            <img src="../image/personal/qb.png" class="qb" alt="" />
+            <div class="-77 fs-12">我的钱包</div>
+        </div>
+    </div>
+    <div class="expert-show wallet com-box df ai-c mt-12">
+        <div class="full-box fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="openWallet()">
+            <img src="../image/personal/qb.png" class="qb" alt="" />
+            <div class="-77 fs-12">我的钱包</div>
+        </div>
+        <div class="full-box fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="openCommission()">
+            <img src="../image/personal/yj.png" class="qb" alt="" />
+            <div class="-77 fs-12">我的佣金</div>
+        </div>
+    </div>
+    <div class="expert-show zixunyy mt-12 com-box">
+        <div class="com-title df ai-c just-c-bet" onclick="openConsult()">
+            <span class="fs-14 c-33 b">咨询预约</span>
+            <span class="more fs-12 c-77">全部</span>
+        </div>
+        <div id="waitconsult" class="df mt-10">
+            <div class="item fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="openConsult(1)">
+                <div class="wait1 fs-26 b lh-36">0</div>
+                <div class="fs-12 mt-4 c-77 lh-1">待答复</div>
+            </div>
+            <div class="item fc df df-c ai-c just-c-ct" tapmode="touch-style" onclick="openConsult(2)">
+                <div class="wait2 fs-26 b lh-36">0</div>
+                <div class="fs-12 mt-4 c-77 lh-1">今日通话预约</div>
+            </div>
+        </div>
+    </div>
+    <div class="expert-show mt-12 com-box" tapmode="touch-style">
+        <div class="com-title df ai-c just-c-bet" onclick="openArticle()">
+            <span class="fs-14 c-33 b">创作文章</span>
+            <span class="more fs-12 c-77">全部</span>
+        </div>
+    </div>
+
+    <div class="menu mt-12 com-box c-77 fs-14 df df-w-w">
+        <div class="item df df-c ai-c" tapmode="touch-style" onclick="openHistory()">
+            <img src="../image/personal/ic1.png" class="img" alt="" />
+            <div class="mt-6">浏览历史</div>
+        </div>
+        <div class="item df df-c ai-c" tapmode="touch-style" onclick="openCollection()">
+            <img src="../image/personal/ic2.png" class="img" alt="" />
+            <div class="mt-6">收藏内容</div>
+        </div>
+        <!-- <div class="item df df-c ai-c" tapmode="touch-style" onclick="openListenHistory()">
+            <img src="../image/personal/ic3.png" class="img" alt="" />
+            <div class="mt-6">旁听记录</div>
+        </div> -->
+        <div class="item df df-c ai-c" tapmode="touch-style" onclick="openFllow()">
+            <img src="../image/personal/ic4.png" class="img" alt="" />
+            <div class="mt-6">我的关注</div>
+        </div>
+        <div class="expert-hide item df df-c ai-c" tapmode="touch-style" >
+            <img src="../image/personal/ic5.png" class="img" alt="" />
+            <div class="mt-6">异常申请</div>
+        </div>
+        <div class="expert-hide item df df-c ai-c" tapmode="touch-style" onclick="openExpertApply()">
+            <img src="../image/personal/ic7.png" class="img" alt="" />
+            <div class="mt-6">申请专家</div>
+        </div>
+        <div class="expert-show item df df-c ai-c" tapmode="touch-style" onclick="openMyFans()">
+            <img src="../image/personal/ic9.png" class="img" alt="" />
+            <div class="mt-6">我的粉丝</div>
+        </div>
+        <div class="expert-show item df df-c ai-c" tapmode="touch-style" onclick="openMyEvaluate()">
+            <img src="../image/personal/ic8.png" class="img" alt="" />
+            <div class="mt-6">粉丝评价</div>
+        </div>
+        <div class="item df df-c ai-c" tapmode="touch-style" onclick="openSystem()">
+            <img src="../image/personal/ic6.png" class="img" alt="" />
+            <div class="mt-6">设置</div>
+        </div>
+    </div>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/zepto.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script>
+apiready = function(){
+    setEvent();
+    api.sendEvent({name: 'personalTestLogin'});
+}
+function setEvent(){
+    api.addEventListener({name:'personalTestLogin'}, function(){
+        setTimeout(function(){api.refreshHeaderLoadDone()},200);
+        getData();
+        var top = $("#top");
+        if(myApp.isLogin()){
+            var userInfo = myApp.getUserData().uinfo;
+            top.find(".info .icon").attr("src",userInfo.avatar);
+            top.find(".username").text(userInfo.nickname);
+            userInfo.phone && top.find(".phone").removeClass("hide").html(userInfo.phone.replace(/^(\d{3})\d{4}/,"$1****"));
+            // 会员
+            var isvip = Number(userInfo.levelid) > 0;
+            top[isvip?'addClass':'removeClass']("svip");
+            api.execScript({name:'root', script:'setHeader4('+isvip+')'});
+            top.find(".vipbtn").html(isvip?"立即续费":"立即开通");
+            top.find(".viptxt").html(isvip && userInfo.leendtime?"会员到期时间："+userInfo.leendtime:"开通课程VIP  购买课程更多优惠");
+            // 专家
+            // userInfo.groupid = 2;
+            var isExpert = userInfo.groupid==2;
+            $(".expert-show")[isExpert?'removeClass':'addClass']("hide");
+            $(".expert-hide")[isExpert?'addClass':'removeClass']("hide");
+            if(isExpert){
+                myApp.ajax({
+                    url: "/api/zixun/zhuanjiadayi/getdayilist",
+                    method: "get",
+                    data: {type:0},
+                    loading: false,
+                    alert: false,
+                    success(data){
+                        if(!data.count){return}
+                        $("#waitconsult .wait1").html(data.count);
+                    }
+                });
+                myApp.ajax({
+                    url: "/api/zixun/zhuanjiadayi/getyuyuelist",
+                    method: "get",
+                    data: {time:new Date().toISOString().substr(0,10)},
+                    loading: false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ,
+                    alert: false,
+                    success(data){
+                        if(!data.list){return}
+                        var all = 0;
+                        var over = 0;
+                        for(var i in data.list){
+                            for(var j in data.list[i]){
+                                var o = data.list[i][j];
+                                all++;
+                                o.status=="0"?over++:'';
+                            }
+                        }
+                        var overSpan = over==0?'':'<span class="fs-16 fw-i c-99">'+ over +' / </span>';
+                        $("#waitconsult .wait2").html(overSpan + all);
+                    }
+                });
+            }
+        }else{
+            top.removeClass("svip");
+            top.find(".info .icon").attr("src","../image/common/head.png");
+            top.find(".username").html("请登录");
+            top.find(".phone").addClass("hide");
+            api.execScript({name:'root', script:'setHeader4()'});
+            $(".expert-show").addClass("hide");
+            $(".expert-hide").removeClass("hide");
+        }
+    });
+    $("#seemoney").on("click",function(){
+        var ts = $(this);
+        var money = ts.siblings().find(".money");
+        var isActive = ts.hasClass("active");
+        ts[isActive?'removeClass':'addClass']("active");
+        money.html(isActive?'***':money.data('money'));
+        $api.setStorage('unseeMoney',isActive);
+    });
+    api.addEventListener({name:'viewappear'},getData);
+    api.addEventListener({name:'moneyChange'},getData)
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        if(!myApp.isLogin()){api.sendEvent({name: 'personalTestLogin'}); return}
+        api.execScript({name:'root', script:'getUserData();'});
+    });
+}
+function getData(){
+    if(!myApp.isLogin()){
+        var yue = $("#yue");
+        yue.html("--").data("money","--");
+        $api.rmStorage('unseeMoney');
+        $("#seemoney").addClass("active");
+        $(".expert-show").addClass("hide");
+        $(".expert-hide").removeClass("hide");
+        return;
+    }
+    myApp.ajax({
+        url: "/api/member/member/getmoney",
+        method: "get",
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var yue = $("#yue");
+            if(data.money){yue.html(data.money).data("money",data.money)}
+            if($api.getStorage('unseeMoney')=="true"){
+                $("#seemoney").removeClass("active");
+                yue.html("***");
+            }
+        }
+    });
+}
+// 登录
+function openLogin(){myApp.login()}
+// 我的钱包
+function openWallet(){myApp.openWin({title:"我的钱包", needLogin:true, url:"/html/personal/wallet.html", headColor:"#f6f7f8"})}
+// 我的佣金
+function openCommission(){myApp.openWin({title:"我的佣金", needLogin:true, url:"/html/special/commission.html", headColor:"#f6f7f8"})}
+// 编辑信息
+function openInforForm(){myApp.openWin({title: "编辑信息", needLogin:true, url: "/html/personal/info_form.html"})}
+// 浏览历史
+function openHistory(){myApp.openWin({title:"浏览历史", needLogin:true, url: "/html/personal/history.html"})}
+// 旁听记录
+function openListenHistory(){myApp.openWin({title:"旁听记录", needLogin:true, url: "/html/personal/listen_history.html"})}
+// 我的关注
+function openFllow(){myApp.openWin({title:"我的关注", needLogin:true, url: "/html/personal/follow.html"})}
+// 我的收藏
+function openCollection(){myApp.openWin({title:"我的收藏", needLogin:true, url:"/html/personal/collection.html"})}
+// 系统设置
+function openSystem(){myApp.openWin({title:"系统设置", url: "/html/personal/system.html"})}
+// 我的订单
+function openOrder(id){myApp.openWin({title:"我的订单", needLogin:true, url: "/html/personal/order.html",pageParam:{id:id}})}
+// 会员包
+function openVip(){myApp.openWin({title:"会员包", needLogin:true, backWhite:true, url:"/html/personal/vip.html", headTxtColor:"#ffffff", headColor:"#474967 linear-gradient(to right, #474967, #20203B)"})}
+// 我的文章
+function openArticle(){myApp.openWin({title:"创作文章", needLogin:true, headColor:'#f6f7f8', url:"/html/special/article.html"})}
+// 咨询预约详情（专家）
+function openConsult(tab){myApp.openWin({title:"咨询预约", backWhite:true, url:"/html/special/consult.html", needLogin:true, headTxtColor:"#ffffff", headColor:"#474967 linear-gradient(to right, #474967, #20203B)", pageParam:{tab:tab}})}
+// 申请专家
+function openExpertApply(){myApp.openWin({title:"申请专家", needLogin:true, url:"/html/special/apply.html"})}
+// 我的粉丝
+function openMyFans(){myApp.openWin({title:"我的粉丝", url:"/html/special/my_fans.html", needLogin:"true"})}
+// 我的评价
+function openMyEvaluate(){myApp.isLogin() && myApp.openWin({title:"评价", needLogin:true, url:"/html/consult/expert_evaluate_list.html", pageParam:{uid:myApp.getUserData().uinfo.uid}})}
+</script>
+</body>
+</html>

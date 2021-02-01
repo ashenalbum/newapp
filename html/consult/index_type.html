@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding-bottom:20px; background:#f6f7f8;}
+        .com-box{margin-left:10px; margin-right:10px;}
+
+        .top{padding:16px 0; background:#ffffff;}
+        .top .item{width:80px;}
+        .top .img{display:block; width:60px; height:60px;}
+        .top .label{line-height:20px;}
+
+        .school-box{margin-left:10px; margin-right:10px;}
+        .school-box .bar{height:30px;}
+        .school-box .more{display:inline-block; height:24px; line-height:24px; padding:0 14px 0 10px; background:url(../../image/common/more.png) no-repeat right center; background-size:12px 12px; border-radius:2px;}
+        .school-box .list{margin-left:-6px; margin-right:-6px;}
+        .school-box .list .item{width:50%;}
+        .school-box .list .item .item-box{margin:0 6px 12px; box-sizing:border-box; padding:12px 10px; background:#ffffff; border-radius:6px; }
+        .school-box .list .logo{display:block; width:52px; height:52px; border-radius:50%;}
+        .school-box .list .title{height:32px; line-height:16px;}
+        .school-box .list .labels{height:32px;}
+        .school-box .list .labels span{display:block; padding:0 4px; line-height:16px; border-right:thin solid; word-break:break-all;}
+        .school-box .list .labels span:last-child{border-right:none;}
+        .school-box .list .btn{height:30px; line-height:32px; padding:0 24px; background:rgba(255, 28, 58, 0.1); border-radius:16px;}
+
+        .zixunlist .item{padding:14px 0; border-bottom:1px solid #dddddd;}
+        .zixunlist .item:last-child{border:none;}
+        .zixunlist .item .icon{display:block; margin-right:14px; width:40px; height:40px; border-radius:50%; background:#f6f7f8;}
+        .zixunlist .item .fen{padding-left:26px; line-height:14px; background:url(../../image/information/save_act.png) no-repeat 10px center; background-size:12px 12px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="top df just-c-aro">
+        <div class="item df df-c ai-c" onclick="openSchool()">
+            <img src="../../image/consult/top1.png" class="img" alt="" />
+            <div class="mt-6 label fs-14">院校</div>
+        </div>
+        <div class="item df df-c ai-c" onclick="openExpert()">
+            <img src="../../image/consult/top2.png" class="img" alt="" />
+            <div class="mt-6 label fs-14">专家</div>
+        </div>
+        <div class="item df df-c ai-c" onclick="openList()">
+            <img src="../../image/consult/top3.png" class="img" alt="" />
+            <div class="mt-6 label fs-14">问答排行</div>
+        </div>
+    </div>
+    <!-- 院校 -->
+    <div class="school-box mt-16 df df-c">
+        <div class="bar df ai-c just-c-bet">
+            <div class="fs-16 b">热门院校</div>
+            <div class="more fs-12 c-77" onclick="openSchool()">更多</div>
+        </div>
+        <div id="schoollist" class="list mt-10 df df-w-w">
+            <div class="item">
+                <div class="item-box df df-c ai-c">
+                    <img src="../../image/common/test.jpg" class="logo shadow2" alt="" />
+                    <div class="title df ai-c txt-c mt-6 tow-hide fs-12">山西工程职业技术学院</div>
+                    <div class="labels mt-4 fs-12 c-99 df ai-c">
+                        <span class="two-hide">111次浏览</span>
+                        <span class="two-hide">121粉丝</span>
+                    </div>
+                    <button class="mt-10 btn com-button c-red fs-12" tapmode="touch-style">发起咨询</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 资讯专家 -->
+    <div id="expert" class="zixun com-box mt-4">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="fs-16 c-33 b">专家咨询</span>
+            <span class="fs-12 c-77 more" onclick="openExpert()">更多</span>
+        </div>
+        <div class="zixunlist itembox fs-12"></div>
+    </div>
+    <!-- 都在问 -->
+    <div id="dayi" class="question com-box mt-16">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="fs-16 c-33 b">热门问答</span>
+            <span class="more fs-12 c-77" onclick="openList()">更多</span>
+        </div>
+        <div class="itembox fs-12"></div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    // 专家
+    $("#expert").on("click",".item",function(e){
+        var ts = $(this);
+        var id = ts.data("id");
+        var uid = ts.data("uid");
+        var money = ts.data("money");
+        if($(e.target).hasClass('to-launch')){openLaunch(uid,ts.data('name'),"expert",money); return}
+        openExpertDetail(id,uid);
+    });
+    // 向学校发起咨询
+    $("#schoollist").on("click",".item-box",function(e){
+        var ts = $(this);
+        var id = ts.data('id');
+        if($(e.target).hasClass("btn")){
+            openLaunch(id,ts.data('name'),"school");
+            return;
+        }
+        openSchoolDetail(id);
+    });
+}
+function getData(){
+
+}
+// 大家都在问
+function setDayi(arr){
+    var dayi = $("#dayi");
+    dayi[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+    var ul = dayi.find(".itembox").empty();
+    for(var i in arr){
+        ul.append('<div class="item df df-c just-c-bet mt-12" onclick="openListen('+ arr[i].id +')">'+
+            '<div class="title two-hide">'+ arr[i].content +'</div>'+
+            '<div class="df ai-c just-c-bet">'+
+                '<span class="fs-12 c-aa">'+ arr[i].tounum +'人旁听</span>'+
+                '<div class="listen c-red b bei">'+ arr[i].money +'贝旁听</div>'+
+            '</div>'+
+        '</div>');
+    }
+}
+// 专家
+function setExpert(arr){
+    $api[arr.length?'removeCls':'addCls']($api.byId('expert'),'hide');
+    if(!arr.length){return false}
+    var ul = $("#expert .zixunlist").empty();
+    for(var i in arr){
+        var o = arr[i];
+        ul.append('<div class="item df" data-id="'+ o.id +'" data-uid="'+ o.uid +'" data-name="'+ o.name +'" data-money="'+ o.pricemsg +'">'+
+            '<img src="'+ o.avatar +'" class="icon" />'+
+            '<div class="fc">'+
+                '<div class="df ai-c just-c-bet">'+
+                    '<span class="fs-14 c-33 b">'+ myApp.htmlEscape(o.name) +'</span>'+
+                    '<button class="to-launch com-button bei-btn c-red b">'+ (Number(o.pricemsg)>0?o.pricemsg:'') +'咨询</button>'+
+                '</div>'+
+                '<div class="mt-6 df ai-c fs-12">'+
+                    '<span class="c-aa">'+ o.dyznum +'次咨询</span>'+
+                    '<span class="fen c-yellow">'+ (o.pingfen=='0'?'<span class="fs-10">暂无评分</span>':o.pingfen) +'</span>'+
+                '</div>'+
+                '<div class="mt-6 one-hide">'+ myApp.htmlEscape(o.message) +'</div>'+
+            '</div>'+
+        '</div>');
+    }
+}
+// 院校详情
+function openSchoolDetail(id){myApp.openWin({hideAll:true, url:"/html/consult/school_main.html", pageParam:{id:id}})}
+// 旁听
+function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
+// 专家详情
+function openExpertDetail(id,uid){myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{id:id, uid:uid}})}
+// 专家列表
+function openExpert(){myApp.openWin({title:"专家", url: "/html/consult/expert.html", headColor:'#f6f7f8'})}
+// 大家都在问
+function openList(){myApp.openWin({title:"大家都在问", url:"/html/consult/listen_all.html"})};
+// 院校列表
+function openSchool(){myApp.openWin({title:"院校", url:"/html/consult/school.html", headColor: "#f6f7f8"})}
+// 发起咨询
+function openLaunch(id,name,type,money){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:type, id:id, uid:id, name:name, money:money}})}
+</script>
+</body>
+</html>

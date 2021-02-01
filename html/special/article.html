@@ -1,0 +1,228 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/swiper.min.css" />
+	<style>
+        body{box-sizing:border-box; padding:50px 10px 10px; background:#f6f7f8;}
+        .menu{height:40px; position:fixed; top:0; left:0; right:0; padding:10px 10px 0; background:#f6f7f8;}
+        .menu .swiper-slide{position:relative; z-index:2; width:auto; height:20px; line-height:20px; padding:10px 20px 6px;}
+        .menu .swiper-slide:first-child{padding-left:12px;}
+        .menu .swiper-slide:last-child{margin-right:12px;}
+        .menu .swiper-slide.active{font-weight:bold; color:#333333;}
+        .menu .i{position:absolute; left:0; bottom:0; width:0; height:6px; background:url(../../image/instantly/active.png) no-repeat center bottom; background-size: 16px 6px; transition:left 0.3s;}
+
+        .newslist.com-box{padding-top:4px; padding-bottom:4px;}
+        .load-more{margin-bottom:60px;}
+
+        .btn-box{position:fixed; height:70px; bottom:0; left:0; right:0; padding:0 30px;}
+        .btn-box .start-btn{width:100%; height:40px; border-radius:10px; line-height:40px; background:#FF3942; }
+    </style>
+</head>
+<body class="df df-c">
+    <!-- 分类 -->
+    <div id="menu" class="menu">
+        <div id="menuswiper" class="swiper-container">
+            <div class="swiper-wrapper fs-14 c-99">
+                <div class="swiper-slide active" data-id="0">全部文章</div>
+                <div class="swiper-slide" data-id="1">审核通过</div>
+                <div class="swiper-slide" data-id="2">审核中</div>
+                <div class="swiper-slide" data-id="3">审核不通过</div>
+                <div class="i"></div>
+            </div>
+        </div>
+    </div>
+    <div id="newslist" class="newslist mt-10 com-box"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-10 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+    <div class="btn-box df ai-c">
+        <button type="button" class="com-btn start-btn c-ff fs-14" onclick="createArticle()">开始创作</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script type="text/javascript">
+var searchId = 0;
+var page = 1;
+var loading = false;
+var over = false;
+var dataList = [];
+var ul = $("#newslist");
+var loadmore = $("#loadmore");
+var menuswiperSwiper = null;
+
+apiready = function(){
+    setEvent();
+    getList();
+}
+
+function setEvent(){
+    api.addEventListener({name: 'reload'}, function(){
+        page = 1;
+        over = false;
+        getList();
+    });
+
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getList();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        page = 1;
+        over = false;
+        getList();
+    });
+
+    setMenu();
+
+    $("#menu").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        if(ts.hasClass("active")){return}
+        if(loading){api.toast({msg:"加载中，请稍候"});return}
+        ts.addClass("active").siblings().removeClass("active");
+        searchId = ts.data("id");
+        page = 1;
+        over = false;
+        getList();
+        var left = ts.get(0).offsetLeft;
+        var width = ts.width();
+        ts.siblings(".i").css({left:left, width:width});
+    });
+}
+// 菜单
+function setMenu(arr){
+    if(menuswiperSwiper){menuswiperSwiper.destroy(false)}
+    menuswiperSwiper = new Swiper('#menuswiper', {slidesPerView :'auto'});
+    var ts = $("#menu .swiper-slide").eq(0);
+    var left = ts.get(0).offsetLeft;
+    var width = ts.width();
+    ts.siblings(".i").css({left:left+'px', width:width+'px'});
+}
+// 获取列表
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/member/newlist",
+        method: "get",
+        loading: false,
+        data: {page:page, sta:searchId},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            ul[dataList.length?'removeClass':'addClass']("hide");
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var obj = data.list[i];
+                var label = obj.label?'<span class="hot mt-8">'+ obj.label +'</span>':'';
+                var from = obj.laiyuan?'<span class="fs-12 lh-1 c-aa mt-8">'+ obj.laiyuan +'</span>':'';
+                if(obj.show_mode=="1"){
+                    ul.append('<div class="news type1 df" onclick="openMenu('+ obj.id +')">'+
+                        '<div class="df df-c just-c-bet f1">'+
+                            '<div class="two-hide">'+ obj.title +'</div>'+
+                            '<div class="df ai-s">'+label+from+'</div>'+
+                        '</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
+                    '</div>');
+                }else if(obj.show_mode=="2"){
+                    ul.append('<div class="news type3" onclick="openMenu('+ obj.id +')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else if(obj.show_mode=="3"){
+                    var img = "";
+                    if(obj.images instanceof Array){
+                        for(var i in obj.images){
+                            if(Number(i)>2){break}
+                            img += '<img src="'+obj.images[i]+'" class="img fc" alt="" />';
+                        }
+                    }
+                    ul.append('<div class="news type2" onclick="openMenu('+ obj.id +')">'+
+                        '<div class="one-hide">'+ obj.title +'</div>'+
+                        '<div class="df mt-6">'+ img +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else{
+                    ul.append('<div class="news type3" onclick="openMenu('+ obj.id +')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }
+            }
+        },
+        error(e){
+            console.log(JSON.stringify(e)); // 1049
+        }
+    })
+}
+// 菜单
+function openMenu(id){
+    api.actionSheet({
+        cancelTitle: '取消',
+        buttons: ['查看','编辑','删除']
+    }, function(ret, err) {
+        var index = ret.buttonIndex;
+        if(index==1){openNews(id)}
+        else if(index==2){openEdit(id)}
+        else if(index==3){
+            myApp.confirm({
+                title: "提示",
+                content: "确定删除该文章吗",
+                callback(btnIndex){
+                    if(btnIndex!=1){return}
+                    myApp.ajax({
+                        url: "/api/zixun/member/newsdel",
+                        method: "get",
+                        data: {id:id},
+                        success(data){
+                            if(data.errcode!=0 && data.errcode!=200){return}
+                            api.toast({msg:"删除成功"});
+                            over = false;
+                            page = 1;
+                            getList();
+                        },
+                        error(e){console.log(JSON.stringify(e))}
+                    });
+                }
+            });
+        }
+    });
+}
+// 编辑
+function openEdit(id){myApp.openWin({name:"article_create", hideHead:true, needLogin:true, url:"/html/special/article_create.html", pageParam:{edit:true, id:id}})}
+// 资讯详情
+function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id}})}
+// 写文章
+function createArticle(){myApp.openWin({name:"article_create", hideHead:true, needLogin:true, url:"/html/special/article_create.html"})}
+</script>
+</body>
+</html>

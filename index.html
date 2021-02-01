@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="./css/style.css"/>
+    <style>
+        html,body{height:100%;}
+        #wrap{height:100%; background:#f1f1f1;}
+        #header .header{height:40px;}
+        #header .header1,
+        #header .header3{background:#ffffff; position:relative;}
+        #header .header2{background:#F6F7F8; height:0;}
+        #header .header2>span{display:none;}
+        #header .header2.vip{background:#F6F7F8; height:40px;}
+        #header .header2.vip>span{display:inline;}
+        #header .header2.svip{background:#F7D9A6 linear-gradient(to right, #F7D9A6, #E3C17B); height:40px;}
+        #header .header2.svip>span{display:inline;}
+        #header .header4{height:0; background:#F6F7F8;}
+        #header .header4.svip{background:#F7D9A6 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
+        #header .header .ic{position:absolute; background:url(image/index/baycar.png) no-repeat center center; background-size:100% 100%; width:30px; height:30px; bottom:5px; right:12px;}
+
+        #footer{height:50px;  background-color:#ffffff; }
+        #footer ul{height:100%;}
+        #footer ul li{box-sizing:border-box; height:100%; padding-top:30px; font-size:10px; line-height:18px; background: url() no-repeat center 6px; background-size:auto 22px; text-align:center; color:#979797;}
+        #footer ul li.active{ color:#FF3942; }
+        #footer ul li:nth-child(1){ background-image: url(./image/common/tab1.png); }
+        #footer ul li:nth-child(2){ background-image: url(./image/common/tab2.png); }
+        #footer ul li:nth-child(3){ background-image: url(./image/common/tab3.png); }
+        #footer ul li:nth-child(4){ background-image: url(./image/common/tab4.png); }
+        #footer ul li:nth-child(1).active{ background-image: url(./image/common/tabact1.png); }
+        #footer ul li:nth-child(2).active{ background-image: url(./image/common/tabact2.png); }
+        #footer ul li:nth-child(3).active{ background-image: url(./image/common/tabact3.png); }
+        #footer ul li:nth-child(4).active{ background-image: url(./image/common/tabact4.png); }
+
+        .fc{overflow: auto}
+        .border-t,.border-b{position:relative;}
+        .border-t:before,.border-b:after{content: ''; position:absolute; left:0; top:0; background:#ddd; right:0; height:1px;-webkit-transform:scaleY(0.5); transform:scaleY(0.5);}
+        .border-b:after{top:auto;bottom:0;}
+    </style>
+</head>
+<body>
+<div id="wrap" class="df df-c">
+    <div id="header">
+        <div class="header header1 df ai-c just-c-ct">
+            <span class="fs-16 b c-33">山西教育综合门户</span>
+            <i id="buyurl" class="ic"></i>
+        </div>
+        <div class="header header2 df ai-c just-c-ct hide"><span class="fs-16 b c-33">即刻</span></div>
+        <div class="header header3 df ai-c just-c-ct hide"><span class="fs-16 b c-33">消息</span></div>
+        <div class="header header4 hide"></div>
+    </div>
+    <div id="main" class="fc"></div>
+    <div id="footer" class="border-t">
+        <ul class="df">
+            <li tapmode="hover" onclick="randomSwitchBtn(this,0);" class="fc active" >首页</li>
+            <li tapmode="hover" onclick="randomSwitchBtn(this,1);" class="fc" >即刻</li>
+            <li tapmode="hover" onclick="randomSwitchBtn(this,2);" class="fc" >消息</li>
+            <li tapmode="hover" onclick="randomSwitchBtn(this,3);" class="fc" >我的</li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript" src="script/api.js"></script>
+<script type="text/javascript" src="script/zepto.min.js"></script>
+<script type="text/javascript" src="script/common.js"></script>
+<script type="text/javascript" src="script/rong.js"></script>
+<script type="text/javascript">
+apiready = function () {
+    api.setStatusBarStyle({style:'dark', color:'transparent'});
+    $api.fixTabBar($api.byId('footer'));
+    var headerList = $("#header .header").css("paddingTop",api.safeArea.top + "px");
+    setEvent();
+    exitApp();
+    getUserData();
+    funIniGroup();
+}
+
+function setEvent(){
+    // 状态栏颜色
+    api.addEventListener({name:'viewappear'},function(){api.setStatusBarStyle({style: 'dark'})});
+    // 来电
+    api.addEventListener({name: 'rongaccept'}, function(ret, err){
+        api.notification({
+            light: true,
+            vibrate: [100, 500, 200, 500, 300, 500, 400, 500],
+            sound: 'default',
+            notify: {
+                title: '有来电',
+                content: '您预约的咨询有来电'
+            }
+        });
+        // 获取预约id 1049
+        // var id =
+        // $api.getStorage('callExtra', ret.message.content.extra);
+        myApp.openWin({hideAll:true, url:"/html/common/ry_video.html", pageParam:{type:"listen", id:id}});
+    });
+
+    if(myApp.isLogin()){
+        RY.init(true);
+        RY.login();
+    }
+}
+// 获取最新userdata 刷新审核，会员过期等
+function getUserData(){
+    if(!myApp.isLogin()){return}
+    myApp.ajax({
+        url: "/api/member/member/getudata",
+        method: "get",
+        loading: false,
+        alert: false,
+        success(data){
+            if(data && data.udata){
+                $api.rmStorage('userData');
+                $api.setStorage('userData', data.udata);
+                api.sendEvent({name: 'instantlyTestLogin'});
+                api.sendEvent({name: 'personalTestLogin'});
+            }
+        },
+        error(){api.sendEvent({name: 'personalTestLogin'});}
+    })
+}
+// 主页面
+function funIniGroup(){
+    var frames = [
+        {name:'index', url:'./html/index.html'},
+        {name:'instantly', url:'./html/instantly.html'},
+        {name:'message', url:'./html/message.html'},
+        {name:'personal', url:'./html/personal.html'}
+    ];
+    api.openFrameGroup({
+        name: 'group',
+        scrollEnabled: false,
+        rect: {
+            x: 0,
+            y: $api.byId("header").offsetHeight,
+            w: api.winWidth,
+            h: $api.dom('#main').offsetHeight
+        },
+        index: 0,
+        frames: frames
+    }, function (ret, err) {});
+    // web链接打开app页面  shanxijiaoyu://?type=xx&data=xxx
+    if(api.pageParam && api.pageParam.appParam){
+        var openData = api.pageParam.appParam;
+        myApp.openBanner(openData.type, openData.data, openData);
+    }
+}
+// 随意切换按钮
+function randomSwitchBtn( tag , id) {
+    if(tag == $api.dom('#footer li.active')){return};
+    $('#header .header').eq(id).removeClass('hide').siblings().addClass('hide');
+    $('#footer li').eq(id).addClass('active').siblings().removeClass('active');
+    api.setFrameGroupIndex({name:'group', index:id});
+    setGroupSize();
+}
+// 即刻头部样式
+function setHeader2(vip){
+    var header2 = $("#header .header2").removeClass("vip svip");
+    vip && header2.addClass(vip);
+    setGroupSize();
+}
+// 个人中心头部样式
+function setHeader4(vip){
+    var header4 = $("#header .header4").removeClass("svip");
+    vip && header4.addClass('svip');
+    setGroupSize();
+}
+// 设置frame大小
+function setGroupSize(){
+    api.setFrameGroupAttr({
+        name: 'group',
+        rect: {x:0, y: $api.byId("header").offsetHeight, w: api.winWidth, h: $api.dom('#main').offsetHeight}
+    });
+}
+// 首页跳转url
+function setShopUrl(url){$("#buyurl").on("click",function(){myApp.openUrl(url)})}
+// 退出app
+function exitApp(){
+    api.addEventListener({
+        name: 'keyback'
+    }, function(){
+        api.toast({msg: '再按一次返回键退出'+api.appName});
+        api.addEventListener({name: 'keyback'}, function(ret, err){api.closeWidget({silent:true})});
+        setTimeout(function(){exitApp()},2500);
+    });
+}
+</script>
+</body>
+</html>

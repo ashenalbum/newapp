@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+	<style>
+        body{box-sizing:border-box; background:#ffffff;}
+        .mt-50{margin-top:50px;}
+        #header{height:40px; background:#ffffff; position:fixed; top:0; left:0; right:0;}
+        #header .back{padding:10px; width:20px; height:20px; margin:0 10px;}
+        #header .form .ipt{box-sizing:border-box; width:180px; height:32px; line-height:32px; border-radius:16px; background:#F6F7F8; padding:0 18px;}
+        #header .form .search-icon{width:20px; height:20px; position:absolute; top:0; bottom:0; right:14px; margin:auto; background:url(../../image/information/search.png); background-size:100% 100%;}
+        #header .submit{width:60px; height:36px; line-height:36px; font-weight:500;}
+
+        #tabs{padding:0 20px;}
+        #tabs .label{display:inline-block; margin:0 10px 10px 0; height:28px; line-height:28px; padding:0 10px; white-space:nowrap; background:#F6F7F8; border-radius:4px; }
+        #tabs .historys .li{padding:10px 0; border-bottom:1px solid #f6f7f8;}
+        #tabs .historys .li:last-child{border-bottom:0;}
+
+        #newslist{padding:0 20px;}
+    </style>
+</head>
+<body class="df df-c">
+    <header id="header" class="header fs-20 c-33 df ai-c">
+        <img src="../../image/common/back.png" class="back" onclick="api.closeWin()" />
+        <form class="fc form pr df ai-c">
+            <input id="search" type="text" class="fc ipt fs-14" placeholder="请输入关键词" />
+            <i class="search-icon" onclick="submit()"></i>
+            <button type="submit" class="hide"></button>
+        </form>
+        <div class="submit fs-14 c-33 txt-c" onclick="submit()">搜索</div>
+    </header>
+    <div id="tabs" class="tabs mt-50">
+        <div id="hot">
+            <div class="fs-16 b">热门搜索</div>
+            <div class="labels mt-16 fs-14 c-66">
+                <div class="txt-c fs-14 c-99 mt-16">暂无数据</div>
+            </div>
+        </div>
+        <div id="history">
+            <div class="mt-30 df ai-c just-c-bet">
+                <div class="fs-16 b">搜索历史</div>
+                <div class="del-history c-blue">删除记录</div>
+            </div>
+            <div class="historys mt-10 fs-14 c-66"></div>
+        </div>
+    </div>
+
+    <div id="newslist" class="newslist mt-50 fs-14 c-33"></div>
+
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14 hide">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+var key = "";
+var saveKey = "";
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var searchOk = false;
+
+apiready = function(){
+    $api.fixTabBar(document.body);
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $(document.body).on("click",".keywords",function(){
+        key = $(this).data('key');
+        $("#search").val(key);
+        submit();
+    });
+    // 回车提交
+    $("#header .form").submit(function(){submit(); $(this).find(".ipt").blur(); return false});
+    (function(){
+        appendHistory();
+        $("#history .del-history").on("click",function(){
+            if(!$api.getStorage('newSearchHistory')){api.toast({msg:"没有搜索记录"});return}
+            myApp.confirm({
+                title: "提示",
+                content: "确定删除搜索记录吗",
+                callback(btnIndex){
+                    if(btnIndex!=1){return}
+                    $api.rmStorage('newSearchHistory');
+                    $("#history .historys").empty();
+                }
+            });
+        })
+    })();
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = true;
+        page = 1;
+        dataList = [];
+        $("#newslist").empty();
+        $("#loadmore").removeClass("over load").addClass("hide");
+        $("#tabs").removeClass("hide");
+        getData();
+    });
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        searchOk && getList();
+    });
+}
+// 初始
+function getData(){
+    myApp.ajax({
+        url: "/api/news/home/search",
+        method: "get",
+        alert: false,
+        success(data){
+            api.refreshHeaderLoadDone();
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var tabs = $("#hot");
+            if(!data.data || data.data.length==0){tabs.addClass("hide");}
+            tabs.removeClass('hide');
+            if(!data.data || !data.data.length){return}
+            var ul = tabs.children(".labels").empty();
+            for(var i in data.data){
+                var o = data.data[i];
+                ul.append('<span class="label keywords" data-key="'+ o.keywords +'">'+ o.keywords +'</span>');
+            }
+            $("#search").attr({placeholder:data.data[0].keywords});
+            key = data.data[0].keywords;
+            saveKey = key;
+        },
+        error(){api.refreshHeaderLoadDone()}
+    });
+}
+// 搜索请求
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/news/home/newslist",
+        method: "get",
+        loading: false,
+        data: {page:page, keyword:key},
+        success(data){
+            searchOk = true;
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var ul = $("#newslist");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var obj = data.list[i];
+                var label = obj.label?'<span class="hot mt-6">'+ obj.label +'</span>':'';
+                var from = obj.laiyuan?'<span class="fs-12 lh-1 c-aa mt-6">'+ obj.laiyuan +'</span>':'';
+                if(obj.show_mode=="1"){
+                    ul.append('<div class="news type1 df" onclick="openNews('+obj.id+')">'+
+                        '<div class="df df-c just-c-bet f1">'+
+                            '<div class="two-hide">'+ obj.title +'</div>'+
+                            '<div class="df ai-s">'+label+from+'</div>'+
+                        '</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
+                    '</div>');
+                }else if(obj.show_mode=="2"){
+                    ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else if(obj.show_mode=="3"){
+                    var img = "";
+                    if(obj.images instanceof Array){
+                        for(var i in obj.images){
+                            if(Number(i)>2){break}
+                            img += '<img src="'+obj.images[i]+'" class="img fc" alt="" />';
+                        }
+                    }
+                    ul.append('<div class="news type2" onclick="openNews('+obj.id+')">'+
+                        '<div class="one-hide">'+ obj.title +'</div>'+
+                        '<div class="df mt-6">'+ img +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else{
+                    ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }
+            }
+        }
+    });
+}
+// 搜索
+function submit(){
+    var val = $("#search").val();
+    if(val){
+        key = val;
+    }else{
+        key = saveKey;
+        $("#search").val(key);
+    }
+    addHistory();
+    page = 1;
+    over = false;
+    $("#tabs").addClass("hide");
+    loadmore.removeClass("over load hide");
+    getList();
+}
+// 添加历史记录
+function addHistory(){
+    var history = $api.getStorage('newSearchHistory') || [];
+    history.unshift(key);
+    for(var i=0;i<history.length;i++){
+        for(var j=i+1;j<history.length;j++){
+            if(history[i]==history[j]){history.splice(j,1);j--;}
+        }
+    }
+    history.splice(10);
+    $api.setStorage('newSearchHistory', history);
+    appendHistory();
+}
+function appendHistory(){
+    var historys = $api.getStorage('newSearchHistory');
+    var historyUl = $("#history .historys").empty();
+    if(historys && historys.length){
+        for(var i in historys){
+            historyUl.append('<div class="li keywords" tapmode="touch-style" data-key="'+ historys[i] +'">'+ historys[i] +'</div>');
+        }
+    }
+}
+// 资讯详情
+function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id}})}
+</script>
+</body>
+</html>

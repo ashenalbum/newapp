@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; height:100%; min-height:360px; padding:20px 16px;}
+        .form{margin-top:28px;}
+        .form .iptbox{box-sizing:border-box; border-bottom:1px solid #EFF0F1; height:50px; padding:6px 0;}
+        .form .iptbox input{height:38px; line-height:38px; color:#333333;}
+        .form .com-button{height:30px; line-height:30px; font-size:12px; background:#cccccc;}
+        .cont .submit{display:block; width:96%; margin:30px auto 0; height:44px; line-height:44px; font-size:16px; background:#cccccc;}
+        .cont .com-button.active{background:#FF3942;}
+        .fixed{position:fixed; width:100%; left:0; bottom:8px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="cont">
+        <div class="fs-16 c-33 b txt-c">修改手机号</div>
+        <div class="form">
+            <div class="iptbox df">
+                <input id="phone" type="number" placeholder="请输入手机号" class="f1 fs-14" />
+            </div>
+            <div class="iptbox df ai-c mt-10">
+                <input id="code" type="number" placeholder="请输入验证码" class="f1 fs-14" />
+                <button id="codebtn" class="com-button c-ff">获取验证码</button>
+            </div>
+            <button id="submit" class="com-button submit c-ff">确定修改</button>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var phone = $api.byId('phone');
+var code = $api.byId('code');
+var codebtn = $api.byId('codebtn');
+var submit = $api.byId('submit');
+var timeout = true;
+
+apiready = function(){
+    phone.addEventListener("input",function(){
+        $api[(/^1\d{10}$/.test(this.value) && timeout)?'addCls':'removeCls'](codebtn, 'active')
+    });
+
+    code.addEventListener("input",function(){
+        $api[(this.value && /^1\d{10}$/.test(phone.value))?'addCls':'removeCls'](submit, 'active');
+    });
+
+    codebtn.addEventListener("click",function(){
+        if(!timeout){return}
+        if(!/^1\d{10}$/.test(phone.value)){api.toast({msg: '请输入正确的手机号'}); return}
+        myApp.ajax({
+            url: "/api/member/user/getcode",
+            method: "post",
+            data: {data:{username:phone.value, type:'login'}},
+            success(data){
+                if(data.errcode!=200 && data.errcode!=0){return}
+                api.toast({msg:"短信已发送"});
+                var time = 60;
+                timeout = false;
+                $api.removeCls(codebtn, 'active');
+                $api.html(codebtn,time+"秒后重新获取");
+                var interval = setInterval(function(){
+                    time--;
+                    $api.html(codebtn,time+"秒后重新获取");
+                    if(time<=0){
+                        clearInterval(interval);
+                        timeout = true;
+                        $api.html(codebtn,"获取验证码");
+                        $api[/^1\d{10}$/.test(phone.value)?'addCls':'removeCls'](codebtn, 'active');
+                    }
+                },1000);
+            },
+            error(){myApp.toast({msg:"请求失败,请稍候重试"})}
+        })
+    });
+
+    submit.addEventListener("click",function(){
+        if(!/^1\d{10}$/.test(phone.value)){api.toast({msg: '请输入正确的手机号'}); return}
+        if(!code.value){api.toast({msg: '请输入验证码'}); return}
+        var o = {mobile:phone.value, code:code.value};
+        myApp.ajax({
+            url: "/api/member/member/upmobile",
+            method: "post",
+            data:{data:o},
+            success(data){
+                if(data.errcode!=0 && data.errcode!=200){return}
+                api.toast({msg:"修改手机号成功", global:true});
+                if(data.udata){
+                    $api.rmStorage('userData');
+                    $api.setStorage('userData', data.udata);
+                    api.sendEvent({name: 'personalTestLogin'});
+                    api.closeWin();
+                }
+            }
+        })
+    });
+}
+// 打开协议
+function openXieyi(){myApp.openWin({url:"/html/personal/login_xieyi.html"})}
+</script>
+</body>
+</html>

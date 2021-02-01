@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="format-detection" content="telephone=no" />
+	<title>视频</title>
+	<link rel="stylesheet" href="../css/api.css">
+    <style>
+        body{background:rgba(0,0,0,0.7);}
+    </style>
+</head>
+<body class="df df-c">
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/zepto.js"></script>
+<script type="text/javascript" src="../../script/rong.js"></script>
+<script>
+apiready = function(){
+    // type:'listen' / 'call'
+    // media: 'audio' / 'video'
+    // uid: uid
+    var url = api.pageParam.type=="listen"?"./ry_listen.html":"./ry_call.html";
+    var yyid = api.pageParam.type=="listen" && $api.getStorage('callExtra');
+    if(!api.pageParam.yyid){api.api.pageParam.yyid = yyid}
+    api.openFrame({name:'rongCtrl', url:url, bgColor:'rgba(0,0,0,0)', pageParam:api.pageParam});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+	<style>
+        body{box-sizing:border-box; background:#ffffff; padding:10px 12px;}
+        .ul .li{padding:6px 0; }
+        .ul .li .icon{display:block; width:46px; height:46px; border-radius:50%; margin-right:14px; background:#f5f6f7;}
+        .ul .li .zan{display:inline-block; height:18px; line-height:20px; padding:4px 0 4px 22px; background:url(../../image/information/zan.png) no-repeat left center; background-size:16px 16px;}
+        .ul .li .zan.active{background-image:url(../../image/information/zan_act.png); color:#FEB533;}
+        
+        .ul .li .txt{line-height:18px; white-space:pre-line; word-break:break-all;}
+    </style>
+</head>
+<body>
+    <div class="ul fs-14"></div>
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript">
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+
+apiready = function(){
+    $api.fixTabBar(document.body);
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({name: 'loginok'}, function(ret, err){
+        over = false;
+        page = 1;
+        getData();
+    });
+
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+
+    $(document.body).on("click",".zan",function(){
+        var ts = $(this);
+        if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+        zan(ts.parents(".li").data('id'),ts);
+    });
+}
+
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/news/home/newpl_list",
+        method: "get",
+        loading: false,
+        data: {page:page, id:api.pageParam.id},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            var ul = $(document.body).children(".ul");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                ul.append('<div class="li df df-r" data-id="'+ o.id +'">'+
+                    '<img src="'+ o.user.avatar +'" class="icon" alt="" />'+
+                    '<div class="fc">'+
+                        '<div class="df ai-c just-c-bet">'+
+                            '<span class="b one-hide">'+ o.user.nickname +'</span>'+
+                            '<span class="zan '+ ((o.zansta && o.zansta==1)?'active':'') +'" data-zan="'+ o.zan +'">'+ o.zan +'</span>'+
+                        '</div>'+
+                        '<div class="txt mt-6">'+ myApp.htmlEscape(o.message) +'</div>'+
+                        '<div class="c-99 mt-4">'+ o.addtime +'</div>'+
+                    '</div>'+
+                '</div>');
+            }
+        }
+    })
+}
+
+function zan(id, dom){
+    if(dom.data("loading")){return}
+    dom.data("loading",true);
+    myApp.ajax({
+        url: "/api/news/News/newsplzan",
+        method: "get",
+        data: {id:api.pageParam.id, pid:id},
+        loading: false,
+        success(data){
+            dom.data("loading","");
+            if(data.errcode!=200 && data.errcode!=0){return}
+            var znum = Number(dom.data('zan'));
+            if(data.scsta==1){znum++;dom.addClass("active scale-animate")}
+            else{znum--;dom.removeClass("active scale-animate")}
+            dom.html(znum).data("zan",znum);
+        },
+        error(){dom.data("loading","")}
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+
+        .top-box{padding:14px 20px; background:#ffffff;}
+        .top-box .icon{display:block; width:46px; height:46px; margin-right:10px; border-radius:50%;}
+        .cont{padding:20px 14px 10px; background:#ffffff;}
+        .cont .label{width:56px;}
+        .cont .star-box i{display:block; width:28px; height:28px; margin-right:6px; background:url(../../image/common/star_g.png) no-repeat center center; background-size:100% 100%;}
+        .cont .star-box i.active{background-image:url(../../image/common/star.png);}
+        .cont .star-box.sm i{background-size:22px 22px;}
+        .cont .num{margin-left:10px;}
+        .cont .input{box-sizing:border-box; width:100%; padding:16px; border:0; background:#FAFAFA; border-radius:8px; resize:none;}
+        .cont .submit{width:100%; height:46px; background:#FF3942;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="top-box df ai-c">
+        <img src="../../image/common/test.jpg" class="icon" alt="" />
+        <div class="df df-c">
+            <div class="fs-16 b">花道常</div>
+            <div class="mt-6 fs-12 c-99">欢迎您对我的辅导进行评价！</div>
+        </div>
+    </div>
+    <div class="fc mt-10 cont">
+        <div class="df ai-c">
+            <div class="label fs-14 b">总体</div>
+			<div id="plfen" class="star-box df ai-c">
+                <i class="active"></i>
+                <i class="active"></i>
+                <i class="active"></i>
+                <i class="active"></i>
+				<i class="active"></i>
+			</div>
+            <div id="plfentxt" class="num fs-14">非常满意</div>
+        </div>
+        <div class="df ai-c mt-20">
+            <div class="label fs-12 c-66 b">专业</div>
+			<div id="zyplfen" class="star-box sm df ai-c">
+                <i class="active"></i>
+                <i class="active"></i>
+                <i class="active"></i>
+                <i class="active"></i>
+				<i class="active"></i>
+			</div>
+            <div id="zyplfentxt" class="num fs-12 c-99">非常满意</div>
+        </div>
+        <div class="df ai-c mt-16">
+            <div class="label fs-12 c-66 b">耐心</div>
+			<div id="nxplfen" class="star-box sm df ai-c">
+                <i class="active"></i>
+                <i class="active"></i>
+                <i class="active"></i>
+                <i class="active"></i>
+				<i class="active"></i>
+			</div>
+            <div id="nxplfentxt" class="num fs-12 c-99">非常满意</div>
+        </div>
+        <textarea id="textarea" class="input mt-20 fs-14" placeholder="觉得专家不错，就评论一下吧～" name="name" rows="8" cols="80"></textarea>
+        <button class="com-button mt-30 submit fs-14 c-ff" type="button" name="button">提 交</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var plfen = 5;
+var zyplfen = 5;
+var nxplfen = 5;
+
+setEvent();
+apiready = function(){
+    getData();
+}
+// 扩展 zepto
+function zeptoAddFunction(){
+    $.fn.prevAll = function(selector){
+        var prevEls = [];
+        var el = this[0];
+        if(!el) return $([]);
+        while (el.previousElementSibling) {
+            var prev = el.previousElementSibling;
+            if (selector) {
+                if($(prev).is(selector)) prevEls.push(prev);
+            }
+            else prevEls.push(prev);
+            el = prev;
+        }
+        return $(prevEls);
+    };
+    $.fn.nextAll = function (selector) {
+        var nextEls = [];
+        var el = this[0];
+        if (!el) return $([]);
+        while (el.nextElementSibling) {
+            var next = el.nextElementSibling;
+            if (selector) {if($(next).is(selector)) nextEls.push(next);}
+            else nextEls.push(next);
+            el = next;
+        }
+        return $(nextEls);
+    };
+}
+function setEvent(){
+    zeptoAddFunction();
+    $("#plfen").on("click","i",function(){
+        var ts = $(this);
+        plfen = ts.index() + 1;
+        ts.addClass("active").prevAll().addClass("active");
+        ts.nextAll().removeClass("active");
+        $("#plfentxt").text(["非常差","差","一般","满意","非常满意"][plfen-1]);
+    });
+    $("#zyplfen").on("click","i",function(){
+        var ts = $(this);
+        zyplfen = ts.index() + 1;
+        ts.addClass("active").prevAll().addClass("active");
+        ts.nextAll().removeClass("active");
+        $("#zyplfentxt").html(["非常差","差","一般","满意","非常满意"][zyplfen-1]);
+    });
+    $("#nxplfen").on("click","i",function(){
+        var ts = $(this);
+        nxplfen = ts.index() + 1;
+        ts.addClass("active").prevAll().addClass("active");
+        ts.nextAll().removeClass("active");
+        $("#nxplfentxt").html(["非常差","差","一般","满意","非常满意"][nxplfen-1]);
+    });
+}
+function getData(){
+
+}
+function submit(){
+    var plcontent = $("#textarea").val();
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiamem/yuyuepj",
+        method: "post",
+        data: {data:{id:api.pageParam.yyid, plfen:plfen, zyplfen:zyplfen, nxplfen:nxplfen}},
+        success(data){
+            if(data.errcode!=200 && data.errcode!=0){return}
+            api.toast({msg:"评价成功",global:true});
+            api.closeWin();
+        }
+    });
+}
+</script>
+</body>
+</html>

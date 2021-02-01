@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px 16px 10px; background:#f6f7f8;}
+        .search{position:fixed; top:0; right:0; left:0; z-index:99; padding:10px 16px; background:#f6f7f8;}
+        .search .input-box{position:relative;}
+        .search .input-box .button{position:absolute; right:0; top:0; height:34px; line-height:34px; padding:0 12px;}
+        .search .input{box-sizing:border-box; width:200px; height:34px; line-height:34px; padding:0 10px 0 34px; background:#ffffff url(../../image/information/search.png) no-repeat 10px center; background-size:18px 18px; border-radius:18px; font-size:14px; outline:none;}
+        .search .btn{margin-left:6px; height:34px; border:none; outline:none; background:transparent; padding:0 10px;}
+
+        .zixunlist .item{padding:14px 0; border-bottom:1px solid #dddddd;}
+        .zixunlist .item:last-child{border:none;}
+        .zixunlist .item .icon{display:block; margin-right:14px; width:44px; height:44px; border-radius:50%; background:#f6f7f8;}
+        .zixunlist .item .fen{padding-left:26px; line-height:14px; background:url(../../image/information/save_act.png) no-repeat 10px center; background-size:12px 12px;}
+    </style>
+</head>
+<body class="df df-c">
+    <!-- 搜索 -->
+    <!-- <form id="search" class="search df ai-c shadow2">
+        <div class="input-box fc df">
+            <input type="text" class="input fc" placeholder="搜索专家"/>
+        </div>
+        <button class="btn fs-14">搜索</button>
+    </form> -->
+    <!-- 资讯专家 -->
+    <div class="zixun">
+        <!-- 列表 -->
+        <div id="list" class="zixunlist itembox fs-12"></div>
+        <!-- 加载提示 -->
+        <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+            <img src="../../image/common/loading_more.gif" class="img" alt="" />
+            <span class="loadtxt">加载中……</span>
+            <span class="overtxt">没有更多数据了</span>
+            <span class="scrollbtm">上拉加载更多</span>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var ul = $("#list");
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 50}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+    ul.on("click",".item",function(e){
+        var ts = $(this);
+        var id = ts.data("id");
+        var uid = ts.data("uid");
+        if($(e.target).hasClass('to-launch')){openLaunch(uid,ts.data('name'),ts.data('money')); return}
+        openExpert(id,uid);
+    });
+    $("#search").submit(function(){
+        over = false;
+        page = 1;
+        // 添加搜索条件 1049
+        getData();
+        $(this).find("input").blur();
+        return false;
+    });
+}
+
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/zhuanjia/zhuanjialist",
+        method: "get",
+        data: {page: page},
+        loading: page==1,
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                i = Number(i);
+                var o = data.list[i];
+                ul.append('<div class="item df" data-id="'+ o.id +'" data-uid="'+ o.uid +'" data-name="'+ myApp.htmlEscape(o.name) +'" data-money="'+ o.pricemsg +'">'+
+                    '<img src="'+ o.avatar +'" class="icon" />'+
+                    '<div class="fc">'+
+                        '<div class="df ai-c just-c-bet">'+
+                            '<span class="fs-14 c-33 b">'+ myApp.htmlEscape(o.name) +'</span>'+
+                            '<button class="to-launch com-button bei-btn c-red b">'+ (o.pricemsg||'') +'资讯</button>'+
+                        '</div>'+
+                        '<div class="df ai-c fs-12">'+
+                            '<span class="c-aa">'+ (o.dyznum||0) +'次答疑</span>'+
+                            '<span class="fen c-yellow">'+ (o.pinmum=='0'?'<span class="fs-12">暂无评分</spana>':o.pinmum) +'</span>'+
+                        '</div>'+
+                        '<div class="mt-10 one-hide">'+ myApp.htmlEscape(o.message) +'</div>'+
+                    '</div>'+
+                '</div>')
+            }
+        },
+        error(){api.refreshHeaderLoadDone()}
+    })
+}
+// 详情
+function openExpert(id,uid){myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{id:id, uid:uid}})}
+// 发起咨询
+function openLaunch(uid,name,money){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:"expert", uid:uid, name:name, money:money}})}
+</script>
+</body>
+</html>

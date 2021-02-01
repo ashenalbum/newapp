@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+	<style>
+        #header{height:40px; position:relative;}
+        #header .back{padding:10px; width:20px; height:20px;}
+        #header .title{text-align:center;}
+        #header .btn{width:40px; height:40px; background-size:20px 20px; background-position:center center; background-repeat:no-repeat;}
+        #header.hideBack .back{display:none;}
+        #header.hideBack .title{margin-left:50px;}
+        #header.hideHead{height:0; overflow:hidden;}
+        #header.hideHead>*{display:none;}
+    </style>
+</head>
+<body class="df df-c">
+    <header id="header" class="header fs-20 c-33 df ai-c">
+        <img id="backimg" src="../../image/common/back.png" class="back" onclick="api.closeWin()" />
+        <div id="title" class="fc title fs-16 one-hide"></div>
+        <div id="btn" class="btn"></div>
+    </header>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript">
+apiready = function() {
+    var header = $api.byId('header');
+    var headerH = $api.fixStatusBar(header);
+    var objs = api.pageParam;
+    // 头部背景
+    if(objs.headColor){header.style.background = objs.headColor;}
+    // 头部字体颜色
+    if(objs.headTxtColor){header.style.color = objs.headTxtColor;}
+    // 标题
+    if(objs.title){$api.text($api.byId('title'),objs.title);}
+    // 隐藏返回
+    if(objs.hideBack){$api.addCls(header,"hideBack")}
+    // 头部只有系统状态栏高度
+    if(objs.hideHead){$api.addCls(header, 'hideHead'); headerH = header.offsetHeight;}
+    // 没有头部
+    if(objs.hideAll){$api.addCls(header,"hide"); headerH = 0;}
+    // 白色返回按钮
+    if(objs.backWhite){$api.byId("backimg").src="../../image/common/back_w.png";}
+
+    api.openFrame({
+        name: objs.url.match(/([^/.]+)(\.html)?$/)[1],
+        url: api.wgtRootDir + objs.url,
+        rect: {x: 0, y: headerH, w: 'auto', h: api.winHeight-headerH},
+        bgColor: objs.contColor || "#f6f7f8",
+        pageParam: objs.pageParam || {}
+    });
+}
+// 修改title
+function changeTitle(title){document.getElementById("title").innerHTML = title;}
+// 修改按钮
+function setTopBtn(obj){
+    // 参数 obj: {img:icon, event:send event}
+    if(!obj){return}
+    if(typeof obj == "string"){obj = JSON.parse(obj)}
+    var btn = $api.byId("btn");
+    btn.style.backgroundImage = 'url('+ obj.img +')';
+    btn.onclick = function(){ obj.event && api.sendEvent({name: obj.event}) };
+}
+</script>
+</html>

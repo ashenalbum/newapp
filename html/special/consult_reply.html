@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; background:#ffffff; padding:16px;}
+        .lh-20{line-height:20px;}
+        .lh-18{line-height:18px;}
+        .textarea{display:block; padding:10px 8px; font-size:14px; line-height:1.4; background:#f6f7f8; border-radius:4px; resize:none;}
+        .submit{width:100%; height:40px; border-radius:4px; background:#FF3942;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="cont" class="fs-14 lh-20"></div>
+    <div id="addtime" class="mt-12 c-aa fs-12 txt-r"></div>
+    <textarea id="textarea" class="textarea mt-30" rows="7" placeholder="请输入回复内容"></textarea>
+    <div class="btn-box mt-30">
+        <button type="button" class="com-button submit c-ff fs-14" onclick="submit()">回 答</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.setStatusBarStyle({style: 'dark'});
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getdayidetails",
+        method: "get",
+        data: {id:api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.data){return}
+            for(var img in data.data.images){
+                if(Number(img)==0){imgs='<div class="fs-0">'}
+                imgs += '<img src="'+data.data.images[img]+'" class="img"/>';
+                if(Number(img)+1==data.data.images.length){imgs+='</div>'}
+            }
+            $("#cont").html(data.data.content + imgs);
+            $("#addtime").html(data.data.addtime);
+        }
+    })
+}
+function submit(){
+    var value = $("#textarea").val();
+    if(!value){api.toast({msg:"请输入回复内容"});return}
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/addhfzixun",
+        method: "post",
+        data: {id:api.pageParam.id, hfcontent:value},
+        success(data){
+
+        }
+    })
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8; padding:10px;}
+        .newslist.com-box{padding-top:4px; padding-bottom:4px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="ul" class="newslist com-box fs-14 c-33"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var ul = $("#ul");
+var loadmore = $("#loadmore");
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/member/member/getcollectionlist",
+        method: "get",
+        loading: false,
+        data: {page:page},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            ul[dataList.length?'removeClass':'addClass']("hide");
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var obj = data.list[i].info;
+                var label = obj.label?'<span class="hot mt-8">'+ obj.label +'</span>':'';
+                var from = obj.laiyuan?'<span class="fs-12 lh-1 c-aa mt-8">'+ obj.laiyuan +'</span>':'';
+                if(obj.show_mode=="1"){
+                    ul.append('<div class="news type1 df" onclick="openNews('+obj.id+')">'+
+                        '<div class="df df-c just-c-bet f1">'+
+                            '<div class="two-hide">'+ obj.title +'</div>'+
+                            '<div class="df ai-s">'+label+from+'</div>'+
+                        '</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
+                    '</div>');
+                }else if(obj.show_mode=="2"){
+                    ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else if(obj.show_mode=="3"){
+                    var img = "";
+                    if(obj.images instanceof Array){
+                        for(var i=0; i<3; i++){
+                            if(!obj.images[i]){continue}
+                            img += '<img src="'+obj.images[i]+'" class="img fc" alt="" />';
+                        }
+                    }
+                    ul.append('<div class="news type2" onclick="openNews('+obj.id+')">'+
+                        '<div class="one-hide">'+ obj.title +'</div>'+
+                        '<div class="df mt-6">'+ img +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else{
+                    ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }
+            }
+            setTimeout(function(){
+                if(ul.get(0).scrollHeight <= api.frameHeight && !over){getData()}
+            },10);
+        }
+    })
+}
+// 资讯详情
+function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id}})}
+</script>
+</body>
+</html>

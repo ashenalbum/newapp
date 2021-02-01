@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/input.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .lh-36{line-height:36px;}
+        .pl-2{padding-left:2px;}
+        .pl-6{padding-left:6px;}
+        .top{padding:14px 14px 20px; background:#474967 linear-gradient(to right, #474967, #20203B);}
+        .top .icon{display:block; width:50px; height:50px; margin-right:14px; border-radius:50%;}
+        .top .vip{display:block; width:18px; height:18px; margin-left:10px; background:url(../../image/instantly/vip.png) no-repeat center center; background-size:100% 100%;}
+        .top .vip.svip{background-image:url(../../image/instantly/svip.png);}
+
+        .viplist{padding:20px 14px; background:#ffffff;}
+        .viplist .swiper-slide{box-sizing:border-box; margin-right:10px; padding:20px 0; width:100px; height:120px; border:1px solid #E9EAEB; border-radius:10px;}
+        .viplist .swiper-slide.active{border-color:#F3D49E; background:rgba(243, 212, 158, 0.3);}
+        .viplist .swiper-slide:last-child{margin-right:0;}
+
+        .paysel{padding:20px 14px; background:#ffffff;}
+        .paysel .bei{display:block; width:24px; height:24px; border-radius:50%; margin-right:10px; background:#FF6976 url(../../image/common/bei_w.png) no-repeat center center; background-size:18px 18px;}
+        .paysel .ipt-radio~.iconfont::before{font-size:22px;}
+
+        .btm{padding:14px; background:#ffffff;}
+        .btm .paybox{padding:0 10px; height:58px; line-height:58px; border-radius:30px; background:#2A2B46;}
+        .btm .paybox .submit{height:44px; line-height:44px; padding:0 30px; border-radius:22px; background:#FBF1D5 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="top" class="top df df-r">
+        <img src="" class="icon" alt="" />
+        <div class="mt-4 df df-c">
+            <div class="fs-16 c-ff df ai-c">
+                <span class="username"></span>
+                <i class="vip"></i>
+            </div>
+            <div id="endtime" class="mt-6 fs-12 c-aa df ai-e">开通课程VIP  购买课程更多优惠</div>
+        </div>
+    </div>
+    <div class="viplist">
+        <div class="fs-16 b">VIP会员</div>
+        <div id="vipswiper" class="swiper-container mt-16">
+            <div class="swiper-wrapper fs-12 c-33"></div>
+        </div>
+    </div>
+    <div class="paysel mt-10">
+        <div class="li df ai-c just-c-bet">
+            <div class="fc df ai-c">
+                <i class="bei"></i>
+                <span class="fs-14">教育贝</span>
+            </div>
+            <label>
+                <input type="radio" class="ipt-radio" checked name="" value="" />
+                <i class="iconfont"></i>
+            </label>
+        </div>
+    </div>
+    <div class="btm mt-10 fc df df-c just-c-end">
+        <div class="paybox df ai-c just-c-bet">
+            <div class="df ai-c">
+                <span class="c-ff fs-16">合计：</span>
+                <span id="money" class="fs-24 c-yellow">0</span>
+                <span class="fs-12 c-yellow pl-6">教育贝</span>
+            </div>
+            <button class="com-button submit b" type="button" name="button" onclick="submit()">立即支付</button>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+var dataList = [];
+var id = null;
+var buytime = null;
+apiready = function(){
+    api.setStatusBarStyle({style: 'light'});
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $("#vipswiper").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        var item = dataList[ts.index()];
+        id = item.id;
+        buytime = item.buytime;
+        ts.addClass('active').siblings().removeClass('active');
+        $("#money").html(item.buymoney);
+    });
+}
+function getData(){
+    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+    var top = $("#top");
+    var userInfo = myApp.getUserData().uinfo;
+    top.find(".icon").attr("src",userInfo.avatar);
+    top.find(".username").text(userInfo.nickname);
+    var isVip = Number(userInfo.levelid) > 0;
+    top.find(".vip")[Number(userInfo.levelid) > 0?'addClass':'removeClass']('svip');
+    if(Number(userInfo.levelid) > 0 && userInfo.leendtime){
+        $("#endtime").html('<span class="c-yellow">'+ userInfo.leendtime +' </span>'+'<span class="pl-2">到期，购后有效期将延长</span>');
+    }
+
+    myApp.ajax({
+        url: "/api/member/member/vipinfo",
+        method: "get",
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            dataList = data.data;
+            setSwiper(data.data);
+        },
+        error(e){console.log(JSON.stringify(e))}
+    });
+}
+function setSwiper(arr){
+    var wrap = $("#vipswiper .swiper-wrapper").empty();
+    for(var i in arr){
+        var o = arr[i];
+        wrap.append('<div class="swiper-slide '+ (i=='0'?'active':'') +' df df-c ai-c" data-money>'+
+            '<div class="fc fs-14 c-66">'+ timeName(o.buytime) +'</div>'+
+            '<div class="fs-24 lh-36 c-yellow">'+ o.buymoney +'</div>'+
+            '<div class="fs-12 c-yellow">'+ o.name +'</div>'+
+        '</div>');
+        if(i=='0'){
+            id = o.id;
+            buytime = o.buytime;
+            $("#money").html(o.buymoney);
+        }
+    }
+    var mySwiper = new Swiper('#vipswiper',{slidesPerView :'auto'});
+}
+function submit(){
+    myApp.ajax({
+        url: "/api/member/member/viporder",
+        method: "post",
+        data: {data:{id:id, buytime:buytime}},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var order = data.data.id;
+            pay(order);
+        }
+    })
+}
+function pay(order){
+    myApp.inputPayPwd(function(pwd){
+        myApp.ajax({
+            url: "/api/member/member/payorder",
+            method: "get",
+            data: {id:order, paypwd:pwd},
+            success(data){
+                if(data.errcode!=0 && data.errcode!=200){return}
+                api.toast({msg:"支付成功"});
+                if(data.udata){
+                    $api.rmStorage('userData');
+                    $api.setStorage('userData', data.udata);
+                    api.sendEvent({name: 'instantlyTestLogin'});
+                    api.sendEvent({name: 'personalTestLogin'});
+                }
+                api.closeWin();
+            }
+        });
+    });
+}
+function timeName(n){
+    n = Number(n);
+    switch(n){
+        case 3:return "季度VIP";
+        case 12:return "年度VIP";
+    }
+    return n + "个月VIP";
+}
+</script>
+</body>
+</html>

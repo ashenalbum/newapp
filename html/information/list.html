@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8; padding:10px;}
+
+        .swiperbox{height:108px;}
+        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative; background:#f6f7f8;}
+        .swiperbox .swiper-slide{box-sizing:border-box; padding:8px 10px;}
+        .swiperbox .swiper-slide:nth-child(4n+1){background-color:#DAE6EB;}
+        .swiperbox .swiper-slide:nth-child(4n+2){background-color:#E4DEE9;}
+        .swiperbox .swiper-slide:nth-child(4n+3){background-color:#F6F0E4;}
+        .swiperbox .swiper-slide:nth-child(4n+4){background-color:#E8DAD5;}
+        .swiperbox .swiper-slide .img{display:block; height:100%; width:auto; max-width:150px;}
+        .swiperbox .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
+        .swiperbox .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
+
+        .expert .swiper-slide{box-sizing:border-box; padding:10px; width:112px; height:164px; margin:0 6px; background:#ffffff; border-radius:6px;}
+        .expert .swiper-slide:first-child{margin-left:0;}
+        .expert .swiper-slide:last-child{margin-right:0;}
+        .expert .img{display:block; width:54px; height:54px; border-radius:50%; background: #f6f7f8;}
+        .expert .dt{height:28px; line-height:14px;}
+        .expert .com-button{padding:0 20px;}
+        .expert .com-button.active{color:#999999;}
+
+        .menu{padding:10px 0;}
+        .menu.fixed{position:fixed; padding-top:4px; background:#f6f7f8; top:0; left:0; right:0; z-index:99;}
+        .menu .swiper-slide{position:relative; z-index:9; width:auto; height:34px; line-height:34px; padding:0 16px; margin:0 4px;}
+        .menu .swiper-slide:first-child{margin-left:0;}
+        .menu .swiper-slide:last-child{margin-right:0;}
+        .menu .swiper-slide.active{font-size:16px; font-weight:bold; color:#333333;}
+        .menu .i{position:absolute; left:0; bottom:1px; width:0; height:6px; background:url(../../image/instantly/active.png) no-repeat center bottom; background-size: 16px 6px; transition:left 0.3s;}
+
+        .newsbox.fixed{margin-top:54px;}
+        .newest .li{padding:10px 0 10px 5px; border-bottom:1px solid #dddddd;}
+        .newest .li:last-child{border-bottom:none;}
+        .newest .tab{padding:0 2px; line-height:14px; border-radius:2px; border:1px solid; margin-right:12px;}
+
+        .newsbox.com-box{padding:0 12px;}
+    </style>
+</head>
+<body>
+    <!-- 轮播 -->
+    <div id="swiperbox" class="swiperbox">
+        <div id="swiper" class="swiper-container">
+            <div class="swiper-wrapper"></div>
+            <div class="dom-wrap"><i></i></div>
+        </div>
+    </div>
+    <!-- 砖家 -->
+    <div id="expert" class="expert mt-12">
+        <div id="expertswiper" class="swiper-container">
+            <div class="swiper-wrapper fs-12 c-33"></div>
+        </div>
+    </div>
+    <!-- 热门资讯 -->
+    <div id="hot" class="newest mt-12 com-box">
+        <div class="com-title b">最新热讯</div>
+        <div class="ul mt-6 fs-14 c-33"></div>
+    </div>
+    <!-- 分类 -->
+    <div id="menu" class="menu">
+        <div id="menuswiper" class="swiper-container">
+            <div class="swiper-wrapper fs-14 c-66"></div>
+        </div>
+    </div>
+    <!-- 资讯 -->
+    <div id="news" class="newsbox com-box">
+        <div class="newslist fs-14 c-33"></div>
+    </div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+var reload = false;
+var firstScroll = false;
+var searchId = null;
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var swiperSwiper = null;
+var menuswiperSwiper = null;
+var expertswiperSwiper = null;
+
+apiready = function(){
+    searchId = api.pageParam.id;
+    if(searchId){firstScroll = true;}
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({name: 'loginok'}, function(){getData()});
+    // 分享
+    api.execScript({name:api.winName, script: 'setTopBtn({img:"../../image/common/search.png", event:"informationSearch"});'});
+    api.addEventListener({name: 'informationSearch'}, openSearch);
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getList();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        reload = true;
+        getData();
+    });
+    // 点击 Banner
+    $(document.body).on("click",".tapbanner",function(){
+        var ts = $(this);
+        myApp.openBanner(ts.data('type'), ts.data('data'))
+    });
+    // 分类
+    $("#menuswiper").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        var id = ts.data('id');
+        if(searchId==id){return}
+        if(loading){api.toast({msg:"加载中，莫着急"});return}
+        searchId = id;
+        menuswiperSwiper && menuswiperSwiper.slideTo(ts.index(),360,false);
+        ts.addClass('active').siblings().removeClass('active');
+
+        var left = ts.get(0).offsetLeft;
+        var width = ts.width();
+        ts.siblings(".i").css({left:left, width:width});
+
+        page = 1;
+        over = false;
+        $("#loadmore").removeClass("load over");
+        getList();
+    });
+    (function(){
+        var menu = $("#menu");
+        var doc = $(window);
+        var list = $("#news");
+        doc.on("scroll",function(){
+            var top = list.offset().top-doc.scrollTop();
+            if(top<=0){!menu.hasClass('fixed') && menu.addClass('fixed shadow') && list.addClass('fixed')}
+            else{menu.hasClass('fixed') && menu.removeClass('fixed shadow') && list.removeClass('fixed')}
+        });
+    })();
+    // 专家详情或关注
+    $("#expertswiper").on("click",".swiper-slide",function(e){
+        var ts = $(this);
+        var id = ts.data('id');
+        var uid = ts.data('uid');
+        if($(e.target).hasClass("guanzhu")){
+            var btn = $(e.target);
+            if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+            myApp.ajax({
+                url: "/api/home/Common/follow",
+                method: "get",
+                data: {id:uid, type:uid=='-1'?3:2},
+                success(data){
+                    if(data.errcode!=0 && data.errcode!=200){return}
+                    if(data.scsta==1){
+                        api.toast({msg:"关注成功"});
+                        btn.html("已关注").addClass("active");
+                    }else{
+                        api.toast({msg:"已取消关注"});
+                        btn.html("关注").removeClass("active");
+                    }
+                }
+            });
+            return
+        }
+        openExpertDetail(id,uid);
+    });
+}
+// 初始化
+function getData(){
+    myApp.ajax({
+        url: "/api/news/home/index",
+        method: "post",
+        loading: !reload,
+        success(data){
+            api.refreshHeaderLoadDone();
+            if(data.errcode!=200 && data.errcode!=0){return}
+            setSwiper(data.swiper);
+            setMenu(data.category);
+            setExpert(data.zjlist);
+            setHotnews(data.top);
+            api.parseTapmode();
+        },
+        error(){api.refreshHeaderLoadDone();}
+    })
+}
+// 轮播
+function setSwiper(arr){
+    $('#swiperbox')[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+
+    var wrap = $("#swiper .swiper-wrapper");
+    var domwrap = $("#swiper .dom-wrap i");
+    wrap.empty();
+    for(var i in arr){
+        wrap.append('<div class="tapbanner swiper-slide df just-c-bet" data-type="'+ arr[i].cktype +'" data-data="'+ arr[i].url +'">'+
+            '<div class="f1">'+
+                '<div class="fs-14 b one-hide mt-10">'+ arr[i].title +'</div>'+
+                '<div class="fs-12 c-66 mt-12 two-hide">'+ arr[i].ftitle +'</div>'+
+            '</div>'+
+            '<img src="'+ arr[i].image +'" class="img" alt=""/>'+
+        '</div>');
+    }
+    domwrap.css({width:(100/arr.length) + "%"});
+    if(swiperSwiper){swiperSwiper.destroy(false)}
+    swiperSwiper = new Swiper('#swiper', {
+        autoplay: {delay:4000, stopOnLastSlide:false, disableOnInteraction:true},
+        on: {slideChange: function(swiper){domwrap.css({left:swiper.realIndex*(100/arr.length)+"%"})}}
+    });
+}
+// 菜单
+function setMenu(arr){
+    $('#menu')[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+    var wrap = $("#menuswiper .swiper-wrapper").empty();
+    for(var i in arr){
+        wrap.append('<div class="swiper-slide '+(i=='0'?'active':'')+'" data-id="'+ arr[i].id +'">'+ myApp.htmlEscape(arr[i].name) +'</div>');
+    }
+    wrap.append('<div class="i"></div>');
+    if(menuswiperSwiper){menuswiperSwiper.destroy(false)}
+    menuswiperSwiper = new Swiper('#menuswiper', {slidesPerView :'auto'});
+    var active = wrap.children('[data-id="'+ searchId+'"]');
+    if(searchId && active.length){
+        active.addClass("active").siblings().removeClass("active");
+        menuswiperSwiper.slideTo(active.index(),false,false);
+    }
+
+    var ts = wrap.children(".swiper-slide.active");
+    var left = ts.get(0).offsetLeft;
+    var width = ts.width();
+    ts.siblings(".i").css({left:left, width:width});
+
+    getList();
+}
+// 列表
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/news/home/newslist",
+        method: "get",
+        loading: false,
+        data: {page:page, catid:searchId},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            var ul = $("#news .newslist");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var obj = data.list[i];
+                var label = obj.label?'<span class="hot mt-8">'+ obj.label +'</span>':'';
+                var from = obj.laiyuan?'<span class="fs-12 lh-1 c-aa mt-8">'+ obj.laiyuan +'</span>':'';
+                if(obj.show_mode=="1"){
+                    ul.append('<div class="news type1 df" onclick="openNews('+obj.id+')">'+
+                        '<div class="df df-c just-c-bet f1">'+
+                            '<div class="two-hide">'+ obj.title +'</div>'+
+                            '<div class="df ai-s">'+label+from+'</div>'+
+                        '</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
+                    '</div>');
+                }else if(obj.show_mode=="2"){
+                    ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else if(obj.show_mode=="3"){
+                    var img = "";
+                    if(obj.images instanceof Array){
+                        for(var i=0; i<3; i++){
+                            if(!obj.images[i]){continue}
+                            img += '<img src="'+obj.images[i]+'" class="img fc" alt="" />';
+                        }
+                    }
+                    ul.append('<div class="news type2" onclick="openNews('+obj.id+')">'+
+                        '<div class="one-hide">'+ obj.title +'</div>'+
+                        '<div class="df mt-6">'+ img +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }else{
+                    ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                        '<div class="two-hide">'+ obj.title +'</div>'+
+                        '<div class="df ai-s">'+label+from+'</div>'+
+                    '</div>');
+                }
+            }
+            var wrap = $("#menuswiper .swiper-wrapper");
+            if(firstScroll && searchId && wrap.children('[data-id="'+ searchId+'"]').length){
+                window.scrollTo(0,$("#menu").offset().top+10);
+                firstScroll = false;
+            }
+        }
+    })
+}
+// 最新热讯
+function setHotnews(arr){
+    var dom = $('#hot')[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+    var ul = dom.children(".ul").empty();
+    for(var i in arr){
+        ul.append('<div class="li df ai-c" onclick="openNews('+ arr[i].id +')" tapmode="touch-style">'+
+            '<span class="tab fs-10 c-red">NO.'+ (Number(i)+1) +'</span>'+
+            '<div class="one-hide">'+ arr[i].title +'</div>'+
+        '</div>');
+    }
+}
+// 专家
+function setExpert(arr){
+    $('#expert')[arr.length?'removeClass':'addClass']('hide');
+    if(!arr.length){return false}
+    var wrap = $("#expertswiper .swiper-wrapper").empty();
+    for(var i in arr){
+        wrap.append('<div class="swiper-slide df df-c ai-c txt-c" data-id="'+ arr[i].id +'" data-uid="'+ arr[i].uid +'">'+
+            '<img src="'+ arr[i].avatar +'" class="img detail" />'+
+            '<div class="name mt-6 one-hide b fs-14 detail">'+ myApp.htmlEscape(arr[i].name) +'</div>'+
+            '<div class="dt mt-6 c-99 two-hide detail">'+ (arr[i].zhiwu||"") +'</div>'+
+            '<button class="guanzhu com-button mt-6 c-red b fs-12 '+(arr[i].is_true==1?'active':'')+'">'+(arr[i].is_true==1?'已关注':'关注')+'</div>'+
+        '</div>');
+    }
+    if(expertswiperSwiper){expertswiperSwiper.destroy(false)}
+    expertswiperSwiper = new Swiper('#expertswiper', {slidesPerView :'auto', freeMode:true});
+}
+// 打开搜索
+function openSearch(){myApp.openWin({url: "/html/information/detail_search.html", hideHead: true})}
+// 资讯详情
+function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id}})}
+// 专家详情
+function openExpertDetail(id,uid){myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{id:id, uid:uid}})}
+</script>
+</body>
+</html>

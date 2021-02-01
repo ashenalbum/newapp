@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .fw-500{font-weight:500;}
+        .ul{background:#ffffff;}
+        .ul .item{padding:10px 16px; height:30px; line-height:30px; border-bottom:1px solid #F2F2F2;}
+        .ul .item:last-child{border-bottom:none;}
+        .ul .item .arrow{display:block; width:12px; height:12px;}
+    </style>
+</head>
+<body>
+    <div class="ul fs-16 c-33">
+        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="openSecurity()">
+            <span>账户安全</span>
+            <img src="../../image/common/more.png" class="arrow" alt="">
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="openRealname()">
+            <span>实名认证</span>
+            <img src="../../image/common/more.png" class="arrow" alt="">
+        </div>
+        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="openCharge()">
+            <span>收费设置</span>
+            <img src="../../image/common/more.png" class="arrow" alt="">
+        </div>
+    </div>
+    <div class="ul mt-30">
+        <div class="item df ai-c just-c-ct c-red fs-16 fw-500" tapmode="touch-style" onclick="logout()">退 出 登 录</div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/rong.js"></script>
+<script type="text/javascript">
+apiready = function(){
+    RY.init();
+}
+function logout(){
+    myApp.confirm({
+        title: "提示",
+        content: "确定要退出登录吗？",
+        callback(btnIndex){
+            if(btnIndex!=1){return}
+            myApp.logout(function(){
+                RY.logout();
+                api.closeWin();
+            });
+        }
+    });
+}
+// 账户安全
+function openSecurity(){myApp.openWin({title:"账户安全", needLogin:true, url:"/html/personal/security.html"})}
+// 收费设置
+function openCharge(){myApp.openWin({title:"收费设置", needLogin:true, url:"/html/special/charge.html"})}
+// 实名
+function openRealname(){myApp.openWin({title:"实名认证", needLogin:true, url:"/html/personal/realname.html"})}
+</script>
+</body>
+</html>

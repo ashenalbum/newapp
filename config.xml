@@ -1,0 +1,29 @@
+ <widget id="A6152872961612"  version="0.0.1">
+    <name>newApp</name>
+    <description>Example For APICloud.</description>
+    <author email="developer@apicloud.com" href="http://www.apicloud.com">Developer</author>    <!-- 微信支付 -->    <feature name="wxPlus">		<param name="urlScheme" value="wx0f000af4b2543743"/>		<param name="apiKey" value="wx0f000af4b2543743"/>		<param name="apiSecret" value="498f402e0ebf393ce28f24f3adfd54de"/>		<param name="universalLink" value="https://app.sx-ug.com/"/>	</feature>    <!-- 阿里云OSS -->    <feature name="aliCloudOss">       <param name="ak" value="LTAI4FrFTrYLebXP5D3cFJH9" />       <param name="sk" value="ceGNS4ahJ2nl7pmzbbD1qxlpFVg45d" />       <param name="endPoint" value="http://oss-cn-beijing.aliyuncs.com/" />    </feature>    <!-- 极光 -->    <feature name="ajpush">        <param name="app_key" value="e998458491c4c7ce41ba5d79"/>        <param name="channel" value="sxjy"/>    </feature>    <!-- 融云 -->    <feature name="rongCloud2">       <param name="appKey" value="8brlm7uf8iar3" />    </feature>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="pageBounce" value="false"/>
+    <preference name="urlScheme" value="shanxijiaoyu" />
+
+	<preference name="appBackground" value="rgba(0,0,0,0.0)"/>
+	<preference name="windowBackground" value="rgba(0,0,0,0.0)"/>
+	<preference name="frameBackgroundColor" value="rgba(0,0,0,0.0)"/>
+	<preference name="hScrollBarEnabled" value="false"/>
+	<preference name="vScrollBarEnabled" value="false"/>
+	<preference name="autoLaunch" value="true"/>
+	<preference name="fullScreen" value="false"/>
+	<preference name="autoUpdate" value="true" />
+	<preference name="smartUpdate" value="false" />
+	<preference name="debug" value="true"/>
+	<preference name="statusBarAppearance" value="true"/>
+	<permission name="readPhoneState" />
+	<permission name="camera" />
+	<permission name="record" />
+	<permission name="location" />
+	<permission name="fileSystem" />
+	<permission name="internet" />
+	<permission name="bootCompleted" />
+	<permission name="hardware" />
+</widget>

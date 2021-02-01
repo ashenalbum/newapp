@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px; background:#ffffff linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.03));}
+        @media screen and (max-width:330px) {.com-button.read-btn{padding-left:8px; background:#f6f7f8;}}
+
+        .reload-title{position:relative; padding-left:26px; }
+        .reload-title::after{content:" "; position:absolute; top:0; bottom:0; left:4px; margin:auto; width:20px; height:20px; background:url(../image/index/reload.png) no-repeat center center; background-size:20px 20px;}
+        .reload-title.animate::after{animation:rotate 0.5s linear infinite; -webkit-animation:rotate 0.5s linear infinite;}
+        @keyframes rotate{
+            0%   {transform: rotate(0);}
+            25%  {transform: rotate(90deg);}
+            50%  {transform: rotate(180deg);}
+            75%  {transform: rotate(270deg);}
+            100% {transform: rotate(360deg);}
+        }
+        @-webkit-keyframes rotate {
+            0%   {transform: rotate(0);}
+            25%  {transform: rotate(90deg);}
+            50%  {transform: rotate(180deg);}
+            75%  {transform: rotate(270deg);}
+            100% {transform: rotate(360deg);}
+        }
+
+        .types .li{margin-top:6px;}
+        .types .li .headline{box-sizing:border-box; width:160px; height:60px; font-weight:400; padding:10px 14px; border-radius:8px 0 0 8px; line-height:16px; background:url() no-repeat 118px center; background-size:28px 28px;}
+        .types .li:nth-child(4n+1) .headline{background-color:#F6F0E4;background-image:url(../image/index/type1.png);}
+        .types .li:nth-child(4n+2) .headline{background-color:#E4DEE9;background-image:url(../image/index/type2.png);}
+        .types .li:nth-child(4n+3) .headline{background-color:#DAE6EB;background-image:url(../image/index/type3.png);}
+        .types .li:nth-child(4n+4) .headline{background-color:#E8DAD5;background-image:url(../image/index/type4.png);}
+        .types .li .itm{position:relative; margin-left:6px; background-color:#f5f5f5; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+        .types .li .itm:last-child{border-radius:0 8px 8px 0;}
+        .types .li .itm.hot::after{content:"HOT"; position:absolute; width:28px; height:14px; line-height:14px; border-radius:0 0 0 8px; text-align:center; font-size:10px; right:0; top:0; background:#ff6a77 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03)); color:#ffffff;}
+
+        .swiperbox{margin-top:12px; height:108px;}
+        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative; background:#f6f7f8;}
+        .swiperbox .swiper-container .swiper-slide{box-sizing:border-box; padding:8px 10px;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+1){background-color:#DAE6EB;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+2){background-color:#E4DEE9;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+3){background-color:#F6F0E4;}
+        .swiperbox .swiper-container .swiper-slide:nth-child(4n+4){background-color:#E8DAD5;}
+        .swiperbox .swiper-container .swiper-slide .img{display:block; height:100%; width:auto;}
+        .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
+        .swiperbox .swiper-container .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
+
+        .activity .swiper-container .swiper-slide{max-width:100px; width:auto; margin:0 8px;}
+        .activity .swiper-container .img{display:block; margin:auto; width:46px; height:46px; border-radius:50%;}
+    </style>
+</head>
+<body>
+    <!-- 顶部 -->
+    <div id="types" class="types fs-12">
+        <div class="li df">
+            <div class="headline df df-c just-c-bet" onclick="openInformation()">
+                <div class="name one-hide c-33">教育资讯</div>
+                <div class="txt one-hide fs-10 c-66"></div>
+            </div>
+            <div class="itm fc" tapmode="touch-style1" onclick="openInformation()">更多</div>
+        </div>
+        <div class="li df">
+            <div class="headline df df-c just-c-bet" onclick="openConsult()">
+                <div class="name one-hide c-33">答疑咨询</div>
+                <div class="txt one-hide fs-10 c-66"></div>
+            </div>
+            <div class="itm fc" tapmode="touch-style1" onclick="openConsult()">更多</div>
+        </div>
+        <div class="li df">
+            <div class="headline df df-c just-c-bet" onclick="openStudy()">
+                <div class="name one-hide c-33">学习视频</div>
+                <div class="txt one-hide fs-10 c-66"></div>
+            </div>
+            <div class="itm fc" tapmode="touch-style1" onclick="openStudy()">更多</div>
+        </div>
+        <div class="li df">
+            <div class="headline df df-c just-c-bet" onclick="openJournal()">
+                <div class="name one-hide c-33">教育报刊</div>
+                <div class="txt one-hide fs-10 c-66"></div>
+            </div>
+            <div class="itm fc" tapmode="touch-style1" onclick="openMoreJournal()">更多</div>
+        </div>
+    </div>
+    <!-- 活动 -->
+    <div id="activity" class="activity mt-12">
+        <div id="activityswiper" class="swiper-container">
+            <div class="swiper-wrapper fs-12 c-33"></div>
+        </div>
+    </div>
+    <!-- 轮播 -->
+    <div id="swiperbox" class="swiperbox hide">
+        <div id="swiper" class="swiper-container">
+            <div class="swiper-wrapper"></div>
+            <div class="dom-wrap"><i></i></div>
+        </div>
+    </div>
+    <!-- 都在问 -->
+    <div id="dayi" class="question com-box mt-10">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="hot-title fs-16 c-33 b">大家都在问</span>
+            <span id="batch" class="reload-title fs-12 c-77">换一批</span>
+        </div>
+        <div id="itembox" class="itembox fs-12"></div>
+        <div class="mt-16 fs-14 df ai-c just-c-ct c-66" onclick="openConsult()">
+            <span>没有解决我的疑惑，自己去咨询</span>
+            <img src="../image/index/que.png" style="width:20px;" />
+        </div>
+    </div>
+    <!-- 热门视频 -->
+    <div id="hotvideo" class="hotvideo com-box mt-10">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="c-33 fs-16 b">热门视频</span>
+            <span class="fs-12 c-77 more" onclick="openStudy()">更多</span>
+        </div>
+        <div class="videolist mt-10">
+            <div id="videos" class="swiper-container">
+                <div class="swiper-wrapper fs-12 c-33"></div>
+            </div>
+        </div>
+    </div>
+    <!-- 热门资讯 -->
+    <div id="zixun" class="hotnews com-box mt-10">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="c-33 fs-16 b">热门资讯</span>
+            <span class="fs-12 c-77 more" onclick="openInformation()">更多</span>
+        </div>
+        <div class="newslist mt-10 fs-14 c-33"></div>
+    </div>
+    <!-- 热门刊物 -->
+    <div id="kanwu" class="magazine com-box mt-10">
+        <div class="com-title df just-c-bet ai-c">
+            <span class="c-33 fs-16 b">最新刊物</span>
+            <span class="fs-12 c-77 more" onclick="openJournal()">更多</span>
+        </div>
+        <div class="kanwulist mt-10"></div>
+    </div>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/zepto.min.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/swiper.min.js"></script>
+<script type="text/javascript">
+var reload = false;
+var swiperSwiper = null;
+var videosSwiper = null;
+var activityswiperSwiper = null;
+var activityArr = [];
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+// 设置
+function setEvent(){
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        reload = true;
+        getData();
+    });
+    // 活动
+    $("#activityswiper").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        var val = activityArr[ts.data('id')].value;
+        if(!val || typeof val!="object"){return}
+        if(val.type && val.url){
+            if(val.type == 'window'){api.openWin({name: val.data.match(/([^/]+\/[^/]+)(.html)$/)[1].replace("/","_"), url:val.url}); return}
+            if(val.type == 'frame'){myApp.openFrame(val); return}
+            myApp.openBanner(val.type, val.url);
+        }
+    });
+    // 点击 Banner
+    $(document.body).on("click",".tapbanner",function(){
+        var ts = $(this);
+        myApp.openBanner(ts.data('type'), ts.data('data'));
+    });
+    // 换一批
+    $("#batch").on("click",function(){
+        var ts = $(this);
+        ts.addClass("animate");
+        myApp.ajax({
+            url: "/api/home/homes/batch",
+            method: "get",
+            loading: false,
+            success(data){
+                setTimeout(function(){
+                    ts.removeClass("animate");
+                    if(data.errcode!=200 && data.errcode!=0){return}
+                    setDayi(data.data);
+                },200);
+            }
+        })
+    })
+}
+// 初始
+function getData(){
+    myApp.ajax({
+        url: "/api/home/homes/getindex",
+        method: "post",
+        loading: !reload,
+        success(data){
+            api.refreshHeaderLoadDone();
+            if(data.errcode!=200){return}
+            if(data.shop){api.execScript({ name:'root', script:'setShopUrl("'+data.shop+'")'})}
+            var dom = $("#types>.li");
+            for(var i in data.data){
+                var li = dom.eq(i);
+                var obj = data.data[i];
+                var fun = ['openInformation','openConsult','openStudy','openJournal'][i];
+                li.find(".name").text(obj.name);
+                li.find(".txt").text(obj.synopsis);
+                if(!obj.value.length){li.append('<div class="itm fc" tapmode="touch-style1" onclick="'+fun+'()">更多</div>');continue}
+                li.find(".itm").remove();
+                for(var v in obj.value){
+                    if(v>2){break}
+                    var ov = obj.value[v];
+                    li.append('<div class="itm fc" tapmode="touch-style1" onclick="'+fun+'('+ov.id+')">'+ myApp.htmlEscape(ov.name) +'</div>');
+                }
+            }
+            for(var i in data.modular){
+                var dom = $(['#dayi','#hotvideo','#zixun','#kanwu'][i]);
+                var obj = data.modular[i];
+                dom[obj.is_open!="1"?'addClass':'removeClass']('hide');
+                if(obj.is_open!="1"){continue}
+                switch (i) {
+                    case '0': setDayi(obj.sun);break;
+                    case '1': setVideo(obj.sun);break;
+                    case '2': setZixun(obj.sun);break;
+                    case '3': setKanwu(obj.sun);break;
+                }
+            }
+        },
+        error(){
+            api.refreshHeaderLoadDone();
+        }
+    });
+    myApp.ajax({
+        url: '/api/home/homes/getPlug',
+        method: 'get',
+        alert: false,
+        loading: false,
+        success(data){
+            if(data.errcode!=200){return}
+            setActivity(data.data);
+        }
+    })
+    myApp.ajax({
+        url: '/api/home/homes/getRotation',
+        method: 'get',
+        loading: false,
+        alert: false,
+        success(data){
+            if(data.errcode!=200){return}
+            setSwiper(data.data);
+        }
+    })
+}
+// 热门答疑咨询
+function setDayi(arr){
+    var ul = $("#itembox").empty();
+    for(var i in arr){
+        var obj = arr[i];
+        ul.append('<div class="item df df-c just-c-bet mt-12" onclick="openListen('+ obj.id +')">'+
+            '<div class="title two-hide">'+ obj.content +'</div>'+
+            '<div class="df ai-c just-c-bet">'+
+                '<span class="fs-12 c-aa">'+ obj.tounum +'人旁听</span>'+
+                '<div class="listen c-red b">旁听</div>'+
+            '</div>'+
+        '</div>');
+    }
+}
+// 热门视频
+function setVideo(arr){
+    var ul = $("#videos .swiper-wrapper").empty();
+    for(var i in arr){
+        var obj = arr[i];
+        ul.append('<div class="get-plug swiper-slide" onclick="openVideo('+ obj.id +')">'+
+            '<img src="'+ (obj.image && obj.image[0]) +'" class="img" />'+
+            '<div class="title mt-10 one-hide">'+ obj.title +'</div>'+
+        '</div>');
+    }
+    if(videosSwiper){videosSwiper.destroy(false)}
+    videosSwiper = new Swiper('#videos', {slidesPerView :'auto'});
+}
+// 热门资讯
+function setZixun(arr){
+    var ul = $("#zixun .newslist").empty();
+    for(var i in arr){
+        var obj = arr[i];
+        var label = obj.label?'<span class="hot">'+ obj.label +'</span>':'';
+        var laiyuan = obj.laiyuan?'<span class="fs-12 c-aa">'+ obj.laiyuan +'</span>':'';
+        if(obj.show_mode=="1"){
+            ul.append('<div class="news type1 df" onclick="openNews('+obj.id+')">'+
+                '<div class="df df-c just-c-bet f1">'+
+                    '<div class="two-hide">'+ obj.title +'</div>'+
+                    '<div class="df ai-c">'+label+laiyuan+'</div>'+
+                '</div>'+
+                '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
+            '</div>');
+        }else if(obj.show_mode=="2"){
+            ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                '<div class="two-hide">'+ obj.title +'</div>'+
+                '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
+                '<div class="df ai-c mt-6">'+label+laiyuan+'</div>'+
+            '</div>');
+        }else if(obj.show_mode=="3"){
+            var img = "";
+            if(obj.images instanceof Array){
+                for(var i in obj.images){
+                    if(Number(i)>2){break}
+                    img += '<img src="'+obj.images[i]+'" class="img fc" alt="" />';
+                }
+            }
+            ul.append('<div class="news type2" onclick="openNews('+obj.id+')">'+
+                '<div class="one-hide">'+ obj.title +'</div>'+
+                '<div class="df mt-6">'+ img +'</div>'+
+                '<div class="df ai-c mt-6">'+label+laiyuan+'</div>'+
+            '</div>');
+        }else{
+            ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
+                '<div class="two-hide">'+ obj.title +'</div>'+
+                '<div class="df ai-c mt-6">'+label+laiyuan+'</div>'+
+            '</div>');
+        }
+    }
+}
+// 设置刊物
+function setKanwu(arr){
+    var ul = $("#kanwu .kanwulist").empty();
+    for(var i in arr){
+        var obj = arr[i];
+        ul.append('<div class="kanwu df" onclick="openJournalDetail('+ obj.id +')">'+
+            '<img src="'+ obj.zimg +'" class="img" />'+
+            '<div class="txts f1 df df-c just-c-bet">'+
+                '<div>'+
+                    '<div class="one-hide fs-16 b">'+ obj.ztitle +'</div>'+
+                    '<div class="mt-10 three-hide c-99 fs-12">'+ obj.zdescribe +'</div>'+
+                '</div>'+
+                '<div class="df ai-c just-c-bet">'+
+                    '<span class="tab c-aa fs-10"><span>'+ obj.zbuynum +'人购买</span><span>'+ obj.zlooknum +'人查看</span></span>'+
+                    '<button class="com-button read-btn fs-12 b c-red">试读</button>'+
+                '</div>'+
+            '</div>'+
+        '</div>');
+    }
+}
+// 活动
+function setActivity(arr){
+    activityArr = arr || [];
+    $api[arr.length?'removeCls':'addCls']($api.byId('activity'),'hide');
+    if(!arr.length){return false}
+    var wrap = $api.dom("#activityswiper .swiper-wrapper");
+    $api.html(wrap,"");
+    for(var i in arr){
+        $api.append(wrap,'<div class="swiper-slide" data-id="'+ i +'">'+
+            '<img src="'+arr[i].img+'" class="img" />'+
+            '<div class="title mt-6 one-hide txt-c">'+ myApp.htmlEscape(arr[i].name) +'</div>'+
+        '</div>');
+    }
+    if(activityswiperSwiper){activityswiperSwiper.destroy(false)}
+    activityswiperSwiper = new Swiper('#activityswiper', {slidesPerView :'auto'});
+}
+// 轮播
+function setSwiper(arr){
+    $api[arr.length?'removeCls':'addCls']($api.byId('swiperbox'),'hide');
+    if(!arr.length){return false}
+
+    var wrap = $api.dom("#swiper .swiper-wrapper");
+    var domwrap = $api.dom("#swiper .dom-wrap i");
+    $api.html(wrap,"");
+    for(var i in arr){
+        $api.append(wrap,'<div class="tapbanner swiper-slide df just-c-bet" data-type="'+ arr[i].cktype +'" data-data="'+ arr[i].url +'">'+
+            '<div class="f1">'+
+                '<div class="fs-14 mt-16">'+ arr[i].title +'</div>'+
+            '</div>'+
+            '<img src="'+ arr[i].image +'" class="img" alt=""/>'+
+        '</div>');
+    }
+    domwrap.style.width = (100/arr.length) + "%";
+    if(swiperSwiper){swiperSwiper.destroy(false)}
+    swiperSwiper = new Swiper('#swiper', {
+        autoplay: {delay:4000, stopOnLastSlide:false, disableOnInteraction:true},
+        on: {slideChange: function(swiper){ domwrap.style.left = swiper.realIndex*(100/arr.length)+"%";}}
+    });
+}
+// 资讯
+function openInformation(id){myApp.openWin({title:"教育资讯", url:"/html/information/list.html", headColor:"#f6f7f8", pageParam:{id:id}})}
+// 资讯详情
+function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id}})}
+// 刊物
+function openJournal(id){
+    var o = {title:"教育报刊", url:"/html/journal/"+(id?"more.html":"index.html"), headColor:id?"#f6f7f8":"#ffffff", pageParam:{id:id}};
+    myApp.openWin(o);
+}
+// 刊物介绍
+function openJournalDetail(id){myApp.openWin({title:"报刊介绍", url: "/html/journal/detail.html", headColor: "#E8DAD5", pageParam:{id:id}})}
+// 更多刊物
+function openMoreJournal(){myApp.openWin({title:"更多报刊", url:"/html/journal/more.html"})}
+// 学习平台
+function openStudy(id){
+    var o = {title:id?"课程":"学习视频", url:"/html/study/"+(id?"list":"index")+".html", headColor:id?"#f6f7f8":"#ffffff", pageParam:{id:id}};
+    myApp.openWin(o);
+}
+// 咨询
+function openConsult(id){myApp.openWin({title:"招考答疑", url:"/html/consult/index.html", pageParam: {id:id}})}
+// 视频
+function openVideo(id){myApp.openWin({ hideHead:true, url:'/html/study/detail.html', pageParam:{id:id}})}
+// 旁听
+function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
+</script>
+</body>
+</html>

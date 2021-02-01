@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .star{display:block; height:14px; margin-right:6px; background:url(../../image/common/star.png) repeat-x 0 center; background-size:14px 14px;}
+        .star.star-1{width:14px;}
+        .star.star-15{width:21px;}
+        .star.star-2{width:28px;}
+        .star.star-25{width:35px;}
+        .star.star-3{width:42px;}
+        .star.star-35{width:49px;}
+        .star.star-4{width:56px;}
+        .star.star-45{width:63px;}
+        .star.star-5{width:70px;}
+
+        .top-box{padding:20px 40px; background:#ffffff;}
+        .top-box .nums .num{font-size:30px; line-height:42px; margin-right:12px;}
+        .top-box .fen{min-width:40px; padding:0 6px;}
+
+        .ul{padding:10px 14px; background:#ffffff;}
+        .ul .li{padding:10px; border-bottom:1px solid #E1E1E1;}
+        .ul .li:last-child{border-bottom:0;}
+        .ul .li{padding:8px 0; border-bottom:1px solid #dddddd;}
+        .ul .li:last-child{border-bottom:none;}
+        .ul .li .icon{display:block; width:46px; height:46px; margin-right:10px; border-radius:50%;}
+        .ul .li .star-num{display:inline-block; height:14px; line-height:16px;}
+        .ul .li .txt{line-height:16px;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="info" class="top-box df">
+        <div class="nums df ai-c fc">
+            <div class="pingfen num c-yellow b"></div>
+            <div class="df df-c just-c-ct ai-s">
+                <div class="name fs-12 c-66"></div>
+                <div class="mt-6 star hide"></div>
+            </div>
+        </div>
+        <div class="fen df df-c ai-c">
+            <div class="fs-12 c-66">专业</div>
+            <div class="zhuanye fs-16 b mt-10">--</div>
+        </div>
+        <div class="fen df df-c ai-c">
+            <div class="fs-12 c-66">耐心</div>
+            <div class="naixin fs-16 b mt-10">--</div>
+        </div>
+    </div>
+    <div id="ul" class="ul mt-10"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var ul = $("#ul");
+var loadmore = $("#loadmore");
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/zhuanjia/pjlist",
+        method: "get",
+        data: {uid: api.pageParam.uid},
+        success(ret){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            var ul = $("#news .newslist");
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            var data = ret.data;
+            if(!data){return}
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            if(!data){return}
+            if(page<=2){
+                var zhuanjia = data.zhuanjia;
+                var list = data.list;
+                var info = $("#info");
+                info.find(".pingfen").html(zhuanjia.pinmum==0?'<span class="fs-14">暂无评分</span>':zhuanjia.pinmum);
+                info.find(".name").text(zhuanjia.name);
+                info.find(".zhuanye").html(zhuanjia.zypinmum==0?'--':zhuanjia.zypinmum);
+                info.find(".naixin").html(zhuanjia.nxpinmum==0?'--':zhuanjia.nxpinmum);
+                zhuanjia.pinmum!=0 && info.find(".star").addClass("star-"+zhuanjia.pinmum).removeClass("hide");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                ul.append('<div class="li df">'+
+                    '<img src="'+ o.avatar +'" class="icon" alt="">'+
+                    '<div class="fc df df-c">'+
+                        '<div class="mt-4 df ai-c just-c-bet">'+
+                            '<span class="fs-16 b">'+ o.username +'</span>'+
+                            '<span class="fs-12 c-99">'+ o.pltime +'</span>'+
+                        '</div>'+
+                        '<div class="mt-4 df ai-c">'+
+                            '<i class="star star-'+ parseInt(o.plfen) +'"></i>'+
+                            '<span class="star-num c-yellow fs-14">'+ o.plfen +'</span>'+
+                        '</div>'+
+                        '<div class="mt-4 txt fs-14">'+ o.plcontent +'</div>'+
+                    '</div>'+
+                '</div>');
+            }
+        }
+    })
+}
+</script>
+</body>
+</html>

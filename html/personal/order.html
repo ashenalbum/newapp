@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8; padding-bottom:10px;}
+        .pd-8{padding:8px 4px; border-radius:2px;}
+        .nowrap{white-space:nowrap;}
+        .menu{position:fixed; top:0; left:0; right:0; z-index:1; background:#ffffff;}
+        .menu .swiper-slide{position:relative; z-index:2; width:25%; min-width:100px; height:28px; line-height:28px; padding: 12px 0; text-align:center;}
+        .menu .swiper-slide:first-child{margin-left:0;}
+        .menu .swiper-slide:last-child{margin-right:0;}
+        .menu .swiper-slide.active{font-size:16px; font-weight:bold; color:#333333;}
+        .menu .i{position:absolute; left:0; bottom:8px; width:0; height:6px; background:url(../../image/instantly/active.png) no-repeat center bottom; background-size: 16px 6px; transition:left 0.3s;}
+
+        .ul{margin-top:64px; padding:0 10px 10px;}
+        .ul .li{padding:10px; margin-bottom:10px; border-radius:6px; background:#ffffff;}
+        .ul .li .order-title{ font-size:16px; padding-bottom:6px; border-bottom:1px solid #f1f1f1;}
+        .ul .li:last-child{margin-bottom:0;}
+        .ul .li .price{display:block; padding-left:20px; height:18px; line-height:18px; background:url(../../image/common/bei.png) no-repeat left center; background-size:18px 18px;}
+        .ul .li .btn-box .btn{background:#FF3942; color:#ffffff; padding:0 16px;}
+        .ul .li.study .img{display:block; width:120px; height:84px; border-radius:6px; margin-right:10px;}
+        .ul .li.study .two-hide{line-height:18px;}
+
+        .ul .li.kanwu .img{width:100px; height:134px; margin-right:12px; background:#f6f7f8; border-radius:6px;}
+        .ul .li.kanwu .txts{padding:6px 0;}
+        .ul .li.kanwu .txts .tab span{display:inline-block; padding:0 4px; border-right:1px solid;}
+        .ul .li.kanwu .txts .tab span:last-child{border-right:none;}
+
+        .ul .li.zhuanjia .icon{display:block; width:44px; height:44px; border-radius:50%; margin-right:10px; background:#f6f7f8;}
+        .ul .li.zhuanjia .msg{line-height:16px;}
+
+        .ul .li.vip .name{margin-right:20px;}
+
+        .ul .li.video .img,
+        .ul .li.audio .img{width:40px; height:40px; border-radius:50%; margin-right:8px;}
+    </style>
+</head>
+<body class="df df-c">
+    <!-- 分类 -->
+    <div id="menu" class="menu">
+        <div id="menuswiper" class="swiper-container">
+            <div class="swiper-wrapper fs-14 c-99">
+                <div class="swiper-slide active" data-id="0">全部订单</div>
+                <div class="swiper-slide" data-id="1">已预约</div>
+                <div class="swiper-slide" data-id="2">待付款</div>
+                <div class="swiper-slide" data-id="4">已完成</div>
+                <div class="i"></div>
+            </div>
+        </div>
+    </div>
+    <div id="ul" class="ul"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+var mySwiper = null;
+var id = 0;
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var ul = $("#ul");
+var loadmore = $("#loadmore");
+
+apiready = function(){
+    setEvent();
+    getList();
+}
+function setEvent(){
+    $("#menuswiper").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        if(ts.data('id') == id){return}
+        id = ts.data('id');
+        ts.addClass("active").siblings().removeClass("active");
+
+        var left = ts.get(0).offsetLeft;
+        var width = ts.width();
+        ts.siblings(".i").css({left:left, width:width});
+
+        over = false;
+        page = 1;
+        getList();
+    });
+
+    (function(){
+        if(api.pageParam.id){
+            id = api.pageParam.id;
+            $("#menuswiper .swiper-slide[data-id='"+ id +"']").addClass("active").siblings().removeClass("active");
+        }
+
+        if(mySwiper){mySwiper.destroy(false)}
+        mySwiper = new Swiper('#menuswiper', {slidesPerView :'auto'});
+
+        var ts = $("#menuswiper .swiper-slide.active");
+        var left = ts.get(0).offsetLeft;
+        var width = ts.width();
+        ts.siblings(".i").css({left:left, width:width});
+    })();
+
+
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getList();
+    });
+
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getList();
+    });
+}
+function getList(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/member/member/getorderlist",
+        method: "get",
+        loading: page==1,
+        data: {type:id, page:page},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                switch(Number(o.type)){
+                    case 1:addJournal(o); break; // 杂志
+                    case 2:addJournalQk(o); break; // 期刊
+                    case 3:addJournalPage(o); break; // 刊页
+                    case 4:addListen(o); break; // 旁听
+                    case 5:addConsult(o); break; // 咨询
+                    case 6:addVideo(o); break; // 视频订单
+                    case 7:addAudio(o); break; // 音频订单
+                    case 8:addVip(o); break; // vip订单
+                }
+            }
+            api.parseTapmode();
+        }
+    })
+
+}
+// 杂志
+function addJournal(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li kanwu">'+
+        getTitle(o.type)+
+        '<div class="df pd-8" tapmode="touch-style" onclick="openDetail('+ o.xid +')">'+
+            '<img src="'+ o.info.zimg +'" class="img" />'+
+            '<div class="txts f1 df df-c just-c-bet">'+
+                '<div>'+
+                    '<div class="two-hide fs-14 c-66">'+ o.info.ztitle +'</div>'+
+                    '<div class="mt-10 two-hide c-99 fs-12">'+ o.info.zshuoming +'</div>'+
+                '</div>'+
+                '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                    '<span>'+ orderStatus(o.status) +'</span>'+
+                    '<span class="price b">'+ o.jiage +'</span>'+
+                '</div>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 期刊
+function addJournalQk(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li kanwu">'+
+        getTitle(o.type)+
+        '<div class="df pd-8" tapmode="touch-style" data-title="'+ o.info.ztitle +'" data-xid="'+ o.xid +'" onclick="toBook(this)">'+
+            '<img src="'+ o.info.zimg +'" class="img" />'+
+            '<div class="txts f1 df df-c just-c-bet">'+
+                '<div>'+
+                    '<div class="two-hide fs-14 c-66">'+ o.info.ztitle +'</div>'+
+                    '<div class="mt-10 two-hide c-99 fs-12">'+ o.info.zshuoming +'</div>'+
+                '</div>'+
+                '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                    '<span>'+ orderStatus(o.status) +'</span>'+
+                    '<span class="price b">'+ o.jiage +'</span>'+
+                '</div>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 刊页
+function addJournalPage(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li kanwu">'+
+        getTitle(o.type)+
+        '<div class="df pd-8" tapmode="touch-style">'+
+            '<img src="'+ o.info.zimg +'" class="img" />'+
+            '<div class="txts f1 df df-c just-c-bet">'+
+                '<div>'+
+                    '<div class="two-hide fs-14 c-66">'+ o.info.ztitle +'</div>'+
+                    '<div class="mt-10 two-hide c-99 fs-12">'+ o.info.zshuoming +'</div>'+
+                '</div>'+
+                '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                    '<span>'+ orderStatus(o.status) +'</span>'+
+                    '<span class="price b">'+ o.jiage +'</span>'+
+                '</div>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 旁听
+function addListen(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li zixun">'+
+        getTitle(o.type)+
+        '<div class="df df-c pd-8" tapmode="touch-style" onclick="openListen('+ o.xid +')">'+
+            '<div class="lh-14 c-66">'+ o.info.content +'</div>'+
+            '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                '<span>'+ orderStatus(o.status) +'</span>'+
+                '<span class="price b">'+ o.jiage +'</span>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 咨询
+function addConsult(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li zixun">'+
+        getTitle(o.type)+
+        '<div class="df df-c pd-8" tapmode="touch-style" onclick="openListen('+ o.xid +')">'+
+            '<div class="lh-14 c-66">'+ o.info.content +'</div>'+
+            '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                '<span>'+ orderStatus(o.status) +'</span>'+
+                '<span class="price b">'+ o.jiage +'</span>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 视频订单
+function addVideo(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li video">'+
+        getTitle(o.type)+
+        '<div class="df df-c pd-8">'+
+            '<div class="df ai-c just-c-bet c-66">'+
+                '<div class="df ai-c">'+
+                    '<img src="'+ o.info.avatar +'" class="img"/>'+
+                    '<span>'+ myApp.htmlEscape(o.info.name) +'</span>'+
+                '</div>'+
+                '<span class="fs-12 c-99">时间:'+ o.info.time +'</span>'+
+            '</div>'+
+            '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                '<span>'+ orderStatus(o.status) +'</span>'+
+                '<span class="price b">'+ o.jiage +'</span>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 音频订单
+function addAudio(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li video">'+
+        getTitle(o.type)+
+        '<div class="df df-c pd-8">'+
+            '<div class="df ai-c just-c-bet c-66">'+
+                '<div class="df ai-c">'+
+                    '<img src="'+ o.info.avatar +'" class="img"/>'+
+                    '<span>'+ myApp.htmlEscape(o.info.name) +'</span>'+
+                '</div>'+
+                '<span class="fs-12 c-99">时间:'+ o.info.time +'</span>'+
+            '</div>'+
+            '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                '<span>'+ orderStatus(o.status) +'</span>'+
+                '<span class="price b">'+ o.jiage +'</span>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// vip
+function addVip(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    ul.append('<div class="li vip">'+
+        getTitle(o.type)+
+        '<div class="df df-c pd-8" >'+
+            '<div class="df ai-c just-c-bet c-66">'+
+                '<div class="name c-yellow mt-6 b">'+ o.info.vipname +'</div>'+
+                '<div class="nowrap fs-14">'+ o.info.buytime +'个月VIP</div>'+
+            '</div>'+
+            '<div class="df mt-10 ai-c just-c-bet fs-12 c-red">'+
+                '<span>'+ orderStatus(o.status) +'</span>'+
+                '<span class="price b">'+ o.jiage +'</span>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 状态
+function orderStatus(status){
+    switch(Number(status)){
+        case 0: return "未完成";
+        case 1: return "待评价";
+        case 2: return "已完成";
+    }
+    return "";
+}
+// 支付
+function toPay(e){
+    var order = $(e).data("orderid");
+    myApp.inputPayPwd(function(pwd){
+        myApp.ajax({
+            url: "/api/member/member/payorder",
+            method: "get",
+            data: {id:order, paypwd:pwd},
+            success(data){
+                if(data.errcode!=0 && data.errcode!=200){return}
+                api.toast({msg:'支付成功'});
+                if(data.udata){
+                    $api.rmStorage('userData');
+                    $api.setStorage('userData', data.udata);
+                    api.sendEvent({name: 'instantlyTestLogin'});
+                    api.sendEvent({name: 'personalTestLogin'});
+                }
+                over = false;
+                page = 1;
+                getList();
+            }
+        });
+    })
+}
+// 标题
+function getTitle(type){
+    var title = "";
+    switch(Number(type)){
+        case 1: title = "购买杂志"; break;
+        case 2: title = "购买期刊"; break;
+        case 3: title = "购买刊页"; break;
+        case 4: title = "咨询旁听"; break;
+        case 5: title = "图文咨询"; break;
+        case 6: title = "视频通话预约"; break;
+        case 7: title = "音频通话预约"; break;
+        case 8: title = "购买VIP"; break;
+    }
+    return '<div class="order-title">'+ title +'</div>';
+}
+// 旁听
+function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
+// 报刊详情
+function openDetail(id){myApp.openWin({title:"报刊介绍", url: "/html/journal/detail.html", headColor: "#E8DAD5", pageParam:{id:id}})}
+// 刊物阅读
+function toBook(e){
+    var ts = $(e);
+    var id = ts.data("xid");
+    var title = ts.data("title");
+    myApp.openWin({title:title, url:"/html/journal/book.html", pageParam:{id:id, title:title}});
+}
+</script>
+</body>
+</html>
