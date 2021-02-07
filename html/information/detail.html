@@ -91,6 +91,7 @@ var groupid = null;
 var authorid = null;
 var fxdata = null;
 var wxPlus = null;
+var hasData = false;
 
 apiready = function(){
     $api.fixTabBar($api.byId('bottom'));
@@ -109,6 +110,7 @@ function setEvent(){
         },300);
     });
     $("#save").on("click",function(){
+        if(!hasData){api.toast({msg:"error"}); return}
         if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
         var ts = $(this);
         myApp.ajax({
@@ -126,6 +128,7 @@ function setEvent(){
 
     $("#info").on("click",function(e){
         if($(e.target).hasClass("guanzhu")){
+            if(!hasData){api.toast({msg:"error"}); return}
             if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
             var ts = $(this);
             myApp.ajax({
@@ -141,6 +144,7 @@ function setEvent(){
             });
             return
         }
+        if(api.pageParam.isSchool){return}
         openExpertDetail(false,authorid);
     });
     // 点击显示图片
@@ -153,6 +157,7 @@ function getData(){
         data: {id: api.pageParam.id},
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
+            hasData = true;
             if(Number(data.count)>0){
                 var num = Number(data.count);
                 if(num>=1000 && num<10000){num = parseInt(num/1000)+"k"}
@@ -176,6 +181,7 @@ function getData(){
 }
 // 评论列表
 function openComment(){
+    if(!hasData){api.toast({msg:"error"}); return}
     myApp.openWin({
         title: "评论",
         url: "/html/information/detail_comment.html",

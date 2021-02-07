@@ -109,7 +109,6 @@ function submit(){
     var id = selTimeId;
     var type = $("input[name='type']").val();
     var timelog = $("#timelog").val();
-    console.log(JSON.stringify(price))
     var jg = price[type];
 
     if(!id){api.toast({msg:"请选择咨询时间"});return}

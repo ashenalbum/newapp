@@ -8,289 +8,96 @@
     <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
     <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
     <style>
-        body{box-sizing:border-box; background:#f6f7f8;}
-        .topbg{position:fixed; top:0; left:0; width:100%; height:120px; overflow:hidden;}
-        .topbg::before{content:" "; position:absolute; z-index:1; top:0; left:0; bottom:0; right:0; background:rgba(0,0,0,0.2);}
-        .topbg .img{position:relative; top:-110px; width:100%; height:auto; -webkit-filter:blur(5px); filter:blur(5px);}
-
-        .header{height:40px; position:fixed; z-index:9;}
-        .header .back{padding:10px; width:20px; height:20px;}
-
-        .body{position:relative; z-index:1;}
-        .body .scroll{position:absolute; top:0; bottom:0; left:0; right:0; padding-bottom:60px; overflow:auto;}
-        .body .scroll .content{margin-top:80px; background:#f6f7f8;}
-
-        .info{position:relative; padding:10px 14px; background:#ffffff;}
-        .info .icon{display:block; position:absolute; width:80px; height:80px; left:14px; top:-50px; border-radius:50%; background:#f6f7f8; border:3px solid #ffffff;}
-        .info .follow{background:#FF3942; height:30px; line-height:30px;}
-        .info .follow.active{background:#f6f7f8; color:#999999; transition:background 1s;}
-        .info .fans{margin-left:14px;}
-        .info .fen{padding-left:26px; line-height:14px; background:url(../../image/information/save_act.png) no-repeat 10px center; background-size:12px 12px;}
-        .info .txt{line-height:20px;}
-        .info .more{display:inline-block; height:20px; line-height:20px; padding:6px 14px 6px 6px; background:url(../../image/common/more.png) no-repeat right center; background-size:12px 12px; border-radius:4px;}
-
-        .evaluate{padding:12px 14px; background:#ffffff;}
-        .evaluate .li{padding:8px 0; border-bottom:1px solid #dddddd;}
-        .evaluate .li:last-child{border-bottom:none;}
-        .evaluate .li .icon{display:block; width:46px; height:46px; margin-right:10px; border-radius:50%;}
-        .evaluate .li .star{display:block; height:14px; margin-right:6px; background:url(../../image/common/star.png) repeat-x 0 center; background-size:14px 14px;}
-        .evaluate .li .star.star-1{width:14px;}
-        .evaluate .li .star.star-2{width:28px;}
-        .evaluate .li .star.star-3{width:42px;}
-        .evaluate .li .star.star-4{width:56px;}
-        .evaluate .li .star.star-5{width:70px;}
-        .evaluate .li .star-num{display:inline-block; height:14px; line-height:16px;}
-        .evaluate .li .txt{line-height:16px;}
-
-        .detail{padding:8px 20px 14px; background:#ffffff;}
-        .detail .labels{position:relative;}
-        .detail .labels .label{position:relative; z-index:2; margin:0 8px; height:28px; display:block; position:relative; line-height:28px;}
-        .detail .labels .label.active{font-size:14px; color:#333333;}
-        .detail .labels .i{position:absolute; left:0; bottom:-2px; width:50%; height:6px; background:url(../../image/instantly/active.png) no-repeat center center; background-size:16px 100%; transition:left 0.3s;}
-        .detail .labels .label1.active~.i{left:0;}
-        .detail .labels .label2.active~.i{left:50%;}
-
-        .btn-box{position:fixed; z-index:2; bottom:0; left:0; box-sizing:border-box; width:100%; height:60px; padding:0 20px; background:#ffffff;}
-        .btn-box .com-button{box-sizing:border-box; margin-right:30px; height:40px; line-height:40px;}
-        .btn-box .com-button .icon{display:block; width:20px; height:20px; margin-right:6px; margin-bottom:2px;}
-        .btn-box .com-button:last-child{margin-right:0;}
-        .btn-box .com-button.ashen-btn{border:1px solid #D3D3D3; background:#f6f7f8;}
-        .btn-box .com-button.red-btn{background:#FF3942;}
+        body{box-sizing:border-box; min-height:100%; background:#f6f7f8;}
+        .blockimg{display:block; width:100%; height:auto;}
+        .box{padding:6px 10px 16px;}
+        .box .item{width:50%; margin-top:10px; height:80px;}
+        .box .item-cont{box-sizing:border-box; margin:0 5px; padding:0 14px; height:100%; border-radius:8px; background:#ffffff;}
+        .box .item-cont .img{display:block; width:38px; height:38px; }
     </style>
 </head>
 <body class="df df-c">
-    <div id="topbg" class="topbg">
-        <img src="../../image/common/back_w.png" class="img" alt="" />
-    </div>
-    <div class="header df ai-c">
-        <img src="../../image/common/back_w.png" class="back" onclick="api.closeWin()" />
-    </div>
-    <div class="body fc mt-40 df df-c">
-        <div id="scroll" class="scroll">
-            <div class="content">
-                <div id="info" class="info">
-                    <img src="" class="icon shadow" alt="">
-                    <div class="df just-c-end">
-                        <button type="button" class="com-button color-animate follow fs-14 c-ff" name="button" onclick="guanzhu(this)"> + 关注</button>
-                    </div>
-                    <div class="mt-10 df ai-c">
-                        <span class="name fs-20 b lh-1"></span>
-                        <span class="fans fs-14 c-99"></span>
-                        <span class="fen fs-14 c-yellow"></span>
-                    </div>
-                    <div class="txt mt-10 fs-14"></div>
-                    <div class="df mt-4 just-c-end">
-                        <div class="c-66 c-14 more" tapmode="touch-style" onclick="openInfo()">详细简介</div>
-                    </div>
-                </div>
-                <!-- 详情 -->
-                <div id="detail" class="detail mt-20">
-                    <div class="labels df ai-c just-c-ct fs-14 c-99">
-                        <span class="label label1 fc txt-c active" data-type="1" >公开咨询</span>
-                        <span class="label label2 fc txt-c" data-type="2">专家文章</span>
-                        <i class="i"></i>
-                    </div>
-                    <div class="show-box">
-                        <div class="question mt-10 fs-12"></div>
-                        <div class="newslist mt-10 fs-14 c-33 hide"></div>
-                    </div>
-                    <!-- 加载提示 -->
-                    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
-                        <img src="../../image/common/loading_more.gif" class="img" alt="" />
-                        <span class="loadtxt">加载中……</span>
-                        <span class="overtxt">没有更多数据了</span>
-                        <span class="scrollbtm">上拉加载更多</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="btn-box df ai-c just-c-ct shadow">
-        <button type="button" class="fc com-button red-btn fs-12 c-red" name="button" onclick="openLaunch()">发起咨询</button>
-    </div>
+    <img id="topimg" src="" class="blockimg hide" />
+    <img id="bgimg" src="" class="blockimg hide" />
+    <div id="box" class="box fc df df-w-w"></div>
+    <img src="" id="bottomimg" class="blockimg hide" alt="" />
 <script type="text/javascript" src="../../script/api.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script>
-var tabType = 1;
-var page = 1;
-var over = false;
-var loading = false;
-var dataList = [];
-var loadmore = $("#loadmore");
 var schoolName = "";
 
 apiready = function(){
-    $api.fixStatusBar(document.body);
-    $api.fixStatusBar(document.getElementById("topbg"));
     setEvent();
     getData();
 }
-function setEvent(){
-    api.addEventListener({name: 'loginok'},getData);
-    $("#scroll").bind("scroll",function(e){
-        var ts = $(this);
-        var viewH = ts.height();//可见高度
-        var contentH = ts.get(0).scrollHeight;//内容高度
-        var scrollTop = ts.scrollTop();//滚动高度
-        if(contentH - viewH - scrollTop <= 10) {getList()}
-    });
-    $("#detail").on("click",".open-listen",function(){
-        var id = $(this).data("id");
-        openListen(id);
-    }).on("click",".news",function(){
-        var id = $(this).data("id");
-        openNews(id);
-    }).children(".labels").on("click",".label",function(){
-        var ts = $(this);
-        var type = Number(ts.data("type"));
-        if(tabType == type){return}
-        if(loading){api.toast({msg:"加载中,请稍候"}); return}
-        tabType = type;
-        ts.addClass("active").siblings().removeClass("active");
-        page = 1;
-        over = false;
-        getList();
-    });
-}
+function setEvent(){}
 function getData(){
     myApp.ajax({
-        url: "/api/zixun/school/homeshow",
+        url: "/api/zixun/school/schoolzhuye",
         method: "get",
-        data: {id: api.pageParam.id},
+        data: {id:api.pageParam.id},
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
-            var infoDom = $("#info");
-            schoolName = data.title;
-            $("#topbg .img").attr("src",data.bgimage || data.logo);
-            infoDom.find(".icon").attr("src",data.logo);
-            infoDom.find(".name").text(data.title);
-            infoDom.find(".fans").html(data.scnum+"粉丝");
-            infoDom.find(".txt").html(data.message);
-            if(data.is_true==1){infoDom.find(".follow").addClass("active").html("已关注")}
-            page = 1;
-            over = false;
-            getList();
+            if(data.data && data.data.title){
+                schoolName = data.data.title;
+                api.execScript({name:api.winName, script: 'changeTitle("'+ data.data.title +'");'});
+            }
+            data.data && data.data.topimg && $("#topimg").attr("src",data.data.topimg).removeClass("hide");
+            data.data && data.data.bgimage && $("#bgimg").attr("src",data.data.bgimage).removeClass("hide");
+            data.data && data.data.bottomimg && $("#bottomimg").attr("src",data.data.bottomimg).removeClass("hide");
+            data.data && data.data.newcate && setMenu(data.data.newcate);
         }
-    });
+    })
 }
-// 列表
-function getList(){
-    if(loading || over){return}
-    loading = true;
-    loadmore.removeClass("over").addClass("load");
-    var url = '';
-    var ul = null;
-    if(tabType==1){
-        url = "/api/zixun/school/openzixun";
-        ul = $("#detail .question")
-        ul.removeClass("hide").siblings().addClass("hide");
-    }else{
-        url = "/api/zixun/school/yxnewslist";
-        ul = $("#detail .newslist");
-        ul.removeClass("hide").siblings().addClass("hide");
+function setMenu(arr){
+    var ul = $("#box").empty();
+    for(var i in arr){
+        var o = arr[i];
+        ul.append('<div class="item" onclick="menuClick('+ o.id +',\''+ o.name +'\')">'+
+            '<div class="item-cont df ai-c">'+
+                '<div class="fc">'+
+                    '<div class="fs-16 b lh-1 one-hide">'+ o.name +'</div>'+
+                    '<div class="mt-12 fs-12 c-99 lh-1 one-hide">'+ (o.shuoming || '') +'</div>'+
+                '</div>'+ getIcon(o.id) +
+            '</div>'+
+        '</div>');
     }
-    myApp.ajax({
-        url: url,
-        method: "get",
-        data: {page:page, id:api.pageParam.id},
-        loading: false,
-        success(data){
-            loading = false;
-            api.refreshHeaderLoadDone();
-            if(Number(page)<=1){ul.empty();dataList=[];}
-            page++;
-            loadmore.removeClass("load");
-            dataList = dataList.concat(data.list || []);
-            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
-                over = true;
-                loadmore.addClass("over");
-            }
-            for(var i in data.list){
-                var obj = data.list[i];
-                if(tabType==1){
-                    ul.append('<div class="open-listen item df df-c just-c-bet mt-12 " data-id="'+ obj.id +'">'+
-                        '<div class="title two-hide">'+ obj.content +'</div>'+
-                        '<div class="df ai-c just-c-bet">'+
-                            '<span class="fs-12 c-aa">'+ obj.tounum +'人旁听</span>'+
-                            '<div class="listen c-red b">旁听</div>'+
-                        '</div>'+
-                    '</div>');
-                } else {
-                    var label = obj.label?'<span class="hot mt-6">'+ obj.label +'</span>':'';
-                    var from = obj.laiyuan?'<span class="fs-12 lh-1 c-aa mt-6">'+ obj.laiyuan +'</span>':'';
-                    if(obj.show_mode=="1"){
-                        ul.append('<div class="news type1 df" data-id="'+obj.id+'">'+
-                            '<div class="df df-c just-c-bet f1">'+
-                                '<div class="two-hide">'+ obj.title +'</div>'+
-                                '<div class="df ai-s">'+label+from+'</div>'+
-                            '</div>'+
-                            '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
-                        '</div>');
-                    }else if(obj.show_mode=="2"){
-                        ul.append('<div class="news type3" data-id="'+obj.id+'">'+
-                            '<div class="two-hide">'+ obj.title +'</div>'+
-                            '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
-                            '<div class="df ai-s">'+label+from+'</div>'+
-                        '</div>');
-                    }else if(obj.show_mode=="3"){
-                        var img = "";
-                        if(obj.images instanceof Array){
-                            for(var imgid=0; imgid<3; imgid++){
-                                if(!obj.images[imgid]){continue}
-                                img += '<img src="'+obj.images[imgid]+'" class="img fc" alt="" />';
-                            }
-                        }
-                        ul.append('<div class="news type2" data-id="'+obj.id+'">'+
-                            '<div class="one-hide">'+ obj.title +'</div>'+
-                            '<div class="df mt-6">'+ img +'</div>'+
-                            '<div class="df ai-s">'+label+from+'</div>'+
-                        '</div>');
-                    }else{
-                        ul.append('<div class="news type3" data-id="'+obj.id+'">'+
-                            '<div class="two-hide">'+ obj.title +'</div>'+
-                            '<div class="df ai-s">'+label+from+'</div>'+
-                        '</div>');
-                    }
-                }
-            }
-            // 内容未满一页继续加载
-            setTimeout(function(){
-                var scroll = $("#scroll");
-                if(scroll.get(0).scrollHeight <= scroll.height() && !over){getList()}
-            },100);
-        }
-    })
 }
-// 关注
-function guanzhu(dom){
-    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+// 点击
+function menuClick(id,name){
+    // 咨询
+    if(id==0){openLaunch(); return}
+    // 其他
     myApp.ajax({
-        url: "/api/home/Common/follow",
+        url: "/api/zixun/school/schoolnews",
         method: "get",
-        data: {id:api.pageParam.id, type:1},
-        loading: false,
+        data: {id:id, sid:api.pageParam.id},
         success(data){
-            var ts = $(dom);
             if(data.errcode!=0 && data.errcode!=200){return}
-            if(data.scsta==1){
-                api.toast({msg:"已关注"});
-                ts.addClass("active").html("已关注");
-            }else{
-                api.toast({msg:"已取消关注"});
-                ts.removeClass("active").html(" + 关注");
-            }
+            if(data.a == 2 && data.id){id==4?openSchoolImage(data.id):openNews(data.id)}
+            if(data.a == 1 && data.data){myApp.openWin({title: name||"院校", url:"/html/consult/school_info.html", pageParam:{id:api.pageParam.id, typeid:id, list:data.data}});}
         }
     })
 }
-// 旁听
-function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
+// 图标
+function getIcon(id){
+    var img = "s4";
+    switch (true) {
+        case id=="1": img = "s1"; break;
+        case id=="2": img = "s2"; break;
+        case id=="3": img = "s3"; break;
+        case id=="4": img = "s5"; break;
+        case id=="5": img = "s6"; break;
+    }
+    return '<img src="../../image/consult/'+ img +'.png" class="img" />';
+}
 // 资讯详情
-function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id}})}
+function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id, isSchool:true}})}
 // 发起咨询
 function openLaunch(){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:"school", id:api.pageParam.id, name:schoolName}})}
-// 学校详情
-function openInfo(){myApp.openWin({url:"/html/consult/school_info.html", pageParam:{id:api.pageParam.id}})}
+// 校园风采
+function openSchoolImage(id){myApp.openWin({title:"校园风采", url:"/html/consult/school_image.html", pageParam:{id:id}})}
 </script>
 </body>
 </html>

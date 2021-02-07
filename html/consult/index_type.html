@@ -21,7 +21,7 @@
         .school-box .more{display:inline-block; height:24px; line-height:24px; padding:0 14px 0 10px; background:url(../../image/common/more.png) no-repeat right center; background-size:12px 12px; border-radius:2px;}
         .school-box .list{margin-left:-6px; margin-right:-6px;}
         .school-box .list .item{width:50%;}
-        .school-box .list .item .item-box{margin:0 6px 12px; box-sizing:border-box; padding:12px 10px; background:#ffffff; border-radius:6px; }
+        .school-box .list .item .item-box{margin:12px 6px 0; box-sizing:border-box; padding:12px 10px; background:#ffffff; border-radius:6px; }
         .school-box .list .logo{display:block; width:52px; height:52px; border-radius:50%;}
         .school-box .list .title{height:32px; line-height:16px;}
         .school-box .list .labels{height:32px;}
@@ -56,44 +56,10 @@
             <div class="fs-16 b">热门院校</div>
             <div class="more fs-12 c-77" onclick="openSchool()">更多</div>
         </div>
-        <div id="schoollist" class="list mt-10 df df-w-w">
-            <div class="item">
-                <div class="item-box df df-c ai-c">
-                    <img src="../../image/common/test.jpg" class="logo shadow2" alt="" />
-                    <div class="title df ai-c txt-c mt-6 tow-hide fs-12">山西工程职业技术学院</div>
-                    <div class="labels mt-4 fs-12 c-99 df ai-c">
-                        <span class="two-hide">111次浏览</span>
-                        <span class="two-hide">121粉丝</span>
-                    </div>
-                    <button class="mt-10 btn com-button c-red fs-12" tapmode="touch-style">发起咨询</button>
-                </div>
-            </div>
-                <div class="item">
-                    <div class="item-box df df-c ai-c">
-                        <img src="../../image/common/test.jpg" class="logo shadow2" alt="" />
-                        <div class="title df ai-c txt-c mt-6 tow-hide fs-12">山西工程职业技术学院</div>
-                        <div class="labels mt-4 fs-12 c-99 df ai-c">
-                            <span class="two-hide">111次浏览</span>
-                            <span class="two-hide">121粉丝</span>
-                        </div>
-                        <button class="mt-10 btn com-button c-red fs-12" tapmode="touch-style">发起咨询</button>
-                    </div>
-                </div>
-                    <div class="item">
-                        <div class="item-box df df-c ai-c">
-                            <img src="../../image/common/test.jpg" class="logo shadow2" alt="" />
-                            <div class="title df ai-c txt-c mt-6 tow-hide fs-12">山西工程职业技术学院</div>
-                            <div class="labels mt-4 fs-12 c-99 df ai-c">
-                                <span class="two-hide">111次浏览</span>
-                                <span class="two-hide">121粉丝</span>
-                            </div>
-                            <button class="mt-10 btn com-button c-red fs-12" tapmode="touch-style">发起咨询</button>
-                        </div>
-                    </div>
-        </div>
+        <div id="schoollist" class="list df df-w-w"></div>
     </div>
     <!-- 资讯专家 -->
-    <div id="expert" class="zixun com-box mt-4">
+    <div id="expert" class="zixun com-box mt-16">
         <div class="com-title df just-c-bet ai-c">
             <span class="fs-16 c-33 b">专家咨询</span>
             <span class="fs-12 c-77 more" onclick="openExpert()">更多</span>
@@ -138,28 +104,58 @@ function setEvent(){
     });
 }
 function getData(){
-
+    myApp.ajax({
+        url: "/api/zixun/dayi/catelist",
+        method: "get",
+        data: {catid: api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            setSchool(data.school);
+            setExpert(data.zhuanjia);
+            setDayi(data.dayi);
+        }
+    })
+}
+// 学校
+function setSchool(arr){
+    var list = $("#schoollist").empty();
+    if(!arr || !arr.length){list.parent().addClass("hide");return}
+    list.parent().removeClass("hide")
+    for(var i in arr){
+        var o = arr[i];
+        list.append('<div class="item">'+
+            '<div class="item-box df df-c ai-c" data-name="'+ o.title +'" data-id="'+ o.id +'">'+
+                '<img src="'+ o.logo +'" class="logo shadow2" alt="" />'+
+                '<div class="title df ai-c txt-c mt-6 tow-hide fs-12">'+ o.title +'</div>'+
+                '<div class="labels mt-4 fs-12 c-99 df ai-c">'+
+                    '<span class="two-hide">'+ (o.looknum||0) +'次浏览</span>'+
+                    '<span class="two-hide">'+ (o.scnum||0) +'粉丝</span>'+
+                '</div>'+
+                '<button class="mt-10 btn com-button c-red fs-12" tapmode="touch-style">发起咨询</button>'+
+            '</div>'+
+        '</div>');
+    }
 }
 // 大家都在问
 function setDayi(arr){
     var dayi = $("#dayi");
-    dayi[arr.length?'removeClass':'addClass']('hide');
-    if(!arr.length){return false}
+    if(!arr || !arr.length){dayi.addClass("hide"); return}
+    dayi.removeClass("hide");
     var ul = dayi.find(".itembox").empty();
     for(var i in arr){
         ul.append('<div class="item df df-c just-c-bet mt-12" onclick="openListen('+ arr[i].id +')">'+
             '<div class="title two-hide">'+ arr[i].content +'</div>'+
             '<div class="df ai-c just-c-bet">'+
                 '<span class="fs-12 c-aa">'+ arr[i].tounum +'人旁听</span>'+
-                '<div class="listen c-red b bei">'+ arr[i].money +'贝旁听</div>'+
+                '<div class="listen c-red b bei">'+ (arr[i].ptmoney?arr[i].ptmoney+'贝':'') +'旁听</div>'+
             '</div>'+
         '</div>');
     }
 }
 // 专家
 function setExpert(arr){
-    $api[arr.length?'removeCls':'addCls']($api.byId('expert'),'hide');
-    if(!arr.length){return false}
+    if(!arr || !arr.length){$("#expert").addClass("hide"); return}
+    $("#expert").removeClass("hide");
     var ul = $("#expert .zixunlist").empty();
     for(var i in arr){
         var o = arr[i];
@@ -180,17 +176,17 @@ function setExpert(arr){
     }
 }
 // 院校详情
-function openSchoolDetail(id){myApp.openWin({hideAll:true, url:"/html/consult/school_main.html", pageParam:{id:id}})}
+function openSchoolDetail(id){myApp.openWin({title:"院校", url:"/html/consult/school_main.html", pageParam:{id:id}})}
 // 旁听
 function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
 // 专家详情
 function openExpertDetail(id,uid){myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{id:id, uid:uid}})}
 // 专家列表
-function openExpert(){myApp.openWin({title:"专家", url: "/html/consult/expert.html", headColor:'#f6f7f8'})}
+function openExpert(){myApp.openWin({title:"专家", url: "/html/consult/expert.html", pageParam:{id:api.pageParam.id}})}
 // 大家都在问
-function openList(){myApp.openWin({title:"大家都在问", url:"/html/consult/listen_all.html"})};
+function openList(){myApp.openWin({title:"大家都在问", url:"/html/consult/listen_all.html", pageParam:{id:api.pageParam.id}})};
 // 院校列表
-function openSchool(){myApp.openWin({title:"院校", url:"/html/consult/school.html", headColor: "#f6f7f8"})}
+function openSchool(){myApp.openWin({title:"院校", url:"/html/consult/school.html", headColor: "#f6f7f8", pageParam:{id:api.pageParam.id}})}
 // 发起咨询
 function openLaunch(id,name,type,money){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:type, id:id, uid:id, name:name, money:money}})}
 </script>

@@ -24,8 +24,11 @@
         .cont .upimg-box{position:relative; width:96px; height:60px; margin:0 20px 12px 0; background:#f6f7f8;}
         .cont .upimg-box img{display:block; width:100%; height:100%; border-radius:2px;}
         .cont .upimg-box .close{position:absolute; top:-8px; right:-10px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.5) url(../../image/common/close.png) no-repeat center center; background-size:16px 16px;}
-        .cont label{padding:6px; border-radius:4px;}
+        .cont .label{padding:6px; border-radius:4px;}
         .cont .iconfont::before{color:#FF3942!important; margin-right:6px;}
+        .cont .catidlabel .lb{display:inline-block; box-sizing:border-box; margin:0 10px 10px 0; white-space:nowrap; height:30px; line-height:30px; padding:0 14px; border:thin solid; border-radius:4px;}
+        .cont .catidlabel input[type='radio']:checked~.lb{color:#FF3942; background:#FFE2E3;}
+        .public{padding:8px 0; background:#f6f7f8;}
 
         .btn-box{height:50px;}
         .btn-box .submit{box-sizing:border-box; width:100%; height:40px; line-height:40px; background:#FF3942; }
@@ -39,14 +42,19 @@
     </header>
     <div class="cont df df-c">
         <textarea id="textarea" class="textarea" rows="8" placeholder="请输入问题描述"></textarea>
-        <div class="mt-20 fs-16 b">上传图片<span class="fs-12 c-99 fw-i">（最多三张）</span></div>
+        <!-- 图片 -->
+        <div class="mt-20 fs-16 b">上传图片<span class="fs-12 c-99 fw-i">（可选项，最多三张）</span></div>
         <div id="upimgbox" class="mt-16 df df-w-w">
             <div class="upimg fs-12 c-99 df df-c ai-c just-c-ct" tapmode="touch-style">
                 <span class="fs-30 lh-1">+</span>
                 <span>添加图片</span>
             </div>
         </div>
-        <label class="public df ai-c mt-10" tapmode="touch-style">
+        <!-- 咨询类型 -->
+        <div class="mt-16 fs-16 b">咨询类型</div>
+        <div id="radios" class="mt-16 df c-99 df df-w-w"></div>
+        <!-- 公开咨询 -->
+        <label class="public label df ai-c mt-16" tapmode="touch-style">
             <input id="ishide" type="checkbox" checked class="ipt-radio" name="ishide" />
             <span class="iconfont"></span>
             <span class="fs-14 c-99">公开咨询</span>
@@ -91,16 +99,36 @@ function setEvent(){
 }
 function init(){
     api.pageParam.name && $("#header .title").text("咨询 - "+api.pageParam.name);
+    myApp.ajax({
+        url: api.pageParam.type=="school"?"/api/zixun/school/schoolcate":"/api/zixun/zhuanjia/zhuanjiacate",
+        method: "get",
+        data: {id:api.pageParam.id, uid:api.pageParam.uid},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            data.data && setRadios(data.data);
+        }
+    })
+}
+// 分类
+function setRadios(arr){
+    var ul = $("#radios").empty();
+    for(var i in arr){
+        ul.append('<label class="catidlabel df ai-c">'+
+            '<input type="radio" class="ipt-radio-o hide" value="'+ arr[i].id +'" '+ (i=='0'?'checked':'') +' name="catid" />'+
+            '<span class="lb fs-14">'+ arr[i].name +'</span>'+
+        '</label>');
+    }
 }
 function submit(){
     var val = $("#textarea").val();
     if(!val){api.toast({msg:"请输入问题描述"});return}
+    var catid = $("#radios input:checked").val();
     var ishide = $("#ishide").is(":checked");
     var url = api.pageParam.type=="school"?"/api/zixun/schoolmem/adddayimsg":"/api/zixun/zhuanjiamem/adddayizjorder";
     myApp.ajax({
         url: url,
         method: "post",
-        data: {data:{content:val, images:imgArr.join(), ishide:ishide?1:0, id:api.pageParam.id, uid:api.pageParam.uid}},
+        data: {data:{content:val, images:imgArr.join(), ishide:ishide?1:0, id:api.pageParam.id, uid:api.pageParam.uid, catid:catid}},
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             if(api.pageParam.type=="school" || !data.data || !data.data.id){

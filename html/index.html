@@ -222,7 +222,7 @@ function getData(){
                 for(var v in obj.value){
                     if(v>2){break}
                     var ov = obj.value[v];
-                    li.append('<div class="itm fc" tapmode="touch-style1" onclick="'+fun+'('+ov.id+')">'+ myApp.htmlEscape(ov.name) +'</div>');
+                    li.append('<div class="itm fc" tapmode="touch-style1" onclick="'+fun+'('+ ov.id +',\''+ ov.name +'\')">'+ myApp.htmlEscape(ov.name) +'</div>');
                 }
             }
             for(var i in data.modular){
@@ -410,7 +410,13 @@ function openStudy(id){
     myApp.openWin(o);
 }
 // 咨询
-function openConsult(id){myApp.openWin({title:"招考答疑", url:"/html/consult/index.html", pageParam: {id:id}})}
+function openConsult(id,title){
+    if(id){
+        myApp.openWin({title:title||"详情", url:"/html/consult/index_type.html", pageParam:{id:id}});
+    }else{
+        myApp.openWin({title:"招考答疑", url:"/html/consult/index.html", pageParam: {id:id}})
+    }
+}
 // 视频
 function openVideo(id){myApp.openWin({ hideHead:true, url:'/html/study/detail.html', pageParam:{id:id}})}
 // 旁听

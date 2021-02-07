@@ -56,7 +56,6 @@ function getData(){
         method: "get",
         data: {uid:api.pageParam.uid},
         success(data){
-            console.log(JSON.stringify(data))
             if(data.errcode!=0 && data.errcode!=200){return}
             if(!data.list || !data.list.length){ul.append('<div class="empty fs-14 c-99 txt-c">暂无数据</div>'); return}
             for(var i=0; i<data.list.length; i++){

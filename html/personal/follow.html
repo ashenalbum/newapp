@@ -105,7 +105,7 @@ function setEvent(){
     });
     $("#school").on("click",".item",function(){
         var id = $(this).data("id");
-        myApp.openWin({hideAll:true, url:"/html/consult/school_main.html", pageParam:{id:id}})
+        myApp.openWin({title:"院校", url:"/html/consult/school_main.html", pageParam:{id:id}})
     });
     $("#expert").on("click",".item",function(){
         var ts = $(this);

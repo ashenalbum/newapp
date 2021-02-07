@@ -71,10 +71,11 @@ function getData(){
         url: "/api/zixun/home/zixunlist",
         method: "get",
         loading: false,
-        data: {page:page},
+        data: {page:page, catid:api.pageParam.id},
         success(data){
             loading = false;
             api.refreshHeaderLoadDone();
+            if(data.errcode!=0 && data.errcode!=200){return}
             var ul = $("#list");
             if(Number(page)<=1){ul.empty();dataList=[];}
             page++;

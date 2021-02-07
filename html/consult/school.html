@@ -8,10 +8,11 @@
     <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
     <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
     <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <link rel="stylesheet" href="../../css/mobileSelect.css" />
     <style>
         body{box-sizing:border-box; padding:10px 16px; background:#f6f7f8;}
 
-        .swiperbox{height:108px;}
+        .swiperbox{height:108px; margin-bottom:16px;}
         .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative; background:#f6f7f8;}
         .swiperbox .swiper-container .swiper-slide{box-sizing:border-box; padding:8px 10px;}
         .swiperbox .swiper-container .swiper-slide:nth-child(4n+1){background-color:#DAE6EB;}
@@ -22,15 +23,15 @@
         .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
         .swiperbox .swiper-container .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
 
-        .search{background:#f6f7f8;}
+        .search{margin-bottom:6px; background:#f6f7f8;}
         .search .input-box{position:relative;}
-        .search .input-box .button{position:absolute; right:0; top:0; height:34px; line-height:36px; padding:0 12px;}
+        .search .input-box .button{position:absolute; right:0; top:0; height:34px; line-height:36px; padding:0 12px; background:transparent; border:none; outline:none;}
         .search .input{box-sizing:border-box; width:200px; height:36px; line-height:36px; padding:0 10px 0 34px; background:#ffffff url(../../image/information/search.png) no-repeat 10px center; background-size:18px 18px; border-radius:18px; font-size:14px; outline:none;}
         .search .area{margin-left:6px; min-width:80px; padding:6px 0;}
         .search .area::after{content:" "; display:inline-block; width:16px; height:16px; margin-left:2px; background:url(../../image/common/sel_b.png) no-repeat center center; background-size:16px 16px;}
 
         .select{height:34px; white-space:nowrap; overflow:hidden;}
-        .select::after{flex-shrink:0; content:" "; display:inline-block; width:16px; height:16px; margin-left:4px; background:url(../../image/common/sel_b.png) no-repeat center center; background-size:100% 100%;}
+        .select::after{flex-shrink:0; content:" "; display:inline-block; width:14px; height:14px; margin-left:4px; background:url(../../image/common/sel.png) no-repeat center center; background-size:100% 100%;}
 
         .list .item{padding:14px 0; border-bottom:1px solid #dddddd;}
         .list .item:last-child{border:none;}
@@ -49,14 +50,14 @@
     </div>
     <!-- 搜索 -->
     <div class="search df df-c">
-        <div id="search" class="input-box fc df">
-            <input type="text" class="input fc" placeholder="搜索院校" onkeypress="search()" />
-            <div class="fs-14 button c-66" onclick="search()">搜索</div>
-        </div>
+        <form id="search" class="input-box fc df">
+            <input type="text" class="input fc" placeholder="搜索院校"/>
+            <button type="submit" class="fs-14 button c-66">搜索</button>
+        </form>
         <div class="sel-box df mt-10">
-            <div class="select fc df ai-c just-c-ct" tapmode="touch-style2">地区</div>
-            <div class="select fc df ai-c just-c-ct" tapmode="touch-style2">院校层次</div>
-            <div class="select fc df ai-c just-c-ct" tapmode="touch-style2">类型</div>
+            <div id="cityPicker" class="select fc df ai-c just-c-ct" tapmode="touch-style2"><span class="c-77">选择地区</span></div>
+            <div id="piciPicker" class="select fc df ai-c just-c-ct" tapmode="touch-style2"><span class="c-77">院校层次</span></div>
+            <div id="leiPicker" class="select fc df ai-c just-c-ct" tapmode="touch-style2"><span class="c-77">选择类型</span></div>
         </div>
     </div>
     <!-- list -->
@@ -72,9 +73,16 @@
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script type="text/javascript" src="../../script/mobileSelect.js"></script>
 <script>
+var topSwiper = null;
 var cityPicker = null;
+var piciPicker = null;
+var leiPicker = null;
+
 var city = "";
+var piciid = "";
+var leiid = "";
 var keyword = "";
 
 var page = 1;
@@ -86,10 +94,11 @@ var ul = $("#list");
 
 apiready = function(){
     setEvent();
-    init();
     getData();
+    setPicker();
 }
 function setEvent(){
+    api.setFrameAttr({name:api.frameName, bounces:true});
     api.addEventListener({
         name: 'scrolltobottom',
         extra: {threshold: 50}
@@ -97,7 +106,6 @@ function setEvent(){
         if(over||loading){return}
         getData();
     });
-    api.setFrameAttr({name:api.frameName, bounces:true});
     api.setRefreshHeaderInfo({
         bgColor: '#f0f0f0',
         textColor: '#666666',
@@ -113,13 +121,21 @@ function setEvent(){
         var ts = $(this);
         myApp.openBanner(ts.data('type'), ts.data('data'))
     });
-}
-function init(){
     $(document.body).on("click",".to-detail",function(e){
         var ts = $(this);
         var id = ts.data("id");
         if($(e.target).hasClass("to-launch")){toLaunch(id,ts.data("name")); return}
         toDetail(id);
+    });
+    // 搜索
+    $("#search").submit(function(){
+        var ts = $(this);
+        keyword = ts.find(".input").val();
+        page = 1;
+        over = false;
+        getData();
+        ts.find(".input").blur();
+        return false;
     });
 }
 function getData(){
@@ -130,43 +146,131 @@ function getData(){
         url: "/api/zixun/school/schoollist",
         method: "get",
         loading: page==1,
-        data: {city_str:city, page:page, keyword:keyword},
+        data: {catid:api.pageParam.id, page:page, city_str:city, keyword:keyword, piciid:piciid, leiid:leiid},
         success(data){
             loading = false;
             api.refreshHeaderLoadDone();
             if(Number(page)<=1){ul.empty();dataList=[];}
             page++;
             loadmore.removeClass("load");
-            dataList = dataList.concat(data.list || []);
+            // 轮播
+            data.swiper && setSwiper(data.swiper);
+            // 列表
+            dataList = dataList.concat(data.school || []);
             ul[dataList.length?'removeClass':'addClass']("hide");
-            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+            if(!data.school || data.school.length==0 || (data.count && dataList.length>=Number(data.count))){
                 over = true;
                 loadmore.addClass("over");
             }
-            for(var i in data.list){
-                var o = data.list[i];
+            for(var i in data.school){
+                var o = data.school[i];
+                var lbs = "";
+                for(var lb in o.piciid){lbs += '<span>'+ o.piciid[lb] +'</span>'}
                 ul.append('<div class="item df ai-c to-detail" data-id="'+ o.id +'" data-name="'+ o.title +'">'+
                     '<img src="'+ o.logo +'" class="icon" />'+
                     '<div class="fc df df-c">'+
                         '<div class="fs-14 c-33 b one-hide">'+ o.title +'</div>'+
-                        '<div class="label one-hide c-aa mt-6">'+
-                            '<span>'+ o.dyznum +'次咨询</span>'+
-                            '<span>'+ o.scnum +'粉丝</span>'+
-                        '</div>'+
+                        '<div class="label one-hide c-aa mt-6">'+ lbs +'</div>'+
                     '</div>'+
-                    '<button class="to-launch com-button c-red b">发起资讯</button>'+
+                    '<button class="to-launch com-button c-red b">招办答疑</button>'+
                 '</div>');
             }
         },
-        error(){api.refreshHeaderLoadDone()}
-    })
+        error(e){api.refreshHeaderLoadDone()}
+    });
 }
-function search(){
-    var input = $("#search .input");
-    keyword = input.val();
-    page = 1;
-    getData();
-    input.blur();
+// 选项
+function setPicker(){
+    // 地区
+    myApp.ajax({
+        url: "/api/zixun/school/schoolcity",
+        data: {catid: api.pageParam.id},
+        alert: false,
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.list || !data.list.length){return}
+            var list = [];
+            for(var i=0; i<data.list.length; i++){
+                list.push({id:i, value:data.list[i].city_str});
+            }
+            if(!cityPicker){
+                cityPicker = new MobileSelect({
+                    trigger: '#cityPicker',
+                    wheels: [{data:list}],
+                    callback(indexArr, data){
+                        if(data[0].value == city){return}
+                        page = 1;
+                        over = false;
+                        city = data[0].value;
+                        getData();
+                    },
+                    onShow(){api.setFrameAttr({name:api.frameName, bounces:false})},
+                    onHide(){api.setFrameAttr({name:api.frameName, bounces:true})}
+                });
+            }
+        }
+    });
+    // 批次
+    myApp.ajax({
+        url: "/api/zixun/school/schoolpici",
+        data: {catid: api.pageParam.id},
+        alert: false,
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.data || !data.data.length){return}
+            var list = [];
+            for(var i=0; i<data.data.length; i++){
+                list.push({id:data.data[i].id, value:data.data[i].title});
+            }
+            if(!piciPicker){
+                piciPicker = new MobileSelect({
+                    trigger: '#piciPicker',
+                    wheels: [{data:list}],
+                    callback(indexArr, data){
+                        if(data[0].id == piciid){return}
+                        page = 1;
+                        over = false;
+                        piciid = data[0].id;
+                        getData();
+                    },
+                    onShow(){api.setFrameAttr({name:api.frameName, bounces:false})},
+                    onHide(){api.setFrameAttr({name:api.frameName, bounces:true})}
+                });
+            }
+        }
+    });
+    // 类别
+    myApp.ajax({
+        url: "/api/zixun/school/schoollei",
+        data: {catid: api.pageParam.id},
+        alert: false,
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.data || !data.data.length){return}
+            var list = [];
+            for(var i=0; i<data.data.length; i++){
+                list.push({id:data.data[i].id, value:data.data[i].title});
+            }
+            if(!leiPicker){
+                leiPicker = new MobileSelect({
+                    trigger: '#leiPicker',
+                    wheels: [{data:list}],
+                    callback(indexArr, data){
+                        if(data[0].id == leiid){return}
+                        page = 1;
+                        over = false;
+                        leiid = data[0].id;
+                        getData();
+                    },
+                    onShow(){api.setFrameAttr({name:api.frameName, bounces:false})},
+                    onHide(){api.setFrameAttr({name:api.frameName, bounces:true})}
+                });
+            }
+        }
+    });
 }
 // 轮播
 function setSwiper(arr){
@@ -195,7 +299,7 @@ function setSwiper(arr){
 // 发起咨询
 function toLaunch(id,name){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:"school", id:id, name:name}})}
 // 院校详情
-function toDetail(id){myApp.openWin({hideAll:true, url:"/html/consult/school_main.html", pageParam:{id:id}})}
+function toDetail(id){myApp.openWin({title:"院校", url:"/html/consult/school_main.html", pageParam:{id:id}})}
 </script>
 </body>
 </html>

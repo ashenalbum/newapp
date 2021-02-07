@@ -12,8 +12,8 @@
         body{box-sizing:border-box; padding:10px 0 20px; background:#f6f7f8;}
         .com-padding{padding:0 4px;}
 
-        .swiperbox{height:108px; margin:0 20px 6px;}
-        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative; background:#f6f7f8;}
+        .swiperbox{height:108px; margin:0 12px 6px;}
+        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative; background:#ffffff;}
         .swiperbox .swiper-container .swiper-slide{box-sizing:border-box; padding:8px 10px;}
         .swiperbox .swiper-container .swiper-slide:nth-child(4n+1){background-color:#DAE6EB;}
         .swiperbox .swiper-container .swiper-slide:nth-child(4n+2){background-color:#E4DEE9;}
@@ -23,7 +23,7 @@
         .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
         .swiperbox .swiper-container .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
 
-        .ls{margin-left:14px; margin-right:14px;}
+        .ls{margin-left:6px; margin-right:6px;}
         .ls .item{width:50%;}
         .ls .item-box{position:relative; box-sizing:border-box; margin:0 6px 12px; padding:18px 16px; height:112px; background:#ffffff; border-radius:8px;}
         .ls .item-box::before{content:" "; position:absolute; right:16px; top:18px; width:36px; height:36px; background:url(../../image/consult/ic9.png) no-repeat center center; background-size:100% 100%;}
@@ -49,56 +49,7 @@
         </div>
     </div>
     <!-- 列表 -->
-    <div id="list" class="df just-c-bet df-w-w mt-10 ls">
-        <div class="item df" data-title="高考">
-            <div class="item-box ic1 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">高考</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-        <div class="item df" data-title="中考">
-            <div class="item-box ic2 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">中考</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-        <div class="item df" data-title="成人高考">
-            <div class="item-box ic3 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">成人高考</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-        <div class="item df" data-title="高职单招">
-            <div class="item-box ic4 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">高职单招</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-        <div class="item df" data-title="高职扩招">
-            <div class="item-box ic5 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">高职扩招</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-        <div class="item df" data-title="对口升学">
-            <div class="item-box ic6 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">对口升学</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-        <div class="item df" data-title="专升本">
-            <div class="item-box ic7 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">专升本</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-        <div class="item df" data-title="艺考">
-            <div class="item-box ic8 fc df df-c just-c-bet ai-s" tapmode="touch-style">
-                <div class="title fs-16 b">艺考</div>
-                <div class="label df ai-c fs-12">去咨询</div>
-            </div>
-        </div>
-    </div>
+    <div id="list" class="df just-c-bet df-w-w mt-10 ls"></div>
 <script type="text/javascript" src="../../script/api.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
@@ -119,11 +70,32 @@ function setEvent(){
     });
     $("#list").on("click",".item",function(){
         var ts = $(this);
-        toDetail(ts.data('title'));
+        toDetail(ts.data('title'), ts.data('id'));
     });
 }
 function getData(){
-
+    myApp.ajax({
+        url: "/api/zixun/home/homeindexnew",
+        method: "get",
+        success(data){
+            if(data.errcode!=200 && data.errcode!=0){return}
+            setSwiper(data.swiper);
+            setMenu(data.category);
+        }
+    })
+}
+function setMenu(arr){
+    var list = $("#list").empty();
+    for(var i in arr){
+        var o = arr[i];
+        list.append('<div class="item df" data-title="'+ o.name +'" data-id="'+ o.id +'">'+
+            '<div class="item-box fc df df-c just-c-bet ai-s '+ getIcon(o.name) +'" tapmode="touch-style">'+
+                '<div class="title fs-16 b">'+ o.name +'</div>'+
+                '<div class="label df ai-c fs-12">去咨询</div>'+
+            '</div>'+
+        '</div>');
+    }
+    api.parseTapmode();
 }
 // 轮播
 function setSwiper(arr){
@@ -148,6 +120,19 @@ function setSwiper(arr){
         autoplay: {delay:4000, stopOnLastSlide:false, disableOnInteraction:true},
         on:{slideChange: function(swiper){domwrap.style.left = swiper.realIndex*(100/arr.length)+"%"}}
     });
+}
+function getIcon(title){
+    switch(true){
+        case title == "高考": return "ic1";
+        case title == "中考": return "ic2";
+        case title == "成人高考": return "ic3";
+        case title == "高职单招": return "ic4";
+        case title == "高职扩招": return "ic5";
+        case title == "对口升学": return "ic6";
+        case title == "专升本": return "ic7";
+        case title == "艺考": return "ic8";
+    }
+    return "";
 }
 function toDetail(title, search){myApp.openWin({title:title||"详情", url:"/html/consult/index_type.html", pageParam:{id:search}})}
 </script>
