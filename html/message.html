@@ -8,13 +8,12 @@
     <link rel="stylesheet" type="text/css" href="../css/api.css"/>
     <link rel="stylesheet" type="text/css" href="../css/style.css"/>
     <style>
-        body{height:100%; background:#f6f7f8;}
-        .content{height:100%;}
+        body{background:#f6f7f8;}
         .top{height:86px; padding:8px; background:#ffffff;}
         .top .item{margin:0 16px; padding:8px; border-radius:6px;}
         .top .item .img{width:44px; height:44px; border-radius:50%;}
-        .scroll-box{background:#ffffff; position:relative;}
-        .scroll-box .scroll{position:absolute; top:0; left:0; bottom:0; right:0; overflow:auto;}
+
+        .cont{padding-bottom:10px; background:#ffffff;}
 
         .msg{padding:0 16px;}
         .msg .border{border-bottom:1px solid #eeeeee; padding:12px 0;}
@@ -25,44 +24,47 @@
         .msg .point{display:inline-block; height:14px; line-height:14px; padding:0 4px; border-radius:8px; background:#FF3942;}
     </style>
 </head>
-<body>
-    <div class="content df df-c">
-        <div class="top df just-c-bet">
-            <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openOrder()">
-                <img src="../image/message/order.png" alt="" class="img" />
-                <div class="mt-6 fs-14">订单消息</div>
-            </div>
-            <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openSystem()">
-                <img src="../image/message/system.png" alt="" class="img" />
-                <div class="mt-6 fs-14">系统消息</div>
-            </div>
-            <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openActive()">
-                <img src="../image/message/active.png" alt="" class="img" />
-                <div class="mt-6 fs-14">活动消息</div>
-            </div>
+<body class="df df-c">
+    <div class="top df just-c-bet">
+        <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openOrder()">
+            <img src="../image/message/order.png" alt="" class="img" />
+            <div class="mt-6 fs-14">订单消息</div>
         </div>
-        <div class="scroll-box mt-10 fc">
-            <div class="scroll">
-                <div class="msg" tapmode="touch-style1">
-                    <div class="border df ai-c">
-                        <img src="../image/index/type1.png" class="icon" />
-                        <div class="fc txts df df-c just-c-bet">
-                            <div class="fs-14 c-33 one-hide">山西工程职业技术学院</div>
-                            <div class="fs-12 c-99 one-hide">这个要看你的分数是否达标，500分以上…</div>
-                        </div>
-                        <div class="info df df-c just-c-bet txt-r ai-e">
-                            <span class="fs-10 c-aa">2020/09/23 23:30:30</span>
-                            <span class="point fs-10 c-ff ">89</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openSystem()">
+            <img src="../image/message/system.png" alt="" class="img" />
+            <div class="mt-6 fs-14">系统消息</div>
+        </div>
+        <div class="item df df-c ai-c fc" tapmode="touch-style1" onclick="openActive()">
+            <img src="../image/message/active.png" alt="" class="img" />
+            <div class="mt-6 fs-14">活动消息</div>
         </div>
     </div>
+    <div class="cont mt-16">
+        <div id="scroll">
+            <div id="ul"></div>
+        </div>
+        <div id="needlogin" class="df ai-c just-c-bet hide">
+            <div class="mt-20 fs-14 c-99" onclick="myApp.login()">请先登录</div>
+        </div>
+    </div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
 <script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/zepto.min.js"></script>
 <script type="text/javascript" src="../script/common.js"></script>
-<script type="text/javascript" src="../script/zepto.js"></script>
 <script type="text/javascript">
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var ul = $("#ul");
+
 apiready = function(){
     setEvent();
     api.sendEvent({name: 'messageTestLogin'});
@@ -70,13 +72,87 @@ apiready = function(){
 
 function setEvent(){
     api.addEventListener({name: 'messageTestLogin'}, function(){
-
+        if(myApp.isLogin()){
+            $("#needlogin").addClass("hide");
+            $("#scroll").removeClass("hide");
+            loadmore.removeClass("hide");
+            page = 1;
+            over = false;
+            getData();
+        }else{
+            $("#scroll").addClass("hide");
+            loadmore.addClass("hide");
+            $("#needlogin").removeClass("hide");
+        }
+    });
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        api.sendEvent({name: 'messageTestLogin'});
+    });
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading||!myApp.isLogin()){return}
+        getData();
+    });
+    $("#ul").on("click",".msg",function(){
+        var ts = $(this);
+        openDetail(ts.data('uid'), ts.data('type'));
     });
 }
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/member/dayilist",
+        method: "get",
+        loading: page==1,
+        data: {page:page},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                ul.append('<div class="msg" tapmode="touch-style1" data-uid="'+ o.hfuid +'" data-type="'+ o.type +'">'+
+                    '<div class="border df ai-c">'+
+                        '<img src="'+ o.avatar +'" class="icon" />'+
+                        '<div class="fc txts df df-c just-c-bet">'+
+                            '<div class="fs-14 c-33 one-hide">'+ o.title +'</div>'+
+                            '<div class="fs-12 c-99 one-hide">'+ o.content +'</div>'+
+                        '</div>'+
+                        '<div class="info df df-c just-c-bet txt-r ai-e">'+
+                            '<span class="fs-10 c-aa">'+ o.addtime +'</span>'+
+                            '<span class="point fs-10 c-ff '+ (o.num<=0?'hide':'') +' ">'+ o.num +'</span>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>');
+            }
+            api.parseTapmode();
+        }
+    });
+}
+// 订单消息
 function openOrder(){myApp.openWin({title:"订单消息", url:"/html/message/order.html"})}
+// 系统消息
 function openSystem(){myApp.openWin({title:"系统消息", url:"/html/message/system.html"})}
+// 活动消息
 function openActive(){myApp.openWin({title:"活动消息", url:"/html/message/active.html"})}
-
+// 咨询详情
+function openDetail(uid,type){myApp.openWin({title:"咨询详情", url:"/html/message/message_detail.html", pageParam:{hfuid:uid, type:type}})}
 </script>
 </body>
 </html>

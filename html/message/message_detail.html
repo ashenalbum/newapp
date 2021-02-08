@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; background:#f6f7f8; padding:10px;}
+        .card .img{display:block; width:40px; height:40px; border-radius:50%; margin-right:16px;}
+        .card .star-num{line-height:14px; padding-left:18px; margin-left:8px; background:url(../../image/common/star.png) no-repeat left center; background-size:14px 14px;}
+
+        .dialog-box .item{margin-top:20px;}
+        .dialog-box .item .icon{width:44px; height:44px; border-radius:50%; margin-right:10px; flex-shrink:0;}
+        .dialog-box .item .dialog{position:relative; background:#ffffff; padding:10px 12px; border-radius:6px; margin-right:54px; line-height:16px; word-break:break-all;}
+        .dialog-box .item .dialog::after{content:" "; position:absolute; left:0; top:12px; margin-left:-12px; width:0; height:0; border:6px solid transparent; border-right-color:#ffffff;}
+        .dialog-box .item.right{flex-direction:row-reverse;}
+        .dialog-box .item.right .icon{margin-left:10px; margin-right:10px;}
+        .dialog-box .item.right .dialog{margin-left:54px; margin-right:0;}
+        .dialog-box .item.right .dialog::after{border-color:transparent; border-left-color:#ffffff; margin-left:0; margin-right:-12px; left:auto; right:0;}
+    </style>
+</head>
+<body class="df df-c">
+    <div id="card" class="card com-box df">
+        <img src="" class="img" />
+        <div class="fc">
+            <div class="name fs-14 b"></div>
+            <div class="df ai-c mt-4">
+                <span class="zxnum fs-12 c-aa"></span>
+                <span class="star-num c-yellow fs-12"></span>
+            </div>
+            <div class="detail mt-4 two-hide fs-12 c-33"></div>
+        </div>
+    </div>
+    <div id="dialogbox" class="dialog-box"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-12 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var ul = $("#dialogbox");
+var myIcon = "";
+var fullCard = false;
+
+apiready = function(){
+    init();
+    setEvent();
+    getData();
+}
+function init(){
+    var userdata = myApp.getUserData();
+    myIcon = (userdata && userdata.uinfo && userdata.uinfo.avatar);
+}
+function setEvent(){
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        page = 1;
+        over = false;
+        getData();
+    });
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/member/dayidetails",
+        method: "get",
+        data: {hfuid:api.pageParam.hfuid, type:api.pageParam.type},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.data || []);
+            if(!data.data || data.data.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            if(data.auth && !fullCard){
+                fullCard = true;
+                var card = $("#card");
+                card.find(".img").attr("src",data.auth.avatar);
+                card.find(".name").text(data.auth.name);
+                card.find(".zxnum").text(data.auth.dyznum+"次咨询");
+                card.find(".star-num").text(data.auth.pinmum==0?"暂无评分":data.auth.pinmum);
+                card.find(".detail").text(data.auth.message);
+            }
+            for(var i in data.data){
+                ul.append('<div class="item right df ai-s">'+
+                    '<img src="'+ myIcon +'" class="icon" />'+
+                    '<div class="dialog mt-4">'+ data.data[i].content +'</div>'+
+                '</div>');
+                if(!data.data[i].hfcontent){continue}
+                ul.append('<div class="item left df ai-s">'+
+                    '<img src="'+ (data.auth && data.auth.avatar) +'" class="icon" />'+
+                    '<div class="dialog mt-4">'+ data.data[i].hfcontent +'</div>'+
+                '</div>');
+            }
+        }
+    })
+}
+</script>
+</body>
+</html>
