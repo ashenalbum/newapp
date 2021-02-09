@@ -21,7 +21,10 @@
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script>
+var schoolName = "";
+
 apiready = function(){
+    schoolName = api.pageParam.schoolName;
     setEvent();
     getData();
 }
@@ -45,7 +48,7 @@ function setCont(){
 // 校园风采
 function openSchoolImage(id){myApp.openWin({title:"校园风采", url:"/html/consult/school_image.html", pageParam:{id:id}})}
 // 资讯详情
-function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id, isSchool:true}})}
+function openNews(id){myApp.openWin({title:schoolName||"教育资讯", url:'/html/information/detail.html', pageParam:{id:id, isSchool:true}})}
 </script>
 </body>
 </html>

@@ -85,6 +85,7 @@ function setEvent(){
             $("#scroll").addClass("hide");
             loadmore.addClass("hide");
             $("#needlogin").removeClass("hide");
+            api.refreshHeaderLoadDone();
         }
     });
     api.setRefreshHeaderInfo({
@@ -148,11 +149,11 @@ function getData(){
     });
 }
 // 订单消息
-function openOrder(){myApp.openWin({title:"订单消息", needlogin:true, url:"/html/message/order.html"})}
+function openOrder(){myApp.openWin({title:"订单消息", needLogin:true, url:"/html/message/order.html"})}
 // 系统消息
-function openSystem(){myApp.openWin({title:"系统消息", needlogin:true, url:"/html/message/system.html"})}
+function openSystem(){myApp.openWin({title:"系统消息", needLogin:true, url:"/html/message/system.html"})}
 // 活动消息
-function openActive(){myApp.openWin({title:"活动消息", needlogin:true, url:"/html/message/active.html"})}
+function openActive(){myApp.openWin({title:"活动消息", needLogin:true, url:"/html/message/active.html"})}
 // 咨询详情
 function openDetail(uid,type){myApp.openWin({title:"咨询详情", url:"/html/message/message_detail.html", pageParam:{hfuid:uid, type:type}})}
 </script>

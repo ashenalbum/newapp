@@ -76,7 +76,7 @@ function menuClick(id,name){
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             if(data.a == 2 && data.id){id==4?openSchoolImage(data.id):openNews(data.id)}
-            if(data.a == 1 && data.data){myApp.openWin({title: name||"院校", url:"/html/consult/school_info.html", pageParam:{id:api.pageParam.id, typeid:id, list:data.data}});}
+            if(data.a == 1 && data.data){myApp.openWin({title: name||"院校", url:"/html/consult/school_info.html", pageParam:{id:api.pageParam.id, typeid:id, list:data.data, schoolName:schoolName}});}
         }
     })
 }
@@ -93,7 +93,7 @@ function getIcon(id){
     return '<img src="../../image/consult/'+ img +'.png" class="img" />';
 }
 // 资讯详情
-function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/information/detail.html', pageParam:{id:id, isSchool:true}})}
+function openNews(id){myApp.openWin({title:schoolName||"教育资讯", url:'/html/information/detail.html', pageParam:{id:id, isSchool:true}})}
 // 发起咨询
 function openLaunch(){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:"school", id:api.pageParam.id, name:schoolName}})}
 // 校园风采
