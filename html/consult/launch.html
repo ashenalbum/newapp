@@ -144,7 +144,8 @@ function submit(){
                     data: {id:order, paypwd:pwd},
                     success(data){
                         if(data.errcode!=0 && data.errcode!=200){return}
-                        api.toast({msg: '发布成功'});
+                        api.toast({msg:'发布成功,请耐心等待回复！', duration:3000, global:true});
+                        api.closeWin();
                     }
                 });
             },api.pageParam.money?"需支付"+api.pageParam.money+"教育贝":false);

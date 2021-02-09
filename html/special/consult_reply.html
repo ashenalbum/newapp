@@ -58,9 +58,12 @@ function submit(){
     myApp.ajax({
         url: "/api/zixun/zhuanjiadayi/addhfzixun",
         method: "post",
-        data: {id:api.pageParam.id, hfcontent:value},
+        data: {data:{id:api.pageParam.id, message:value}},
         success(data){
-
+            if(data.errcode!=200 && data.errcode!=0){return}
+            api.toast({msg:"回复成功", global:true});
+            api.sendEvent({name: 'setWaitconsult'});
+            setTimeout(function(){api.closeWin()},300);
         }
     })
 }

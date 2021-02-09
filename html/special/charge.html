@@ -56,7 +56,13 @@ function getData(){
         method: "get",
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
-            for(var i in data.data){$("input[name='"+ i +"']").attr("placeholder","建议"+data.data[i]+"贝")}
+            for(var i in data.data){
+                if(data.data.sta==1){
+                    $("input[name='"+ i +"']").val(data.data[i]);
+                }else{
+                    $("input[name='"+ i +"']").attr("placeholder","建议"+data.data[i]+"贝");
+                }
+            }
         }
     })
 }
@@ -76,7 +82,7 @@ function submit(){
         method: "post",
         data: {data:{pricemsg:pricemsg, pricepantin:pricepantin, priceaudio:priceaudio, pricevideo:pricevideo}},
         success(data){
-            console.log(JSON.stringify(data))
+            // console.log(JSON.stringify(data))
             if(data.errcode!=0 && data.errcode!=200){return}
             api.toast({msg:'设置成功', global:true});
             setTimeout(function(){api.closeWin()},300);

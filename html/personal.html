@@ -194,6 +194,7 @@ apiready = function(){
     api.sendEvent({name: 'personalTestLogin'});
 }
 function setEvent(){
+    api.addEventListener({name: 'setWaitconsult'},setWaitconsult);
     api.addEventListener({name:'personalTestLogin'}, function(){
         setTimeout(function(){api.refreshHeaderLoadDone()},200);
         getData();
@@ -214,40 +215,7 @@ function setEvent(){
             var isExpert = userInfo.groupid==2;
             $(".expert-show")[isExpert?'removeClass':'addClass']("hide");
             $(".expert-hide")[isExpert?'addClass':'removeClass']("hide");
-            if(isExpert){
-                myApp.ajax({
-                    url: "/api/zixun/zhuanjiadayi/getdayilist",
-                    method: "get",
-                    data: {type:0},
-                    loading: false,
-                    alert: false,
-                    success(data){
-                        if(!data.count){return}
-                        $("#waitconsult .wait1").html(data.count);
-                    }
-                });
-                myApp.ajax({
-                    url: "/api/zixun/zhuanjiadayi/getyuyuelist",
-                    method: "get",
-                    data: {time:new Date().toISOString().substr(0,10)},
-                    loading: false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ,
-                    alert: false,
-                    success(data){
-                        if(!data.list){return}
-                        var all = 0;
-                        var over = 0;
-                        for(var i in data.list){
-                            for(var j in data.list[i]){
-                                var o = data.list[i][j];
-                                all++;
-                                o.status=="0"?over++:'';
-                            }
-                        }
-                        var overSpan = over==0?'':'<span class="fs-16 fw-i c-99">'+ over +' / </span>';
-                        $("#waitconsult .wait2").html(overSpan + all);
-                    }
-                });
-            }
+            if(isExpert){setWaitconsult()}
         }else{
             top.removeClass("svip");
             top.find(".info .icon").attr("src","../image/common/head.png");
@@ -268,7 +236,7 @@ function setEvent(){
         $api.setStorage('unseeMoney',isActive);
     });
     api.addEventListener({name:'viewappear'},getData);
-    api.addEventListener({name:'moneyChange'},getData)
+    api.addEventListener({name:'moneyChange'},getData);
     api.setRefreshHeaderInfo({
         bgColor: '#f0f0f0',
         textColor: '#666666',
@@ -276,6 +244,7 @@ function setEvent(){
         textUp: '松开刷新...'
     }, function(ret, err) {
         if(!myApp.isLogin()){api.sendEvent({name: 'personalTestLogin'}); return}
+        api.addEventListener({name: 'setWaitconsult'},setWaitconsult);
         api.execScript({name:'root', script:'getUserData();'});
     });
 }
@@ -301,6 +270,39 @@ function getData(){
                 $("#seemoney").removeClass("active");
                 yue.html("***");
             }
+        }
+    });
+}
+function setWaitconsult(){
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getdayilist",
+        method: "get",
+        data: {type:0},
+        loading: false,
+        alert: false,
+        success(data){
+            $("#waitconsult .wait1").html(data.count||0);
+        }
+    });
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiadayi/getyuyuelist",
+        method: "get",
+        data: {time:new Date().toISOString().substr(0,10)},
+        loading: false                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ,
+        alert: false,
+        success(data){
+            if(!data.list){return}
+            var all = 0;
+            var over = 0;
+            for(var i in data.list){
+                for(var j in data.list[i]){
+                    var o = data.list[i][j];
+                    all++;
+                    o.status=="0"?over++:'';
+                }
+            }
+            var overSpan = over==0?'':'<span class="fs-16 fw-i c-99">'+ over +' / </span>';
+            $("#waitconsult .wait2").html(overSpan + all);
         }
     });
 }

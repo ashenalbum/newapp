@@ -101,7 +101,13 @@ apiready = function(){
 }
 // 初始化
 function init(){
-    api.addEventListener({name:'viewappear'},function(){api.setStatusBarStyle({style: 'light'})});
+    api.addEventListener({name:'viewappear'},function(){
+        api.setStatusBarStyle({style: 'light'});
+        getData();
+        over = false;
+        page = 1;
+        getList();
+    });
     chengeTab(api.pageParam.tab || 1);
     $("#top").on("click",".tab",function(){
         var ts = $(this);
@@ -148,6 +154,8 @@ function init(){
             });
         });
     })();
+}
+function getData(){
     // 获取数量
     myApp.ajax({
         url: "/api/zixun/zhuanjiadayi/getdayilist",
@@ -156,8 +164,7 @@ function init(){
         loading: false,
         alert: false,
         success(data){
-            if(!data.count){return}
-            $("#top .dfnum").html(data.count);
+            $("#top .dfnum").html(data.count || 0);
         }
     });
     myApp.ajax({
@@ -198,6 +205,7 @@ function setEvent(){
         textDown: '下拉刷新...',
         textUp: '松开刷新...'
     }, function(ret, err) {
+        getData();
         over = false;
         page = 1;
         getList();
