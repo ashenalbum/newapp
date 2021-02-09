@@ -16,34 +16,76 @@
     </style>
 </head>
 <body class="df df-c">
-    <div class="ul">
-        <div class="li df">
-            <img src="../../image/common/test.jpg" class="icon" alt="" />
-            <div class="mt-4 df df-c">
-                <div class="fs-14 b">利威尔</div>
-                <div class="mt-6 msg fs-12 c-99">您已预约 2020/10/1  12:00 的专家问答</div>
-            </div>
-        </div>
-        <div class="li df">
-            <img src="../../image/common/test.jpg" class="icon" alt="" />
-            <div class="mt-4 df df-c">
-                <div class="fs-14 b">利威尔</div>
-                <div class="mt-6 msg fs-12 c-99">您已预约 2020/10/1  12:00 的专家问答</div>
-            </div>
-        </div>
-        <div class="li df">
-            <img src="../../image/common/test.jpg" class="icon" alt="" />
-            <div class="mt-4 df df-c">
-                <div class="fs-14 b">利威尔</div>
-                <div class="mt-6 msg fs-12 c-99">您已预约 2020/10/1  12:00 的专家问答</div>
-            </div>
-        </div>
+    <div id="ul" class="ul"></div>
+    <!-- 加载提示 -->
+    <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+        <img src="../../image/common/loading_more.gif" class="img" alt="" />
+        <span class="loadtxt">加载中……</span>
+        <span class="overtxt">没有更多数据了</span>
+        <span class="scrollbtm">上拉加载更多</span>
     </div>
 <script type="text/javascript" src="../../script/api.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script>
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var ul = $("#ul");
+
 apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+}
+function getData(){
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/member/getnoticelist",
+        method: "get",
+        data: {type:1},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            for(var i in data.list){
+                var o = data.list[i];
+                ul.append('<div class="li df df-c">'+
+                    '<div class="fs-14 b">'+ o.title +'</div>'+
+                    '<div class="mt-6 msg fs-12 c-99">'+ o.note +'</div>'+
+                '</div>');
+            }
+        }
+    })
 }
 </script>
 </body>

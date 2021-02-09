@@ -8,16 +8,24 @@
     <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
     <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
     <style>
-        body{box-sizing:border-box; background:#f6f7f8;}
+        body{box-sizing:border-box; padding-bottom:10px; background:#f6f7f8;}
 
         .labels{position:fixed; z-index:1; top:0; left:0; right:0; background:#ffffff;}
-        .labels .label{display:block; padding:20px 0; position:relative; height:20px; line-height:20px;}
-        .labels .label.active{font-size:14px; color:#333333;}
-        .labels .label.active:after{content:" "; position:absolute; bottom:10px; left:0; right:0; margin:3px auto 0; width:16px; height:6px; background:url(../../image/instantly/active.png) no-repeat center center; background-size:100% 100%;}
+        .labels i{position:absolute; width:50%; height:10px; left:0; bottom:0; transition:left 0.3s;}
+        .labels i:after{content:" "; position:absolute; bottom:6px; left:0; right:0; margin:3px auto 0; width:16px; height:6px; background:url(../../image/instantly/active.png) no-repeat center center; background-size:100% 100%;}
+        .labels .label{display:block; padding:15px 0; position:relative; height:20px; line-height:20px;}
+        .labels .label.active{font-weight:bold; color:#333333;}
+        .labels .label1.active~i{left:0;}
+        .labels .label2.active~i{left:50%;}
 
-        .cont{margin-top:70px; padding:0 10px;}
-        .cont .kanwulist .kanwu{padding:10px; border:none; margin-bottom:10px; background:#ffffff; border-radius:6px;}
-        .cont .kanwulist .kanwu:last-child{margin-bottom:0;}
+        .cont{margin-top:60px; padding:0 10px;}
+        .cont .kanwu{padding:10px; border:none; margin-bottom:10px; background:#ffffff; border-radius:6px;}
+        .cont .kanwu:last-child{margin-bottom:0;}
+
+        .cont .kanwu .img{width:70px; height:90px; margin-right:12px; background:#f6f7f8; border-radius:6px;}
+        /*.cont .kanwu .txts{padding:4px 0;}
+        .cont .kanwu .txts .tab span{display:inline-block; padding:0 4px; border-right:1px solid;}
+        .cont .kanwu .txts .tab span:last-child{border-right:none;}*/
         .cont .price{display:block; padding-left:20px; height:18px; line-height:18px; background:url(../../image/common/bei.png) no-repeat left center; background-size:18px 18px;}
 
         .cont .kecheng .li{padding:10px; margin-bottom:10px; border-radius:6px; background:#ffffff;}
@@ -27,69 +35,131 @@
     </style>
 </head>
 <body class="df df-c">
-    <div class="labels txt-c df ai-c fs-16 c-99">
-        <span class="fc label active" >报刊</span>
-        <span class="fc label">课程</span>
+    <div id="menu" class="labels txt-c df ai-c fs-16 c-99">
+        <span class="fc label label1 active" data-type="1" >刊物</span>
+        <span class="fc label label2" data-type="2">课程</span>
+        <i></i>
     </div>
-    <div class="cont">
-        <div class="kanwulist">
-            <div class="kanwu df">
-                <img src="../../image/index/type1.png" class="img" />
-                <div class="txts f1 df df-c just-c-bet">
-                    <div>
-                        <div class="one-hide fs-16 b">山西教育《一往无前》</div>
-                        <div class="mt-10 three-hide c-99 fs-12">杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等</div>
-                    </div>
-                    <div class="df ai-c just-c-bet fs-12 c-red">
-                        <span>订购成功</span>
-                        <span class="price b">99</span>
-                    </div>
-                </div>
-            </div>
-                <div class="kanwu df">
-                    <img src="../../image/index/type1.png" class="img" />
-                    <div class="txts f1 df df-c just-c-bet">
-                        <div>
-                            <div class="one-hide fs-16 b">山西教育《一往无前》</div>
-                            <div class="mt-10 three-hide c-99 fs-12">杂志内容涵盖了国家和我省幼教政策申报知道、职业发展等</div>
-                        </div>
-                        <div class="df ai-c just-c-bet fs-12 c-red">
-                            <span>订购成功</span>
-                            <span class="price b">99</span>
-                        </div>
-                    </div>
-                </div>
-        </div>
-        <div class="kecheng fs-14 c-33">
-            <div class="li df ">
-                <img src="../../image/common/test.jpg" class="img" alt="" />
-                <div class="df df-c just-c-bet">
-                    <div class="two-hide">9月7号专科批志愿线上填报9月7号专科批志愿线上填报</div>
-                    <div class="df ai-c just-c-bet fs-12 c-red b">
-                        <span>订购成功</span>
-                        <span class="price">123贝</span>
-                    </div>
-                </div>
-            </div>
-            <div class="li df ">
-                <img src="../../image/common/test.jpg" class="img" alt="" />
-                <div class="df df-c just-c-bet">
-                    <div class="two-hide">9月7号专科批志愿线上填报9月7号专科批志愿线上填报</div>
-                    <div class="df ai-c just-c-bet fs-12 c-red b">
-                        <span>订购成功</span>
-                        <span class="price">123贝</span>
-                    </div>
-                </div>
-            </div>
+    <div class="cont fs-14 c-33">
+        <div id="ul"></div>
+        <!-- 加载提示 -->
+        <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
+            <img src="../../image/common/loading_more.gif" class="img" alt="" />
+            <span class="loadtxt">加载中……</span>
+            <span class="overtxt">没有更多数据了</span>
+            <span class="scrollbtm">上拉加载更多</span>
         </div>
     </div>
 <script type="text/javascript" src="../../script/api.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script>
-apiready = function(){
-}
+var type = 1;
+var page = 1;
+var over = false;
+var loading = false;
+var dataList = [];
+var loadmore = $("#loadmore");
+var ul = $("#ul");
 
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $("#menu").on("click",".label",function(){
+        var ts = $(this);
+        if(ts.hasClass("active")){return}
+        ts.addClass("active").siblings(".label").removeClass("active");
+        type = ts.data("type");
+        over = false;
+        loading = false;
+        page = 1;
+        ul.empty();
+        getData();
+    });
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
+}
+function getData(){
+    var type2 = type;
+    if(loading || over){return}
+    loading = true;
+    loadmore.removeClass("over").addClass("load");
+    myApp.ajax({
+        url: "/api/zixun/member/getnoticelist",
+        method: "get",
+        data: {type:3, type2:type2},
+        success(data){
+            loading = false;
+            api.refreshHeaderLoadDone();
+            if(Number(page)<=1){ul.empty();dataList=[];}
+            page++;
+            loadmore.removeClass("load");
+            dataList = dataList.concat(data.list || []);
+            if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
+                over = true;
+                loadmore.addClass("over");
+            }
+            if(type2==1){
+                for(var i in data.list){
+                    var o = data.list[i];
+                    ul.append('<div class="kanwu df">'+
+                        '<img src="'+ o.zimg +'" class="img" />'+
+                        '<div class="txts f1 df df-c just-c-bet">'+
+                            '<div>'+
+                                '<div class="one-hide fs-16 b">'+ o.title +'</div>'+
+                                '<div class="mt-10 three-hide c-99 fs-12">'+ o.zshuoming +'</div>'+
+                            '</div>'+
+                            '<div class="df ai-c just-c-bet fs-12 c-red">'+
+                                '<span>'+ getStatus(o.status) +'</span>'+
+                                '<span class="price b">'+ o.jiage +'</span>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>')
+                }
+            }else{
+                for(var i in data.list){
+                    var o = data.list[i];
+                    ul.append('<div class="li df ">'+
+                        '<img src="../../image/common/test.jpg" class="img" alt="" />'+
+                        '<div class="df df-c just-c-bet">'+
+                            '<div class="two-hide">9月7号专科批志愿线上填报9月7号专科批志愿线上填报</div>'+
+                            '<div class="df ai-c just-c-bet fs-12 c-red b">'+
+                                '<span>订购成功</span>'+
+                                '<span class="price">123贝</span>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>');
+                }
+            }
+        }
+    })
+}
+// 状态
+function getStatus(status){
+    switch(Number(status)){
+        case 0: return "未完成";
+        case 1: return "待评价";
+        case 2: return "已完成";
+    }
+    return "";
+}
 </script>
 </body>
 </html>

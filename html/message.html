@@ -22,6 +22,8 @@
         .msg .icon{display:block; margin-right:10px; width:44px; height:44px; border-radius:50%; background:#f6f7f8;}
         .msg .info{min-width:70px; height:44px;}
         .msg .point{display:inline-block; height:14px; line-height:14px; padding:0 4px; border-radius:8px; background:#FF3942;}
+
+        #needlogin{padding-bottom:10px;}
     </style>
 </head>
 <body class="df df-c">
@@ -43,7 +45,7 @@
         <div id="scroll">
             <div id="ul"></div>
         </div>
-        <div id="needlogin" class="df ai-c just-c-bet hide">
+        <div id="needlogin" class="df ai-c just-c-ct hide">
             <div class="mt-20 fs-14 c-99" onclick="myApp.login()">请先登录</div>
         </div>
     </div>
@@ -146,11 +148,11 @@ function getData(){
     });
 }
 // 订单消息
-function openOrder(){myApp.openWin({title:"订单消息", url:"/html/message/order.html"})}
+function openOrder(){myApp.openWin({title:"订单消息", needlogin:true, url:"/html/message/order.html"})}
 // 系统消息
-function openSystem(){myApp.openWin({title:"系统消息", url:"/html/message/system.html"})}
+function openSystem(){myApp.openWin({title:"系统消息", needlogin:true, url:"/html/message/system.html"})}
 // 活动消息
-function openActive(){myApp.openWin({title:"活动消息", url:"/html/message/active.html"})}
+function openActive(){myApp.openWin({title:"活动消息", needlogin:true, url:"/html/message/active.html"})}
 // 咨询详情
 function openDetail(uid,type){myApp.openWin({title:"咨询详情", url:"/html/message/message_detail.html", pageParam:{hfuid:uid, type:type}})}
 </script>

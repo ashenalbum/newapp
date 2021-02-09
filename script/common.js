@@ -136,7 +136,7 @@ myApp.inputPayPwd = function(callback,title){
         myApp.alert({
             content: "首次支付将设置支付密码",
             callback(){
-                this.setPayPwd();
+                myApp.setPayPwd();
             }
         });
         return;
@@ -377,7 +377,4 @@ myApp.confirm = function(obj){
         myApp.dialogBox.close({dialogName: 'alert'});
         obj.callback && obj.callback((ret&&ret.eventType!='left')?1:0);
     });
-}
-myApp.linkage = function(arr){
-
 }

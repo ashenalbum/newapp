@@ -8,19 +8,43 @@
     <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
     <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
     <style>
-        body{box-sizing:border-box; padding:10px; background:#f6f7f8;}
-
+        body{box-sizing:border-box; padding:10px 12px; background:#ffffff;}
+        .topimg{display:block; width:100%; height:auto;}
+        .title{line-height:32px; font-weight:500;}
+        .info .span{padding:0 6px;}
+        .html{line-height:24px; padding-bottom:10px; overflow-x:auto;}
+        .html img{display:block!important; width:100%!important; height:auto!important; float:none!important; background:#f6f7f8;}
     </style>
 </head>
 <body class="df df-c">
-    <div class="html">
-
+    <img id="topimg" src="" class="topimg hide" />
+    <div id="title" class="mt-12 title fs-24 margin"></div>
+    <div class="info mt-12 c-99 fs-12  df ai-c">
+        <div id="addtime" class="span"></div>
+        <div id="look" class="span"></div>
     </div>
+    <div id="html" class="html fs-16 mt-16 margin"></div>
 <script type="text/javascript" src="../../script/api.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script>
 apiready = function(){
+    getData();
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/zixun/member/huodongxq",
+        data: {id: api.pageParam.id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.data){return}
+            data.data.img && $("#topimg").attr("src",data.data.img).removeClass("hide");
+            $("#title").text(data.data.title);
+            $("#look").text("浏览量："+(data.data.looknum||0));
+            $("#addtime").text("发布时间："+data.data.addtime);
+            $("#html").html(data.data.content);
+        }
+    })
 }
 </script>
 </body>

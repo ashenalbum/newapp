@@ -20,6 +20,7 @@
         .dialog-box .item.right .icon{margin-left:10px; margin-right:10px;}
         .dialog-box .item.right .dialog{margin-left:54px; margin-right:0;}
         .dialog-box .item.right .dialog::after{border-color:transparent; border-left-color:#ffffff; margin-left:0; margin-right:-12px; left:auto; right:0;}
+        .dialog-box .line{position:relative; border-top:thin solid #ddd; margin:20px 10px 0;}
     </style>
 </head>
 <body class="df df-c">
@@ -116,11 +117,19 @@ function getData(){
                     '<img src="'+ myIcon +'" class="icon" />'+
                     '<div class="dialog mt-4">'+ data.data[i].content +'</div>'+
                 '</div>');
-                if(!data.data[i].hfcontent){continue}
+                if(!data.data[i].hfcontent){
+                    if(data.data.length && Number(i)<data.data.length-1){
+                        ul.append('<div class="line"></div>');
+                    }
+                    continue
+                }
                 ul.append('<div class="item left df ai-s">'+
                     '<img src="'+ (data.auth && data.auth.avatar) +'" class="icon" />'+
                     '<div class="dialog mt-4">'+ data.data[i].hfcontent +'</div>'+
                 '</div>');
+                if(data.data.length && Number(i)<data.data.length-1){
+                    ul.append('<div class="line"></div>');
+                }
             }
         }
     })
