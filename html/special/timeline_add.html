@@ -93,7 +93,8 @@ function submit(){
         data: {data:{time:date, shiduan:time, num:parseInt(num)}},
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
-            api.toast({msg: '添加成功'});
+            api.toast({msg: '添加成功', global:true});
+            api.closeWin();
         }
     });
 }

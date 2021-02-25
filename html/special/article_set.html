@@ -141,12 +141,33 @@ function getData(){
                     '<span class="label fs-14">'+ myApp.htmlEscape(data.data[i].name) +'</span>'+
                 '</label>');
             }
-        }
+            fullData();
+        },
+        error(){fullData()}
     });
+
+}
+// 原数据
+function fullData(){
     if(api.pageParam.edit && api.pageParam.editObj){
-        var type = api.pageParam.editObj.show_mode; // 1049 没有显示方式
+        var type = api.pageParam.editObj.show_mode;
         var imgs = api.pageParam.editObj.image;
+        var catid = api.pageParam.editObj.catid;
+        // 版式
+        var checkType = $("#form").find("[value='"+ type +"']");
+        if(checkType.length && !checkType.is(":checked")){
+            $("#form").find("[name='banshi']:checked").prop("checked",false);
+            checkType.prop("checked",true);
+        }
+        // 标签
+        var checkInput = $("#labelbox").find("[value='"+catid+"']");
+        if(checkInput.length && !checkInput.is(":checked")){
+            $("#labelbox").find("[name='catid']:checked").prop("checked",false);
+            checkInput.prop("checked",true);
+        }
+        // 图片
         var upimg = $("#upimgbox .upimg");
+        if(!imgs){return}
         if(typeof imgs == "string"){
             imgArr.push(imgs);
             upimg.before('<div class="upimg-box">'+
@@ -172,12 +193,10 @@ function submit(){
     if(type==3 && imgArr.length<3){api.toast({msg:"该版式需上传三张图片"}); return}
     var catid = $("#labelbox input[name='catid']:checked").val();
 
-    var url = api.pageParam.edit?"":"/api/zixun/member/addnews";
-
     myApp.ajax({
-        url: url,
+        url: "/api/zixun/member/addnews",
         method: "post",
-        data: {data:{title:title, show_mode:type, catid:catid, images:imgArr.join(), content:html}},
+        data: {data:{title:title, show_mode:type, catid:catid, images:imgArr.join(), content:html, id:api.pageParam.id||''}},
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             api.toast({msg:"发布成功",global:true});

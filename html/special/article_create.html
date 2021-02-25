@@ -93,7 +93,7 @@ function next(){
     var html = artEditor.getContent();
     if(!title){api.toast({msg:"请输入文章标题"}); titleipt.focus(); return}
     if(!html){api.toast({msg:"请编辑文章内容"}); return}
-    myApp.openWin({title:"撰写文章", url:"/html/special/article_set.html", pageParam:{title:title, html:html, edit:api.pageParam && api.pageParam.edit, editObj:editObj}});
+    myApp.openWin({title:"撰写文章", url:"/html/special/article_set.html", pageParam:{title:title, html:html, id:api.pageParam.id||'', edit:api.pageParam && api.pageParam.edit, editObj:editObj}});
 }
 </script>
 </body>

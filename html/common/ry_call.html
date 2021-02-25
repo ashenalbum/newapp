@@ -20,14 +20,14 @@
     <div class="btns df just-c-aro fs-14 c-ff">
         <div id="btn1" class="btn fc df df-c ai-c">
             <img src="../../image/rong/call3.png" class="img" onclick="chengeCamera()"/>
-            <div class="mt-10">转换摄像头</div>
+            <div class="mt-10 fs-12">转换摄像头</div>
         </div>
         <div id="btn2" class="btn fc df df-c ai-c">
-            <img src="../../image/rong/call2.png" class="img" onclick="" />
+            <img src="../../image/rong/call2.png" class="img" onclick="off()" />
         </div>
         <div id="btn4" class="btn fc df df-c ai-c">
             <img src="../../image/rong/call6.png" class="img" onclick="setMuted()" />
-            <div class="mt-10">静音</div>
+            <div class="mt-10 fs-12">静音</div>
         </div>
     </div>
 </body>
@@ -40,8 +40,9 @@ var jtTime = 0;
 var sound = true;
 var miantibtn = true;
 apiready = function(){
-    var header = $api.byId('header');
-    var headerH = $api.fixStatusBar(header);
+    // var header = $api.byId('header');
+    // var headerH = $api.fixStatusBar(header);
+
     setEvent();
 }
 function setEvent(){
@@ -52,6 +53,7 @@ function setEvent(){
         api.toast({msg: '通话结束',global:true});
         api.closeWin();
     });
+
     api.addEventListener({name: 'rongacceptok'}, function(ret, err){
         if( !ret ){api.toast({msg:JSON.stringify( err ), global:true});return}
         jtTime = Date.now();

@@ -1,5 +1,6 @@
 var myApp = {
-    baseUrl:"http://sxjy.okdela.top"
+    // baseUrl:"http://sxjy.okdela.top"
+    baseUrl:"http://wl03.sx-ug.com"
 };
 // ajax
 myApp.ajax = function(obj){
@@ -114,12 +115,12 @@ myApp.openWin = function(obj){
 // 点击banner
 myApp.openBanner = function(type, data, param){
     switch(true){
-        case type=="url": this.openUrl(data); break;
-        case type=="page": this.openWin(param); break;
-        case type=="news": this.openWin({title:"教育资讯",url:"/html/information/detail.html",pageParam:{id:data}}); break;
-        case type=="school": this.openWin({title:"院校", url:'/html/consult/school_main.html', pageParam:{id:data}}); break;
-        case type=="consult": this.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{uid:data}}); break;
-        case type=="journal": this.openWin({title:"报刊介绍", url: "/html/journal/detail.html", headColor: "#E8DAD5", pageParam:{id:data}}); break;
+        case type=="url": myApp.openUrl(data); break;
+        case type=="page": myApp.openWin(param); break;
+        case type=="news": myApp.openWin({title:"教育资讯",url:"/html/information/detail.html",pageParam:{id:data}}); break;
+        case type=="school": myApp.openWin({title:"院校", url:'/html/consult/school_main.html', pageParam:{id:data}}); break;
+        case type=="consult": myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{uid:data}}); break;
+        case type=="journal": myApp.openWin({title:"报刊介绍", url: "/html/journal/detail.html", headColor: "#E8DAD5", pageParam:{id:data}}); break;
         case type=="listen": myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:data}}); break;
     }
 }

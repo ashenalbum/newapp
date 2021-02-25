@@ -24,7 +24,7 @@ apiready = function(){
     var url = api.pageParam.type=="listen"?"./ry_listen.html":"./ry_call.html";
     var yyid = api.pageParam.type=="listen" && $api.getStorage('callExtra');
     if(!api.pageParam.yyid){api.api.pageParam.yyid = yyid}
-    api.openFrame({name:'rongCtrl', url:url, bgColor:'rgba(0,0,0,0)', pageParam:api.pageParam});
+    api.openFrame({name:'rongCtrl', url:url, bgColor:'rgba(0,0,0,0)', rect:{x:0,y:0}, pageParam:api.pageParam});
 }
 </script>
 </body>
