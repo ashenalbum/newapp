@@ -9,45 +9,46 @@
 	<link rel="stylesheet" href="../../css/api.css">
 	<link rel="stylesheet" href="../../css/style.css">
     <style>
-        html,body{background:rgba(0,0,0,1);}
+        html,body{background:rgba(0,0,0,0);}
         .btns{position:fixed; bottom:0; left:0; right:0;}
         .btns .btn{height:100px; min-width:64px;}
         .btns .btn .img{display:block; width:56px; height:56px;}
+        #time{position:absolute; left:10px; top:10px; padding:8px 16px; background:rgba(0,0,0,0.5); color:#ffffff; font-size:14px;}
     </style>
 </head>
 <body class="df df-c">
     <div id="header"></div>
+    <div id="time">00 : 00</div>
     <div class="btns df just-c-aro fs-14 c-ff">
         <div id="btn1" class="btn fc df df-c ai-c">
-            <img src="../../image/rong/call3.png" class="img" onclick="chengeCamera()"/>
+            <img src="../../image/rong/call3.png" class="img" onclick="changeCamera()"/>
             <div class="mt-10 fs-12">转换摄像头</div>
         </div>
         <div id="btn2" class="btn fc df df-c ai-c">
             <img src="../../image/rong/call2.png" class="img" onclick="off()" />
         </div>
         <div id="btn4" class="btn fc df df-c ai-c">
-            <img src="../../image/rong/call6.png" class="img" onclick="setMuted()" />
-            <div class="mt-10 fs-12">静音</div>
+            <img src="../../image/rong/call4.png" class="img" onclick="setMuted()" />
+            <div class="mt-10 fs-12">麦克风</div>
         </div>
     </div>
 </body>
 <script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script type="text/javascript" src="../../script/rong.js"></script>
 <script>
 var jtTime = 0;
-
+var timeAdd = 0;
 var sound = true;
 var miantibtn = true;
 apiready = function(){
-    // var header = $api.byId('header');
-    // var headerH = $api.fixStatusBar(header);
-
+    document.getElementById("time").style.marginTop = api.safeArea.top + "px";
     setEvent();
 }
 function setEvent(){
     RY.init();
-    RY.startCall(api.pageParam.ryid, api.pageParam.media, api.pageParam.yyid);
+    RY.startCall(api.pageParam.ryid, api.pageParam.mediaType, api.pageParam.yyid);
 
     api.addEventListener({name: 'ronghangup'}, function(ret, err){
         api.toast({msg: '通话结束',global:true});
@@ -57,30 +58,61 @@ function setEvent(){
     api.addEventListener({name: 'rongacceptok'}, function(ret, err){
         if( !ret ){api.toast({msg:JSON.stringify( err ), global:true});return}
         jtTime = Date.now();
-        if(api.pageParam.media=='audio'){return}
-        RY.rong.setVideoView({
-            userId: api.pageParam.uid,
-            renderModel: 'adaptive',
-            bg:'#fff',
-            fixed: true
-        });
-        RY.rong.setVideoView({
-            userId: RY.uinfo.userId,
-            rect: {x:api.frameWidth-110, y:10, w:100, h:150},
-            renderModel: 'adaptive',
-            bg:'#fff',
-            fixed: true
+        startTime();
+    });
+
+    api.addEventListener({name: 'rongvideo'}, function(ret, err){
+        if(api.pageParam.mediaType=='audio'){return}
+        RY.rong.getCallSession(function(ret){
+            if(ret.mediaType=='audio'){return}
+            RY.rong.setVideoView({
+                userId: api.pageParam.ryid,
+                rect: {x:0, y:0, w:api.frameWidth, h:api.frameHeight},
+                bg:'#fff',
+                fixedOn: "ryvideo",
+                fixed: true
+            });
+
+            var userdata = myApp.getUserData();
+            var myRyid = userdata.uinfo && userdata.uinfo.ryuid;
+            RY.rong.setVideoView({
+                userId: myRyid,
+                rect: {x:api.frameWidth-110, y:api.safeArea.top + 10, w:100, h:150},
+                renderModel: 'adaptive',
+                bg:'#fff',
+                fixedOn: "ryvideo",
+                fixed: true
+            });
         });
     });
+}
+// 计时
+function startTime(){
+    if(window.interval){clearInterval(window.interval)}
+    window.interval = setInterval(function(){
+        timeAdd ++;
+        var m = parseInt(timeAdd / 60);
+        m = m<10?'0'+m:m;
+        var s = timeAdd % 60;
+        s = s<10?'0'+s:s;
+        $("#time").html(m+" : "+s);
+    },1000);
 }
 // 挂断
 function off(){RY.rong.hangup()}
 // 静音
 function setMuted(){
-    RY.rong.setMuted({muted:sound},function(ret){ret.status && $("#btn4 .img").attr("src","../../image/rong/"+(sound?"call5.png":"call4.png"))});
+    RY.rong.setMuted({muted:sound},function(ret){});
+    $("#btn4 .img").attr("src","../../image/rong/"+(sound?"call5.png":"call4.png"));
     sound = !sound;
 }
 // 切换摄像头
-function changeCamera(){rong.switchCameraMode(function(ret){ret.status && api.toast({msg:"切换成功"})})}
+function changeCamera(){
+    if(api.pageParam.mediaType=='audio'){
+        api.toast({msg:"音频通话无需切换摄像头"});
+        return
+    }
+    RY.rong.switchCameraMode(function(ret){})
+}
 </script>
 </html>

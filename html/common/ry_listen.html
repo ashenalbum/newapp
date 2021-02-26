@@ -9,28 +9,30 @@
 	<link rel="stylesheet" href="../../css/api.css">
 	<link rel="stylesheet" href="../../css/style.css">
     <style>
-        html,body{background:rgba(0,0,0,1);}
+        html,body{background:rgba(0,0,0,0);}
         .btns{position:fixed; bottom:0; left:0; right:0;}
         .btns .btn{height:100px; min-width:64px;}
         .btns .btn .img{display:block; width:56px; height:56px;}
+        #time{position:absolute; left:10px; top:10px; padding:8px 16px; background:rgba(0,0,0,0.5); color:#ffffff; font-size:14px;}
     </style>
 </head>
 <body class="df df-c">
     <div id="header"></div>
+    <div id="time">00 : 00</div>
     <div class="btns df just-c-aro fs-14 c-ff">
         <div id="btn1" class="btn fc df df-c ai-c hide">
-            <img src="../../image/rong/call3.png" class="img" onclick="chengCamera()"/>
+            <img src="../../image/rong/call3.png" class="img" onclick="changeCamera()"/>
             <div class="mt-10 fs-12">转换摄像头</div>
         </div>
         <div id="btn2" class="btn fc df df-c ai-c">
-            <img src="../../image/rong/call2.png" class="img" onclick="guaduan()"/>
+            <img src="../../image/rong/call2.png" class="img" onclick="off()"/>
         </div>
         <div id="btn3" class="btn fc df df-c ai-c">
             <img src="../../image/rong/call1.png" class="img" onclick="jieting()"/>
         </div>
         <div id="btn4" class="btn fc df df-c ai-c hide">
-            <img src="../../image/rong/call6.png" class="img" />
-            <div class="mt-10 fs-12">静音</div>
+            <img src="../../image/rong/call4.png" class="img" onclick="setMuted()"/>
+            <div class="mt-10 fs-12">麦克风</div>
         </div>
     </div>
 </body>
@@ -40,23 +42,32 @@
 <script type="text/javascript" src="../../script/rong.js"></script>
 <script>
 var jtTime = 0;
+var timeAdd = 0;
 var sound = true;
 var miantibtn = true;
+var yyid = null;
+
 apiready = function(){
-    // var header = $api.byId('header');
-    // var headerH = $api.fixStatusBar(header);
+    document.getElementById("time").style.marginTop = api.safeArea.top + "px";
+    myApp.hasPermission(['microphone','camera']);
     setEvent();
 }
 function setEvent(){
     RY.init();
+    // 挂断
     api.addEventListener({name: 'ronghangup'}, function(ret, err){
         api.toast({msg: '通话结束',global:true});
         RY.rong.removeVideoView({userId:RY.uinfo.userId});
         RY.rong.removeVideoView({userId:api.pageParam.uid});
+        if(window.interval){clearInterval(window.interval)}
+        if(!yyid){
+            api.closeWin();
+            return;
+        }
         myApp.ajax({
             url: "/api/zixun/zhuanjiamem/endyuyue",
             method: "get",
-            data: {id:api.pageParam.yyid, starttime:jtTime},
+            data: {id:yyid, starttime:jtTime},
             success(data){
                 if(data.errcode!=0 && data.errcode!=200){return}
                 if(data.data.sta==1){
@@ -71,36 +82,60 @@ function setEvent(){
                 } else if(data.data.sta==2){
                     api.toast({msg:"超出通话费用将退还至余额", global:true});
                     toEvaluate();
-                    setTimeout(function(){api.closeWin()},500);
+                    api.closeWin();
                 } else {
                     api.toast({msg:"通话结束", global:true});
                     toEvaluate();
-                    setTimeout(function(){api.closeWin()},500);
+                    api.closeWin();
                 }
             }
         })
     });
+    // 接通
     api.addEventListener({name: 'rongacceptok'}, function(ret, err){
         if( !ret ){api.toast({msg:JSON.stringify( err ), global:true});return}
         jtTime = Date.now();
+        startTime();
+        RY.rong.getCallSession(function(ret){
+            yyid = ret && ret.extra;
+        });
+    });
+    // 显示视频
+    api.addEventListener({name: 'rongvideo'}, function(ret, err){
         RY.rong.getCallSession(function(ret){
             if(ret.mediaType=='audio'){return}
             var uid = ret.callerUserId;
             RY.rong.setVideoView({
                 userId: uid,
-                renderModel: 'adaptive',
                 bg:'#fff',
+                rect: {x:0, y:0, w:api.frameWidth, h:api.frameHeight},
+                fixedOn: "ryvideo",
                 fixed: true
             });
+
+            var userdata = myApp.getUserData();
+            var myRyid = userdata.uinfo && userdata.uinfo.ryuid;
             RY.rong.setVideoView({
-                userId: RY.uinfo.userId,
-                rect: {x:api.frameWidth-110, y:10, w:100, h:150},
-                renderModel: 'adaptive',
+                userId: myRyid,
+                rect: {x:api.frameWidth-110, y:api.safeArea.top + 10, w:100, h:150},
                 bg:'#fff',
+                fixedOn: "ryvideo",
                 fixed: true
             });
         });
     });
+}
+// 计时
+function startTime(){
+    if(window.interval){clearInterval(window.interval)}
+    window.interval = setInterval(function(){
+        timeAdd ++;
+        var m = parseInt(timeAdd / 60);
+        m = m<10?'0'+m:m;
+        var s = timeAdd % 60;
+        s = s<10?'0'+s:s;
+        $("#time").html(m+" : "+s);
+    },1000);
 }
 // 支付
 function pay(pwd,order){
@@ -111,13 +146,17 @@ function pay(pwd,order){
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             api.toast({msg:"支付成功",global:true});
-            setTimeout(toEvaluate,2000);
+            toEvaluate();
+            api.closeWin();
         }
     });
 }
 // 接听
 function jieting(){
-    RY.rong.accept();
+    RY.rong.accept({
+        mediaType:api.pageParam.mediaType,
+        callId:api.pageParam.id
+    });
     $("#btn3").addClass("hide");
     $("#btn1").removeClass("hide");
     $("#btn4").removeClass("hide");
@@ -127,12 +166,22 @@ function jieting(){
 function off(){RY.rong.hangup()}
 // 静音
 function setMuted(){
-    RY.rong.setMuted({muted:sound},function(ret){ret.status && $("#btn4 .img").attr("src","../../image/rong/"+(sound?"call5.png":"call4.png"))});
+    RY.rong.setMuted({muted:sound},function(ret){});
+    $("#btn4 .img").attr("src","../../image/rong/"+(sound?"call5.png":"call4.png"));
     sound = !sound;
 }
 // 切换摄像头
-function changeCamera(){rong.switchCameraMode(function(ret){ret.status && api.toast({msg:"切换成功"})})}
+function changeCamera(){
+    if(api.pageParam.mediaType=='audio'){
+        api.toast({msg:"音频通话无需切换摄像头"});
+        return
+    }
+    RY.rong.switchCameraMode(function(ret){})
+}
 // 评价
-function toEvaluate(){myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:api.pageParam.yyid}})}
+function toEvaluate(){
+    api.sendEvent({name: 'toEvaluate', extra: {yyid:yyid}});
+    // myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}})
+}
 </script>
 </html>

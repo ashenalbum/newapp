@@ -17,6 +17,21 @@
 <script type="text/javascript" src="../../script/zepto.js"></script>
 <script type="text/javascript" src="../../script/rong.js"></script>
 <script>
+apiready = function(){
+    // type:'listen' / 'call'
+    // media: 'audio' / 'video'
+    // uid: uid
+    var url = api.pageParam.type=="listen"?"./ry_listen.html":"./ry_call.html";
+    var yyid = api.pageParam.type=="listen" && $api.getStorage('callExtra');
+    if(!api.pageParam.yyid){api.pageParam.yyid = yyid}
+    api.openFrame({
+        name: 'ryvideo',
+        url: './ry_video.html',
+        rect: {x: 0, y: 0, w: api.winWidth, h: api.winHeight},
+        bgColor: 'rgba(0,0,0,1)'
+    });
+    api.openFrame({name:'rongCtrl', url:url, bgColor:'rgba(0,0,0,0)', rect:{x:0,y:0}, pageParam:api.pageParam});
+}
 </script>
 </body>
 </html>

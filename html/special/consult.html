@@ -131,7 +131,9 @@ function init(){
             content: '现在要与 '+ name + ' ' + (type=='1'?'视频':'音频') + '通话吗',
             callback(btnIndex){
                 if(btnIndex!=1){return}
-                myApp.openWin({hideAll:true, url:"/html/common/ry_video.html", pageParam:{media:type, media:'call', ryid:ryuid, yyid:id}});
+                myApp.hasPermission(['microphone','camera'],function(){
+                    myApp.openWin({hideAll:true, url:"/html/common/ry_window.html", pageParam:{mediaType:type=='1'?'video':'audio', media:'call', ryid:ryuid, yyid:id}});
+                });
             }
         });
     });
@@ -181,7 +183,7 @@ function getData(){
                 for(var j in data.list[i]){
                     var o = data.list[i][j];
                     all++;
-                    o.status=="0"?over++:'';
+                    o.status=="2"?over++:'';
                 }
             }
             var overSpan = over==0?'':'<span class="fs-16 fw-i c-99">'+ over +' / </span>';
@@ -290,15 +292,16 @@ function getTimeline(){
                 var timeline = $('<div class="timeline mt-12"></div>');
                 for(var j in data.list[i]){
                     var o = data.list[i][j];
-                    timeline.append('<div class="node df ai-c '+(o.type=="1"?'red':'blue')+'"  data-name="'+ myApp.htmlEscape(o.name) +'" data-type="'+ (o.type==1?"video":"audio") +'" data-id="'+o.id+'" data-ryuid="'+o.ryuid+'" >'+
+                    // o.status = "0"; //1049
+                    timeline.append('<div class="node df ai-c '+(o.type=="1"?'red':'blue')+'"  data-name="'+ myApp.htmlEscape(o.name) +'" data-type="'+ o.type +'" data-id="'+o.id+'" data-ryuid="'+o.ryuid+'" >'+
                         '<div class="line"></div>'+
-                        '<div class="txt fc df ai-c '+ (o.status=="0"?'callbox':'') +'">'+
+                        '<div class="txt fc df ai-c '+ (o.status=="1"?'callbox':'') +'">'+
                             '<div class="icon"></div>'+
                             '<div class="df df-c fc pr-10">'+
                                 '<div class="name fs-16 b lh-1 one-hide">'+ myApp.htmlEscape(o.name) +'</div>'+
                                 '<div class="mt-6 fs-12 lh-1 c-99 one-hide">'+ (o.timelog?'预约咨询时长'+o.timelog+'分钟':'') +'</div>'+
                             '</div>'+
-                            '<div class="status fs-12 c-99">'+ (o.status=="0"?'未通话':'已通话') +'</div>'+
+                            '<div class="status fs-12 c-99">'+ (o.status=='1'?'未通话':(o.status=='2'?'已通话':'')) +'</div>'+
                         '</div>'+
                     '</div>');
                 }

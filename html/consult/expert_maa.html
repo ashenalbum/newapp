@@ -105,9 +105,16 @@ function getData(){
         }
     });
 }
+
 function submit(){
+    myApp.hasPermission(['microphone','camera'],function(){
+        submitFrom();
+    });
+}
+
+function submitFrom(){
     var id = selTimeId;
-    var type = $("input[name='type']").val();
+    var type = $("input[name='type']:checked").val();
     var timelog = $("#timelog").val();
     var jg = price[type];
 

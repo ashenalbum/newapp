@@ -82,26 +82,34 @@ apiready = function () {
 function setEvent(){
     // 状态栏颜色
     api.addEventListener({name:'viewappear'},function(){api.setStatusBarStyle({style: 'dark'})});
-    // 来电
-    api.addEventListener({name: 'rongaccept'}, function(ret, err){
-        api.notification({
-            light: true,
-            vibrate: [100, 500, 200, 500, 300, 500, 400, 500],
-            sound: 'default',
-            notify: {
-                title: '有来电',
-                content: '您预约的咨询有来电'
-            }
-        });
-        // 获取预约id 1049
-        // var id =
-        // $api.getStorage('callExtra', ret.message.content.extra);
-        myApp.openWin({hideAll:true, url:"/html/common/ry_video.html", pageParam:{type:"listen", id:id}});
-    });
 
     if(myApp.isLogin()){
         RY.init(true);
-        RY.login();
+        RY.login(function(){
+            // 来电
+            api.addEventListener({name: 'rongaccept'}, function(ret, err){
+                api.notification({
+                    light: true,
+                    vibrate: [100, 500, 200, 500, 300, 500, 400, 500],
+                    sound: 'default',
+                    notify: {
+                        title: '有来电',
+                        content: '您预约的咨询有来电'
+                    }
+                });
+                // 获取预约id 1049
+                var id = ret.value.callerUserId;
+                var mediaType = ret.value.mediaType;
+
+                myApp.openWin({hideAll:true, url:"/html/common/ry_window.html", pageParam:{type:"listen", id:id, mediaType:mediaType}});
+            });
+        });
+        api.addEventListener({name: 'toEvaluate'}, function(ret, err){
+            var yyid = ret && ret.value && ret.value.yyid;
+            setTimeout(function(){
+                myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}});
+            },360)
+        });
     }
 }
 // 获取最新userdata 刷新审核，会员过期等

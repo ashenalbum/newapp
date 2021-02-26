@@ -25,6 +25,7 @@ RY.init = function(init) {
     return rong;
 };
 RY.login = function(callback){
+
     var udata = myApp.getUserData();
     var token = udata && udata.uinfo && udata.uinfo.rytoken;
     if(!token){api.toast({msg:"通话模块登录失败",global:true});return;}
@@ -34,7 +35,7 @@ RY.login = function(callback){
             callback && callback();
         }else{
             if(err && err.code==31006){return}
-            // api.toast({msg:'融云连接异常，将在10秒后为您尝试连接！'});
+            console.log("融云连接异常");
             RY.logout();
             setTimeout(function(){RY.login()},10000);
         }
@@ -46,31 +47,37 @@ RY.logout = function(){
 }
 
 RY.setConnectionStatusListener = function(){
-    RY.rong.setOnReceiveMessageListener(function(ret, err) {
-        if(ret && ret.message && ret.message.content && ret.message.content.extra){
-            $api.setStorage('callExtra', ret.message.content.extra);
-        }
-    });
+    // RY.rong.setOnReceiveMessageListener(function(ret, err) {
+    //     console.log(JSON.stringify(ret))
+    //     if(ret && ret.message && ret.message.content && ret.message.content.extra){
+    //         $api.setStorage('callExtra', ret.message.content.extra);
+    //     }
+    // });
     RY.rong.addCallReceiveListener({target:'didReceiveCall'},function(ret,err){
+        // console.log('didReceiveCall')
         api.sendEvent({ name :'rongaccept', extra : ret.callSession });
     });
     RY.rong.addCallSessionListener({target:'didConnect'},function(ret,err){
+        // console.log('didConnect')
         api.sendEvent({ name :'rongacceptok', extra : ret.callSession });
     });
     RY.rong.addCallSessionListener({target:'didDisconnect'},function(ret,err){
+        // console.log('didDisconnect')
         api.sendEvent({ name :'ronghangup', extra : ret.callSession });
     });
     RY.rong.addCallSessionListener({target:'remoteUserDidLeft'},function(ret,err){
+        // console.log('remoteUserDidLeft')
         RY.rong.hangup();
         api.sendEvent({ name :'rongoutroom', extra : ret });
     });
     RY.rong.addCallSessionListener({target: 'remoteUserDidJoin'}, function(ret) {
+        // console.log('remoteUserDidJoin')
         api.sendEvent({ name :'rongvideo', extra : ret });
     });
 }
 RY.startCall = function(id,type,yyid){
     RY.rong.startCall({
-        targetId: 'didReceiveCall',
+        targetId: id, //'didReceiveCall',
         conversationType: "PRIVATE",
         mediaType: type || "video",
         userIdList: [id],
