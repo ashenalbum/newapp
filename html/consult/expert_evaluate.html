@@ -133,14 +133,27 @@ function setEvent(){
     });
 }
 function getData(){
-
+    myApp.ajax({
+        url: "/api/zixun/zhuanjiamem/getpjzj",
+        method: "get",
+        data: {id: api.pageParam.yyid},
+        loading: false,
+        alert: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            var img = data.data.avatar;
+            var name = data.data.name;
+            $("#icon").attr("src",img);
+            $("#name").text(name);
+        }
+    })
 }
 function submit(){
     var plcontent = $("#textarea").val();
     myApp.ajax({
         url: "/api/zixun/zhuanjiamem/yuyuepj",
         method: "post",
-        data: {data:{id:api.pageParam.yyid, plfen:plfen, zyplfen:zyplfen, nxplfen:nxplfen}},
+        data: {data:{id:api.pageParam.yyid, plfen:plfen, zyplfen:zyplfen, nxplfen:nxplfen, plcontent:plcontent}},
         success(data){
             if(data.errcode!=200 && data.errcode!=0){return}
             api.toast({msg:"评价成功",global:true});

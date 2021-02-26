@@ -99,48 +99,47 @@ function getData(){
     loading = true;
     loadmore.removeClass("over").addClass("load");
     myApp.ajax({
-        url: "/api/zixun/zhuanjia/pjlist",
+        url: "/api/zixun/zhuanjiamem/pjlist",
         method: "get",
         data: {uid: api.pageParam.uid},
-        success(ret){
+        success(data){
+            // console.log("=========")
+            // console.log(JSON.stringify(data))
             loading = false;
             api.refreshHeaderLoadDone();
-            var ul = $("#news .newslist");
             if(Number(page)<=1){ul.empty();dataList=[];}
             page++;
             loadmore.removeClass("load");
-            var data = ret.data;
             if(!data){return}
             dataList = dataList.concat(data.list || []);
             if(!data.list || data.list.length==0 || (data.count && dataList.length>=Number(data.count))){
                 over = true;
                 loadmore.addClass("over");
             }
-            if(!data){return}
             if(page<=2){
-                var zhuanjia = data.zhuanjia;
+                var zhuanjia = data.zpl;
                 var list = data.list;
                 var info = $("#info");
-                info.find(".pingfen").html(zhuanjia.pinmum==0?'<span class="fs-14">暂无评分</span>':zhuanjia.pinmum);
+                info.find(".pingfen").html(zhuanjia.zplfen==0?'<span class="fs-14">暂无评分</span>':zhuanjia.zplfen);
                 info.find(".name").text(zhuanjia.name);
-                info.find(".zhuanye").html(zhuanjia.zypinmum==0?'--':zhuanjia.zypinmum);
-                info.find(".naixin").html(zhuanjia.nxpinmum==0?'--':zhuanjia.nxpinmum);
-                zhuanjia.pinmum!=0 && info.find(".star").addClass("star-"+zhuanjia.pinmum).removeClass("hide");
+                info.find(".zhuanye").html(zhuanjia.zzyfen==0?'--':zhuanjia.zzyfen);
+                info.find(".naixin").html(zhuanjia.znxfen==0?'--':zhuanjia.znxfen);
+                zhuanjia.zplfen!=0 && info.find(".star").addClass("star-"+parseInt(zhuanjia.zplfen)).removeClass("hide");
             }
             for(var i in data.list){
                 var o = data.list[i];
                 ul.append('<div class="li df">'+
-                    '<img src="'+ o.avatar +'" class="icon" alt="">'+
+                    '<img src="'+ o.avatar +'" class="icon shadow2" alt="" />'+
                     '<div class="fc df df-c">'+
                         '<div class="mt-4 df ai-c just-c-bet">'+
-                            '<span class="fs-16 b">'+ o.username +'</span>'+
+                            '<span class="fs-14 b">'+ o.name +'</span>'+
                             '<span class="fs-12 c-99">'+ o.pltime +'</span>'+
                         '</div>'+
-                        '<div class="mt-4 df ai-c">'+
+                        '<div class="mt-4 df ai-c mt-4">'+
                             '<i class="star star-'+ parseInt(o.plfen) +'"></i>'+
                             '<span class="star-num c-yellow fs-14">'+ o.plfen +'</span>'+
                         '</div>'+
-                        '<div class="mt-4 txt fs-14">'+ o.plcontent +'</div>'+
+                        '<div class="'+ (o.plcontent?'mt-10':'') +' txt fs-14">'+ (o.plcontent || "") +'</div>'+
                     '</div>'+
                 '</div>');
             }

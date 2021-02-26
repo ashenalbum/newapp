@@ -104,12 +104,6 @@ function setEvent(){
                 myApp.openWin({hideAll:true, url:"/html/common/ry_window.html", pageParam:{type:"listen", id:id, mediaType:mediaType}});
             });
         });
-        api.addEventListener({name: 'toEvaluate'}, function(ret, err){
-            var yyid = ret && ret.value && ret.value.yyid;
-            setTimeout(function(){
-                myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}});
-            },360)
-        });
     }
 }
 // 获取最新userdata 刷新审核，会员过期等

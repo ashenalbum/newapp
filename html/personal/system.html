@@ -57,7 +57,15 @@ function logout(){
 // 账户安全
 function openSecurity(){myApp.openWin({title:"账户安全", needLogin:true, url:"/html/personal/security.html"})}
 // 收费设置
-function openCharge(){myApp.openWin({title:"收费设置", needLogin:true, url:"/html/special/charge.html"})}
+function openCharge(){
+    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+    var userData = myApp.getUserData().uinfo;
+    if(userData.groupid!==2){
+        myApp.alert({content: "您还未通过专家申请"});
+        return;
+    }
+    myApp.openWin({title:"收费设置", needLogin:true, url:"/html/special/charge.html"})
+}
 // 实名
 function openRealname(){myApp.openWin({title:"实名认证", needLogin:true, url:"/html/personal/realname.html"})}
 </script>

@@ -135,7 +135,8 @@ function submitFrom(){
                     data: {id:order, paypwd:pwd},
                     success(data){
                         if(data.errcode!=0 && data.errcode!=200){return}
-                        api.toast({msg:'预约成功，请耐心等待专家给你答复！'});
+                        api.toast({msg:'预约成功，请耐心等待专家给你答复！', global:true});
+                        setTimeout(function(){ api.closeWin(); },300)
                     }
                 });
             });

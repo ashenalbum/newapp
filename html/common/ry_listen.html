@@ -54,6 +54,9 @@ apiready = function(){
 }
 function setEvent(){
     RY.init();
+    api.addEventListener({
+        name: 'keyback'
+    }, function(){off()});
     // 挂断
     api.addEventListener({name: 'ronghangup'}, function(ret, err){
         api.toast({msg: '通话结束',global:true});
@@ -181,7 +184,7 @@ function changeCamera(){
 // 评价
 function toEvaluate(){
     api.sendEvent({name: 'toEvaluate', extra: {yyid:yyid}});
-    // myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}})
+    myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}})
 }
 </script>
 </html>

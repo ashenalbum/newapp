@@ -50,8 +50,13 @@ function setEvent(){
     RY.init();
     RY.startCall(api.pageParam.ryid, api.pageParam.mediaType, api.pageParam.yyid);
 
+    api.addEventListener({
+        name: 'keyback'
+    }, function(){off()});
+
     api.addEventListener({name: 'ronghangup'}, function(ret, err){
         api.toast({msg: '通话结束',global:true});
+        api.sendEvent({name: 'myconsultlist'});
         api.closeWin();
     });
 

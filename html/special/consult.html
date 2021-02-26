@@ -98,6 +98,7 @@ var selTime = new Date().toISOString().substr(0,10);
 
 apiready = function(){
     init();
+    setEvent();
 }
 // 初始化
 function init(){
@@ -108,6 +109,15 @@ function init(){
         page = 1;
         getList();
     });
+    api.addEventListener({name: 'myconsultlist'}, function(ret, err){
+        setTimeout(function(){
+            getData();
+            over = false;
+            page = 1;
+            getList();
+        },1000);
+    });
+
     chengeTab(api.pageParam.tab || 1);
     $("#top").on("click",".tab",function(){
         var ts = $(this);
@@ -183,7 +193,7 @@ function getData(){
                 for(var j in data.list[i]){
                     var o = data.list[i][j];
                     all++;
-                    o.status=="2"?over++:'';
+                    o.status>="2"?over++:'';
                 }
             }
             var overSpan = over==0?'':'<span class="fs-16 fw-i c-99">'+ over +' / </span>';
@@ -210,7 +220,11 @@ function setEvent(){
         getData();
         over = false;
         page = 1;
-        getList();
+        if(pageTab==1){
+            getList();
+        }else{
+            getTimeline();
+        }
     });
 }
 // 切换选项卡
@@ -221,13 +235,12 @@ function chengeTab(tab){
     $("#cont").children(".tab"+tab).removeClass("hide").siblings().addClass("hide");
     $("#bottom").children(".btn"+tab).removeClass("hide").siblings().addClass("hide");
     if(tab==1){
-        setEvent();
+        // setEvent();
         over = false;
         page = 1;
         getList();
     } else {
-        api.removeEventListener({name: 'addEventListener'});
-        api.setFrameAttr({name:api.frameName, bounces:false});
+        // api.setFrameAttr({name:api.frameName, bounces:false});
         getTimeline();
     }
 }
@@ -278,6 +291,7 @@ function getTimeline(){
         method: "get",
         data: {time:selTime},
         success(data){
+            api.refreshHeaderLoadDone();
             if(data.errcode!=0 && data.errcode!=200){return}
             var dom = $("#timelinebox").empty();
             for(var i in data.list){
@@ -301,7 +315,7 @@ function getTimeline(){
                                 '<div class="name fs-16 b lh-1 one-hide">'+ myApp.htmlEscape(o.name) +'</div>'+
                                 '<div class="mt-6 fs-12 lh-1 c-99 one-hide">'+ (o.timelog?'预约咨询时长'+o.timelog+'分钟':'') +'</div>'+
                             '</div>'+
-                            '<div class="status fs-12 c-99">'+ (o.status=='1'?'未通话':(o.status=='2'?'已通话':'')) +'</div>'+
+                            '<div class="status fs-12 c-99">'+ (o.status=='1'?'未通话':(o.status>='2'?'已通话':'')) +'</div>'+
                         '</div>'+
                     '</div>');
                 }
@@ -309,7 +323,7 @@ function getTimeline(){
             }
             if(dom.html()==""){dom.append('<div class="fs-14 pd-20 txt-c c-99">没有更多数据了</div>')}
         },
-        error(e){console.log(JSON.stringify(e))}
+        error(e){api.refreshHeaderLoadDone();}
     });
 }
 // 排期
