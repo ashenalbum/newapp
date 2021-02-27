@@ -126,13 +126,14 @@ function setEvent(){
 }
 
 function getData(){
+    var rq_type = type;
     if(loading || over){return}
     loading = true;
     loadmore.removeClass("over").addClass("load");
     myApp.ajax({
         url: "/api/member/member/getbrowseloglist",
         method: "get",
-        data: {page:page, type:type},
+        data: {page:page, type:rq_type},
         loading: false,
         success(data){
             loading = false;
@@ -145,10 +146,10 @@ function getData(){
                 over = true;
                 loadmore.addClass("over");
             }
-            if(type==1){addNews(data.list)}
-            if(type==2){addConsult(data.list)}
-            if(type==3){} // 1049
-            if(type==4){addJournal(data.list)}
+            if(rq_type==1){addNews(data.list)}
+            if(rq_type==2){addConsult(data.list)}
+            if(rq_type==3){} // 1049
+            if(rq_type==4){addJournal(data.list)}
         },
         error(){api.refreshHeaderLoadDone()}
     });

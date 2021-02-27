@@ -20,7 +20,7 @@
     <img id="topimg" src="" class="blockimg hide" />
     <img id="bgimg" src="" class="blockimg hide" />
     <div id="box" class="box fc df df-w-w"></div>
-    <img src="" id="bottomimg" class="blockimg hide" alt="" />
+    <!-- <img src="" id="bottomimg" class="blockimg hide" alt="" /> -->
 <script type="text/javascript" src="../../script/api.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
@@ -45,7 +45,7 @@ function getData(){
             }
             data.data && data.data.topimg && $("#topimg").attr("src",data.data.topimg).removeClass("hide");
             data.data && data.data.bgimage && $("#bgimg").attr("src",data.data.bgimage).removeClass("hide");
-            data.data && data.data.bottomimg && $("#bottomimg").attr("src",data.data.bottomimg).removeClass("hide");
+            // data.data && data.data.bottomimg && $("#bottomimg").attr("src",data.data.bottomimg).removeClass("hide");
             data.data && data.data.newcate && setMenu(data.data.newcate);
         }
     })

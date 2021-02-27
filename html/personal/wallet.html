@@ -48,7 +48,7 @@
             <span id="yue" class="num fs-24 b">--</span>
             <span class="fs-12 mt-6">教育贝</span>
         </div>
-        <button class="com-button recharge c-red fs-14" onclick="showMask()">充值</div>
+        <button class="com-button recharge c-red fs-14" onclick="toInvest()">充值</div>
     </div>
     <div class="df df-c details com-box mt-16">
         <div class="com-title detail-title">交易明细</div>
@@ -61,7 +61,7 @@
             <span class="scrollbtm">上拉加载更多</span>
         </div>
     </div>
-    <div id="mask" class="mask hide">
+    <!-- <div id="mask" class="mask hide">
         <div class="bg" onclick="hideMask()"></div>
         <div class="cont df df-c">
             <div class="fs-16 txt-c b">充值教育贝</div>
@@ -93,7 +93,7 @@
                 <button class="com-button pay-btn fs-16 c-ff" onclick="createOrder()">充值</button>
             </div>
         </div>
-    </div>
+    </div> -->
 <script type="text/javascript" src="../../script/api.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
@@ -110,6 +110,7 @@ var iap = null;
 
 apiready = function(){
     wxPayPlus = api.require('wxPayPlus');
+    api.addEventListener({name: 'viewappear'},getData);
     setEvent();
     getData();
 }
@@ -157,26 +158,6 @@ function getData(){
             getList();
         }
     });
-    myApp.ajax({
-        url: "/api/member/member/chongzhi",
-        method: "get",
-        loading: false,
-        success(data){
-            if(data.errcode!=0 && data.errcode!=200){return}
-            var cont = $("#mask .cont");
-            var config = cont.find(".config").empty();
-            var ul = cont.find(".czlist").empty();
-            if(data.config && data.config.content){config.text(data.config.content)}
-            if(!data.list || data.list.length==0){return}
-            for(var i=0; i<data.list.length; i++){
-                if(i==0){payObj = data.list[0].id}
-                var zs = Number(data.list[i].song)>0?'<div class="fs-12">赠送:'+ data.list[i].song +'</div>':'';
-                ul.append('<div class="li c-red df ai-c df-c just-c-bet '+(i==0?'active':'')+'" data-id="'+ data.list[i].id +'">'+
-                    '<div class="fs-16">面额:'+ data.list[i].jiage +'</div>'+zs+
-                '</div>');
-            }
-        }
-    })
 }
 function getList(){
     if(loading || over){return}
@@ -213,76 +194,80 @@ function getList(){
         error(){api.refreshHeaderLoadDone()}
     })
 }
-// 创建订单
-function createOrder(){
-    if(!payObj){api.toast({msg:"请选择面额"});return}
-    myApp.ajax({
-        url: "/api/member/member/czorder",
-        method: "get",
-        data: {id:payObj},
-        success(data){
-            if(data.errcode!=0 && data.errcode!=200){return}
-            getOrder(data);
-        }
-    })
+// // 创建订单
+// function createOrder(){
+//     if(!payObj){api.toast({msg:"请选择面额"});return}
+//     myApp.ajax({
+//         url: "/api/member/member/czorder",
+//         method: "get",
+//         data: {id:payObj},
+//         success(data){
+//             if(data.errcode!=0 && data.errcode!=200){return}
+//             getOrder(data);
+//         }
+//     })
+// }
+// // 获取订单
+// function getOrder(obj){
+//     payType = $("#mask input[name='paytype']:checked").val() || "wxpay";
+//     myApp.ajax({
+//         url: "/api/member/member/czpay",
+//         method: "get",
+//         data: {id:obj.ids, paytype:payType},
+//         success(data){
+//             if(data.errcode!=0 && data.errcode!=200){return}
+//             if(payType=="wxpay"){
+//                 wxPay(data.str);
+//             }else{
+//                 iospay();
+//             }
+//         }
+//     })
+// }
+// // 微信支付 1049
+// function wxPay(orderObj){
+//     wxPayPlus.payOrder({
+//         apiKey: orderObj.appid,
+//         orderId: orderObj.prepayid,
+//         mchId: "1483571312",
+//         nonceStr: orderObj.noncestr,
+//         timeStamp: orderObj.timestamp,
+//         package: orderObj.package,
+//         sign: orderObj.sign
+//     }, function(retp, err) {
+//         hideMask();
+//         if (retp && retp.status) {
+//             api.toast({msg:'支付成功', global:true});
+//             getData();
+//         } else {
+//             if(err.code == -2){
+//                 api.toast({msg: "已取消支付"})
+//             }else{
+//                 api.toast({msg:"支付失败"});
+//             }
+//         }
+//     });
+// }
+// // 苹果支付
+// function iospay(){
+//     iap.getProducts({productIds:[ chong_iosid ]}, function(retget, err){
+//         if(!retget){return}
+//         iap.purchase({
+//             productId: chong_iosid,
+//             applicationUsername:order_id
+//         }, function(ret, err) {
+//             if(!ret){return}
+//         });
+//     })
+// }
+// // 显示
+// function showMask(){$("#mask").removeClass("hide").addClass("animate");$(document.body).css("overflow","hidden")}
+// // 隐藏
+// function hideMask(){$("#mask").addClass("hide").removeClass("animate");$(document.body).css("overflow","auto")}
+// 充值
+function toInvest(){
+    myApp.openWin({url:"/html/personal/wallet_invest.html", title:"充值"});
 }
-// 获取订单
-function getOrder(obj){
-    payType = $("#mask input[name='paytype']:checked").val() || "wxpay";
-    myApp.ajax({
-        url: "/api/member/member/czpay",
-        method: "get",
-        data: {id:obj.ids, paytype:payType},
-        success(data){
-            if(data.errcode!=0 && data.errcode!=200){return}
-            if(payType=="wxpay"){
-                wxPay(data.str);
-            }else{
-                iospay();
-            }
-        }
-    })
-}
-// 微信支付 1049
-function wxPay(orderObj){
-    wxPayPlus.payOrder({
-        apiKey: orderObj.appid,
-        orderId: orderObj.prepayid,
-        mchId: "1483571312",
-        nonceStr: orderObj.noncestr,
-        timeStamp: orderObj.timestamp,
-        package: orderObj.package,
-        sign: orderObj.sign
-    }, function(retp, err) {
-        hideMask();
-        if (retp && retp.status) {
-            api.toast({msg:'支付成功', global:true});
-            getData();
-        } else {
-            if(err.code == -2){
-                api.toast({msg: "已取消支付"})
-            }else{
-                api.toast({msg:"支付失败"});
-            }
-        }
-    });
-}
-// 苹果支付
-function iospay(){
-    iap.getProducts({productIds:[ chong_iosid ]}, function(retget, err){
-        if(!retget){return}
-        iap.purchase({
-            productId: chong_iosid,
-            applicationUsername:order_id
-        }, function(ret, err) {
-            if(!ret){return}
-        });
-    })
-}
-// 显示
-function showMask(){$("#mask").removeClass("hide").addClass("animate");$(document.body).css("overflow","hidden")}
-// 隐藏
-function hideMask(){$("#mask").addClass("hide").removeClass("animate");$(document.body).css("overflow","auto")}
 </script>
 </body>
 </html>

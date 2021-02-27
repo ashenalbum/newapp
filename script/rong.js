@@ -35,9 +35,9 @@ RY.login = function(callback){
             callback && callback();
         }else{
             if(err && err.code==31006){return}
-            console.log("融云连接异常");
-            RY.logout();
-            setTimeout(function(){RY.login()},10000);
+            api.toast({msg:"通话模块连接异常"});
+            // RY.logout();
+            // setTimeout(function(){RY.login()},10000);
         }
     });
 }

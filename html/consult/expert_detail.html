@@ -215,12 +215,13 @@ function getData(){
 }
 // 列表
 function getList(){
+    var rQtabType = tabType;
     if(loading || over){return}
     loading = true;
     loadmore.removeClass("over").addClass("load");
     var url = '';
     var ul = null;
-    if(tabType==1){
+    if(rQtabType==1){
         url = "/api/zixun/zhuanjia/openzixun";
         ul = $("#detail .question")
         ul.removeClass("hide").siblings().addClass("hide");
@@ -248,7 +249,7 @@ function getList(){
             for(var i in data.list){
                 i = Number(i);
                 var obj = data.list[i];
-                if(tabType==1){
+                if(rQtabType==1){
                     ul.append('<div class="open-listen item df df-c just-c-bet mt-12 " data-id="'+ obj.id +'">'+
                         '<div class="title two-hide">'+ obj.content +'</div>'+
                         '<div class="df ai-c just-c-bet">'+
@@ -321,6 +322,8 @@ function guanzhu(dom){
                 api.toast({msg:"已取消关注"});
                 ts.removeClass("active").html("+ 关注");
             }
+            api.sendEvent({name: 'informationReloadData'});
+
         }
     })
 }

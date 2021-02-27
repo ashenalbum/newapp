@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/input.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper.min.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .lh-36{line-height:36px;}
+        .pl-2{padding-left:2px;}
+        .pl-6{padding-left:6px;}
+
+        .czlist{padding:20px 14px; background:#ffffff;}
+        .czlist .swiper-slide{box-sizing:border-box; margin-right:10px; padding:20px 0; width:100px; height:120px; border:1px solid #E9EAEB; border-radius:10px;}
+        .czlist .swiper-slide.active{border-color:#F3D49E; background:rgba(243, 212, 158, 0.3);}
+        .czlist .swiper-slide:last-child{margin-right:0;}
+
+        .paysel{padding:20px 14px; background:#ffffff;}
+        .paysel .bei{display:block; width:24px; height:24px; border-radius:50%; margin-right:10px; background:#FF6976 url(../../image/common/bei_w.png) no-repeat center center; background-size:18px 18px;}
+        .paysel .wx{display:block; width:28px; height:28px; border-radius:50%; margin-right:10px; background:url(../../image/common/wxpay.png) no-repeat center center; background-size:28px 28px;}
+        .paysel .ipt-radio~.iconfont::before{font-size:22px;}
+
+        .btm{padding:14px; background:#ffffff;}
+        .btm .paybox{padding:0 10px; height:58px; line-height:58px; border-radius:30px; background:#2A2B46;}
+        .btm .paybox .submit{height:44px; line-height:44px; padding:0 30px; border-radius:22px; background:#FBF1D5 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="czlist">
+        <div class="fs-16 b">充值金额</div>
+        <div id="czswiper" class="swiper-container mt-16">
+            <div class="swiper-wrapper fs-12 c-33"></div>
+        </div>
+    </div>
+    <div class="paysel mt-10">
+        <div class="li df ai-c just-c-bet">
+            <div class="fc df ai-c">
+                <i class="wx"></i>
+                <span class="fs-14">微信支付</span>
+            </div>
+            <label>
+                <input type="radio" class="ipt-radio" checked name="" value="" />
+                <i class="iconfont"></i>
+            </label>
+        </div>
+    </div>
+    <div class="btm mt-10 fc df df-c just-c-end">
+        <div class="paybox df ai-c just-c-bet">
+            <div class="df ai-c">
+                <span class="c-ff fs-16">合计：</span>
+                <span class="fs-12 c-yellow pl-6">￥</span>
+                <span id="money" class="fs-24 c-yellow">0</span>
+            </div>
+            <button class="com-button submit b" type="button" name="button" onclick="createOrder()">立即支付</button>
+        </div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/swiper.min.js"></script>
+<script>
+var dataList = [];
+var id = null;
+var money = 0;
+var wxPayPlus = null;
+
+apiready = function(){
+    wxPayPlus = api.require('wxPayPlus');
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $("#czswiper").on("click",".swiper-slide",function(){
+        var ts = $(this);
+        var item = dataList[ts.index()];
+        id = item.id;
+        money = item.jiage;
+        ts.addClass('active').siblings().removeClass('active');
+        $("#money").html(item.jiage);
+    });
+}
+function getData(){
+    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+    myApp.ajax({
+        url: "/api/member/member/chongzhi",
+        method: "get",
+        loading: false,
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            dataList = data.list;
+            setSwiper(data.list);
+        }
+    });
+}
+function setSwiper(arr){
+    var wrap = $("#czswiper .swiper-wrapper").empty();
+    for(var i in arr){
+        var o = arr[i];
+        wrap.append('<div class="swiper-slide '+ (i=='0'?'active':'') +' df df-c ai-c" data-money>'+
+            '<div class="fc fs-14 c-66">'+ o.jiage +'教育贝</div>'+
+            '<div class="fs-24 lh-36 c-yellow"><span class="fs-14">￥</span>'+ o.jiage +'</div>'+
+            (Number(o.song)>0?'<div class="fs-12 c-yellow">赠送：'+ o.song +'教育贝</div>':'')+
+        '</div>');
+        if(i=='0'){
+            id = o.id;
+            money = o.jiage;
+            $("#money").html(money);
+        }
+    }
+    var mySwiper = new Swiper('#czswiper',{slidesPerView :'auto'});
+}
+// 创建订单
+function createOrder(){
+    if(!id){api.toast({msg:"请选择面额"});return}
+    myApp.ajax({
+        url: "/api/member/member/czorder",
+        method: "get",
+        data: {id:id},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            getOrder(data);
+        }
+    })
+}
+// 获取订单
+function getOrder(obj){
+    payType = "wxpay";
+    myApp.ajax({
+        url: "/api/member/member/czpay",
+        method: "get",
+        data: {id:obj.ids, paytype:payType},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(payType=="wxpay"){
+                wxPay(data.str);
+            }
+        }
+    })
+}
+// 微信支付 1049
+function wxPay(orderObj){
+    wxPayPlus.payOrder({
+        apiKey: orderObj.appid,
+        orderId: orderObj.prepayid,
+        mchId: "1483571312",
+        nonceStr: orderObj.noncestr,
+        timeStamp: orderObj.timestamp,
+        package: orderObj.package,
+        sign: orderObj.sign
+    }, function(retp, err) {
+        if (retp && retp.status) {
+            api.toast({msg:'支付成功', global:true});
+            api.closeWin();
+        } else {
+            if(err.code == -2){
+                api.toast({msg: "已取消支付"})
+            }else{
+                api.toast({msg:"支付失败"});
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>

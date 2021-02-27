@@ -56,7 +56,7 @@
     <div id="top" class="top">
         <div class="info df ai-c">
             <div class="df ai-c fc" onclick="openLogin()">
-                <img src="../image/common/head.png" class="icon" alt="" />
+                <img src="../image/common/nologin.png" class="icon shadow2" alt="" />
                 <div class="txts">
                     <div class="df ai-c">
                         <div class="username fs-16 b c-33">请登录</div>
@@ -218,7 +218,7 @@ function setEvent(){
             if(isExpert){setWaitconsult()}
         }else{
             top.removeClass("svip");
-            top.find(".info .icon").attr("src","../image/common/head.png");
+            top.find(".info .icon").attr("src","../image/common/nologin.png");
             top.find(".username").html("请登录");
             top.find(".phone").addClass("hide");
             top.find(".viptxt").html("开通课程VIP  购买课程更多优惠");

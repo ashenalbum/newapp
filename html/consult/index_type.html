@@ -29,7 +29,7 @@
         .school-box .list .labels span:last-child{border-right:none;}
         .school-box .list .btn{height:30px; line-height:32px; padding:0 24px; background:rgba(255, 28, 58, 0.1); border-radius:16px;}
 
-        .zixunlist .item{padding:14px 0; border-bottom:1px solid #dddddd;}
+        .zixunlist .item{padding:14px 0; border-bottom:thin solid #dddddd;}
         .zixunlist .item:last-child{border:none;}
         .zixunlist .item .icon{display:block; margin-right:14px; width:40px; height:40px; border-radius:50%; background:#f6f7f8;}
         .zixunlist .item .fen{padding-left:26px; line-height:14px; background:url(../../image/information/save_act.png) no-repeat 10px center; background-size:12px 12px;}
@@ -186,7 +186,7 @@ function openExpert(){myApp.openWin({title:"专家", url: "/html/consult/expert.
 // 大家都在问
 function openList(){myApp.openWin({title:"大家都在问", url:"/html/consult/listen_all.html", pageParam:{id:api.pageParam.id}})};
 // 院校列表
-function openSchool(){myApp.openWin({title:"院校", url:"/html/consult/school.html", headColor: "#f6f7f8", pageParam:{id:api.pageParam.id}})}
+function openSchool(){myApp.openWin({title:(api.pageParam.title||"")+"院校", url:"/html/consult/school.html", headColor: "#f6f7f8", pageParam:{id:api.pageParam.id}})}
 // 发起咨询
 function openLaunch(id,name,type,money){myApp.openWin({hideHead:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:type, id:id, uid:id, name:name, money:money}})}
 </script>

@@ -30,7 +30,7 @@
             <div class="name fs-14 b"></div>
             <div class="df ai-c mt-4">
                 <span class="zxnum fs-12 c-aa"></span>
-                <span class="star-num c-yellow fs-12"></span>
+                <span class="star-num c-yellow fs-12 hide"></span>
             </div>
             <div class="detail mt-4 two-hide fs-12 c-33"></div>
         </div>
@@ -93,6 +93,7 @@ function getData(){
         method: "get",
         data: {hfuid:api.pageParam.hfuid, type:api.pageParam.type},
         success(data){
+            // console.log(JSON.stringify(data));
             loading = false;
             api.refreshHeaderLoadDone();
             if(Number(page)<=1){ul.empty();dataList=[];}

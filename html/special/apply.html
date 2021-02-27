@@ -117,7 +117,12 @@ function submit(){
     });
 }
 // 添加封面
-function addFmimg(){myApp.upImg(false, function(url){fmUrl = url});}
+function addFmimg(){
+    myApp.upImg(false, function(url){
+        fmUrl = url;
+        $("#form .fmimg").attr("src",fmUrl);
+    });
+}
 </script>
 </body>
 </html>

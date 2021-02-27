@@ -65,7 +65,7 @@ function getData(){
             if(!data.list || !data.list.length){ul.append('<div class="empty fs-14 c-99 txt-c">暂无数据</div>'); return}
             for(var i=0; i<data.list.length; i++){
                 var o = data.list[i];
-                ul.append('<div class="li df ai-c '+ (o.sta==1?'disabled':'') +'" data-id="'+ o.id +'" data-txt="'+ (o.time+' '+o.week) +'" tapmode="touch-style">'+
+                ul.append('<div class="li df ai-c '+ (o.sta==0?'':'disabled') +'" data-id="'+ o.id +'" data-txt="'+ (o.time+' '+o.week) +'" tapmode="touch-style">'+
                     '<div class="fc df df-c">'+
                         '<div class="df ai-c">'+
                             '<span>'+ o.time +' '+ o.week +' '+ getWord(o.shiduan) +'</span>'+
@@ -73,7 +73,7 @@ function getData(){
                         '</div>'+
                         '<div class="mt-4 c-99">已预约'+ o.ynum +'/'+ o.num +'</div>'+
                     '</div>'+
-                    '<div class="status fs-12 c-99">'+ (o.sta==1?'已满':'可选') +'</div>'+
+                    '<div class="status fs-12 c-99">'+ (o.sta==1?'已满':(o.sta==0?'可选':'已过期')) +'</div>'+
                 '</div>');
             }
             api.parseTapmode();

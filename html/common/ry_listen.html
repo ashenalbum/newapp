@@ -50,6 +50,7 @@ var yyid = null;
 apiready = function(){
     document.getElementById("time").style.marginTop = api.safeArea.top + "px";
     myApp.hasPermission(['microphone','camera']);
+    RY.rong.setSpeakerEnabled({speakerEnabled: true});
     setEvent();
 }
 function setEvent(){

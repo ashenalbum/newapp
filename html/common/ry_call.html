@@ -49,7 +49,7 @@ apiready = function(){
 function setEvent(){
     RY.init();
     RY.startCall(api.pageParam.ryid, api.pageParam.mediaType, api.pageParam.yyid);
-
+    RY.rong.setSpeakerEnabled({speakerEnabled: true});
     api.addEventListener({
         name: 'keyback'
     }, function(){off()});

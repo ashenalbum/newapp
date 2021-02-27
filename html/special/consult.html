@@ -107,14 +107,14 @@ function init(){
         getData();
         over = false;
         page = 1;
-        getList();
+        pageTab==1?getList():getTimeline();
     });
     api.addEventListener({name: 'myconsultlist'}, function(ret, err){
         setTimeout(function(){
             getData();
             over = false;
             page = 1;
-            getList();
+            pageTab==1?getList():getTimeline();
         },1000);
     });
 
@@ -291,6 +291,7 @@ function getTimeline(){
         method: "get",
         data: {time:selTime},
         success(data){
+            // console.log(JSON.stringify(data))
             api.refreshHeaderLoadDone();
             if(data.errcode!=0 && data.errcode!=200){return}
             var dom = $("#timelinebox").empty();

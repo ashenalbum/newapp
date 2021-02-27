@@ -129,7 +129,7 @@ span{display:inline;}
 .videolist .swiper-container .swiper-slide .img{display:block; width:158px; height:98px; border-radius:5px; background:#f4f4f4;}
 .videolist .swiper-container .swiper-slide .title{padding-left:4px; line-height:20px;}
 
-.newslist .news{border-bottom:1px solid #EBEBEB; padding:12px 0;}
+.newslist .news{border-bottom:thin solid #EBEBEB; padding:12px 0;}
 .newslist .news:last-child{border-bottom:none;}
 .newslist .news .hot{border:thin solid #FF3E47; color:#FF3E47; line-height:12px; border-radius:2px; font-size:10px; padding:0 3px; margin-right:6px;}
 .newslist .news.type1 .img{display:block; margin-left:16px; width:108px; height:76px; background:#f6f7f8; border-radius:6px;}
@@ -138,11 +138,11 @@ span{display:inline;}
 .newslist .news.type2 .img:last-child{border-radius:0 6px 6px 0;}
 .newslist .news.type3 .img{display:block; width:100%; height:auto; border-radius:6px;}
 
-.kanwulist .kanwu{border-bottom:1px solid #EBEBEB; padding:6px 0;}
+.kanwulist .kanwu{border-bottom:thin solid #EBEBEB; padding:6px 0;}
 .kanwulist .kanwu:last-child{border-bottom:none;}
 .kanwulist .kanwu .img{width:100px; height:130px; margin-right:12px; background:#f6f7f8; border-radius:6px;}
 .kanwulist .kanwu .txts{padding:4px 0;}
-.kanwulist .kanwu .txts .tab span{display:inline-block; padding:0 4px; border-right:1px solid;}
+.kanwulist .kanwu .txts .tab span{display:inline-block; padding:0 4px; border-right:thin solid;}
 .kanwulist .kanwu .txts .tab span:last-child{border-right:none;}
 
 .load-more{height:24px;}

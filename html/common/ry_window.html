@@ -21,6 +21,9 @@ apiready = function(){
     // type:'listen' / 'call'
     // media: 'audio' / 'video'
     // uid: uid
+    api.addEventListener({name:'viewdisappear'},function(){
+        setTimeout(function(){api.closeWin({name:api.winName})},300);
+    });
     var url = api.pageParam.type=="listen"?"./ry_listen.html":"./ry_call.html";
     var yyid = api.pageParam.type=="listen" && $api.getStorage('callExtra');
     if(!api.pageParam.yyid){api.pageParam.yyid = yyid}
