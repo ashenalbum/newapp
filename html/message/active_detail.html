@@ -38,7 +38,7 @@ function getData(){
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             if(!data.data){return}
-            data.data.img && $("#topimg").attr("src",data.data.img).removeClass("hide");
+            // data.data.img && $("#topimg").attr("src",data.data.img).removeClass("hide");
             $("#title").text(data.data.title);
             $("#look").text("浏览量："+(data.data.looknum||0));
             $("#addtime").text("发布时间："+data.data.addtime);

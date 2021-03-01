@@ -60,7 +60,7 @@ function openSecurity(){myApp.openWin({title:"账户安全", needLogin:true, url
 function openCharge(){
     if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
     var userData = myApp.getUserData().uinfo;
-    if(userData.groupid!==2){
+    if(userData.groupid!='2'){
         myApp.alert({content: "您还未通过专家申请"});
         return;
     }

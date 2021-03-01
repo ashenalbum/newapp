@@ -89,7 +89,7 @@ function getData(){
     myApp.ajax({
         url: "/api/member/member/chongzhi",
         method: "get",
-        loading: false,
+        // loading: false,
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             dataList = data.list;

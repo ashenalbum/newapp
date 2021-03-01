@@ -154,6 +154,7 @@ function funIniGroup(){
 }
 // 随意切换按钮
 function randomSwitchBtn( tag , id) {
+    if(id==1){myApp.alert({content:"! ! !"}); return}
     if(tag == $api.dom('#footer li.active')){return};
     $('#header .header').eq(id).removeClass('hide').siblings().addClass('hide');
     $('#footer li').eq(id).addClass('active').siblings().removeClass('active');

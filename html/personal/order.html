@@ -50,6 +50,7 @@
                 <div class="swiper-slide active" data-id="0">全部订单</div>
                 <div class="swiper-slide" data-id="1">已预约</div>
                 <div class="swiper-slide" data-id="2">待付款</div>
+                <div class="swiper-slide" data-id="3">待评价</div>
                 <div class="swiper-slide" data-id="4">已完成</div>
                 <div class="i"></div>
             </div>
@@ -87,6 +88,7 @@ function setEvent(){
         if(ts.data('id') == id){return}
         id = ts.data('id');
         ts.addClass("active").siblings().removeClass("active");
+        mySwiper && mySwiper.slideTo(ts.index(),360,false);
 
         var left = ts.get(0).offsetLeft;
         var width = ts.width();
@@ -98,13 +100,14 @@ function setEvent(){
     });
 
     (function(){
+        if(mySwiper){mySwiper.destroy(false)}
+        mySwiper = new Swiper('#menuswiper', {slidesPerView :'auto'});
+
         if(api.pageParam.id){
             id = api.pageParam.id;
             $("#menuswiper .swiper-slide[data-id='"+ id +"']").addClass("active").siblings().removeClass("active");
+            mySwiper && mySwiper.slideTo(api.pageParam.id,360,false);
         }
-
-        if(mySwiper){mySwiper.destroy(false)}
-        mySwiper = new Swiper('#menuswiper', {slidesPerView :'auto'});
 
         var ts = $("#menuswiper .swiper-slide.active");
         var left = ts.get(0).offsetLeft;
@@ -133,6 +136,7 @@ function setEvent(){
     });
 }
 function getList(){
+    var getid = id;
     if(loading || over){return}
     loading = true;
     loadmore.removeClass("over").addClass("load");
@@ -140,8 +144,9 @@ function getList(){
         url: "/api/member/member/getorderlist",
         method: "get",
         loading: page==1,
-        data: {type:id, page:page},
+        data: {type:getid, page:page},
         success(data){
+            if(getid!=id){return}
             loading = false;
             api.refreshHeaderLoadDone();
             if(Number(page)<=1){ul.empty();dataList=[];}
@@ -154,6 +159,7 @@ function getList(){
             }
             for(var i in data.list){
                 var o = data.list[i];
+                o.getid = getid;
                 switch(Number(o.type)){
                     case 1:addJournal(o); break; // 杂志
                     case 2:addJournalQk(o); break; // 期刊
@@ -291,7 +297,7 @@ function addVideo(o){
             '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
         '</div>';
     }
-    ul.append('<div class="li video">'+
+    ul.append('<div class="li video" '+ (o.getid==3 && o.yyid?'onclick="toPingjia('+ o.yyid +')"':'') +'>'+
         getTitle(o.type)+
         '<div class="df df-c pd-8">'+
             '<div class="df ai-c just-c-bet c-66">'+
@@ -316,7 +322,7 @@ function addAudio(o){
             '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
         '</div>';
     }
-    ul.append('<div class="li video">'+
+    ul.append('<div class="li video" '+ (o.getid==3 && o.yyid?'onclick="toPingjia('+ o.yyid +')"':'') +'>'+
         getTitle(o.type)+
         '<div class="df df-c pd-8">'+
             '<div class="df ai-c just-c-bet c-66">'+
@@ -359,8 +365,9 @@ function addVip(o){
 function orderStatus(status){
     switch(Number(status)){
         case 0: return "未完成";
-        case 1: return "待评价";
-        case 2: return "已完成";
+        case 1: return "已完成";
+        case 2: return "已预约";
+        case 3: return "待评价";
     }
     return "";
 }
@@ -414,6 +421,8 @@ function toBook(e){
     var title = ts.data("title");
     myApp.openWin({title:title, url:"/html/journal/book.html", pageParam:{id:id, title:title}});
 }
+// 评价
+function toPingjia(yyid){myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}})}
 </script>
 </body>
 </html>

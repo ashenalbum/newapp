@@ -128,7 +128,7 @@ function setEvent(){
     // 点击 Banner
     $(document.body).on("click",".tapbanner",function(){
         var ts = $(this);
-        myApp.openBanner(ts.data('type'), ts.data('data'))
+        myApp.openBanner(ts.data('type'), ts.data('data'));
     });
     // 分类
     $("#menuswiper").on("click",".swiper-slide",function(){
@@ -149,6 +149,7 @@ function setEvent(){
         $("#loadmore").removeClass("load over");
         getList();
     });
+    // 菜单置顶
     (function(){
         var menu = $("#menu");
         var doc = $(window);

@@ -14,11 +14,13 @@
         .btns .btn{height:100px; min-width:64px;}
         .btns .btn .img{display:block; width:56px; height:56px;}
         #time{position:absolute; left:10px; top:10px; padding:8px 16px; background:rgba(0,0,0,0.5); color:#ffffff; font-size:14px;}
+        #text{position:absolute; left:0; right:0; top:36%;}
     </style>
 </head>
 <body class="df df-c">
     <div id="header"></div>
     <div id="time">00 : 00</div>
+    <div id="text" class="fs-28 c-ff txt-c">预约专家来电</div>
     <div class="btns df just-c-aro fs-14 c-ff">
         <div id="btn1" class="btn fc df df-c ai-c hide">
             <img src="../../image/rong/call3.png" class="img" onclick="changeCamera()"/>
@@ -37,8 +39,8 @@
     </div>
 </body>
 <script type="text/javascript" src="../../script/api.js"></script>
-<script type="text/javascript" src="../../script/common.js"></script>
 <script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
 <script type="text/javascript" src="../../script/rong.js"></script>
 <script>
 var jtTime = 0;
@@ -50,14 +52,12 @@ var yyid = null;
 apiready = function(){
     document.getElementById("time").style.marginTop = api.safeArea.top + "px";
     myApp.hasPermission(['microphone','camera']);
-    RY.rong.setSpeakerEnabled({speakerEnabled: true});
     setEvent();
 }
 function setEvent(){
     RY.init();
-    api.addEventListener({
-        name: 'keyback'
-    }, function(){off()});
+    RY.rong.setSpeakerEnabled({speakerEnabled: true});
+    api.addEventListener({name: 'keyback'}, function(){off()});
     // 挂断
     api.addEventListener({name: 'ronghangup'}, function(ret, err){
         api.toast({msg: '通话结束',global:true});
@@ -98,7 +98,7 @@ function setEvent(){
     // 接通
     api.addEventListener({name: 'rongacceptok'}, function(ret, err){
         if( !ret ){api.toast({msg:JSON.stringify( err ), global:true});return}
-        jtTime = Date.now();
+        jtTime = parseInt(Date.now() / 1000);
         startTime();
         RY.rong.getCallSession(function(ret){
             yyid = ret && ret.extra;
@@ -161,13 +161,17 @@ function jieting(){
         mediaType:api.pageParam.mediaType,
         callId:api.pageParam.id
     });
+    $("#text").addClass("hide");
     $("#btn3").addClass("hide");
     $("#btn1").removeClass("hide");
     $("#btn4").removeClass("hide");
-    jtTime = Date.now();
+    jtTime = parseInt(Date.now() / 1000);
 }
 // 挂断
-function off(){RY.rong.hangup()}
+function off(){
+    $("#text").addClass("hide");
+    RY.rong.hangup();
+}
 // 静音
 function setMuted(){
     RY.rong.setMuted({muted:sound},function(ret){});
@@ -184,8 +188,8 @@ function changeCamera(){
 }
 // 评价
 function toEvaluate(){
-    api.sendEvent({name: 'toEvaluate', extra: {yyid:yyid}});
-    myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}})
+    // api.sendEvent({name: 'toEvaluate', extra: {yyid:yyid}});
+    myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}});
 }
 </script>
 </html>

@@ -112,6 +112,7 @@ function setEvent(){
         var ts = $(this);
         if(ts.hasClass("active")){return}
         ts.addClass("active").siblings().removeClass("active");
+        mySwiper && mySwiper.slideTo(api.pageParam.id,360,false);
 
         var left = ts.get(0).offsetLeft;
         var width = ts.width();
