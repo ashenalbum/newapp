@@ -177,7 +177,7 @@ function setEvent(){
         }
     });
     // 点击 Banner
-    $(document.body).on("click",".tapbanner",function(){
+    $("#swiper").on("click",".tapbanner",function(){
         var ts = $(this);
         myApp.openBanner(ts.data('type'), ts.data('data'));
     });

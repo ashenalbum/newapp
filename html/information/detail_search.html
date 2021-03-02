@@ -77,7 +77,7 @@ apiready = function(){
     getData();
 }
 function setEvent(){
-    $(document.body).on("click",".keywords",function(){
+    $("#hot").on("click",".keywords",function(){
         key = $(this).data('key');
         $("#search").val(key);
         submit();

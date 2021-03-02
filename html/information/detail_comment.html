@@ -13,12 +13,12 @@
         .ul .li .icon{display:block; width:46px; height:46px; border-radius:50%; margin-right:14px; background:#f5f6f7;}
         .ul .li .zan{display:inline-block; height:18px; line-height:20px; padding:4px 0 4px 22px; background:url(../../image/information/zan.png) no-repeat left center; background-size:16px 16px;}
         .ul .li .zan.active{background-image:url(../../image/information/zan_act.png); color:#FEB533;}
-        
+
         .ul .li .txt{line-height:18px; white-space:pre-line; word-break:break-all;}
     </style>
 </head>
 <body>
-    <div class="ul fs-14"></div>
+    <div id="ul" class="ul fs-14"></div>
     <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
         <img src="../../image/common/loading_more.gif" class="img" alt="" />
         <span class="loadtxt">加载中……</span>
@@ -32,6 +32,7 @@
 var page = 1;
 var over = false;
 var loading = false;
+var ul = $("#ul");
 var dataList = [];
 var loadmore = $("#loadmore");
 
@@ -66,7 +67,7 @@ function setEvent(){
         getData();
     });
 
-    $(document.body).on("click",".zan",function(){
+    ul.on("click",".zan",function(){
         var ts = $(this);
         if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
         zan(ts.parents(".li").data('id'),ts);
@@ -85,7 +86,6 @@ function getData(){
         success(data){
             loading = false;
             api.refreshHeaderLoadDone();
-            var ul = $(document.body).children(".ul");
             if(Number(page)<=1){ul.empty();dataList=[];}
             page++;
             loadmore.removeClass("load");

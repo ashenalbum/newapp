@@ -48,18 +48,14 @@ apiready = function(){
     init();
 }
 function init(){
-    var date = new Date();
-    var month = date.getMonth()+1;
-    var day = date.getDate();
-    month = month<10?'0'+month:month;
-    day = day<10?'0'+day:day;
-    $("#date").html(date.getFullYear()+"-"+month+"-"+day);
+    $("#date").html(getNow());
 }
 function selDate(){
     api.openPicker({
         type: 'date',
         date: new Date().toLocaleDateString().replace(/\//g,"-"),
-        title: '选择时间'
+        title: '选择时间',
+        minDate: getNow() + " 00:00"
     }, function(ret, err) {
         if (!ret) {return}
         var month = ret.month<10?"0"+ret.month:ret.month;
@@ -97,6 +93,14 @@ function submit(){
             api.closeWin();
         }
     });
+}
+function getNow(){
+    var date = new Date();
+    var month = date.getMonth()+1;
+    var day = date.getDate();
+    month = month<10?'0'+month:month;
+    day = day<10?'0'+day:day;
+    return date.getFullYear()+"-"+month+"-"+day;
 }
 </script>
 </body>

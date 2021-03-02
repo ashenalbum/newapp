@@ -117,7 +117,7 @@ function setEvent(){
         var ts = $(this);
         myApp.openBanner(ts.data('type'), ts.data('data'))
     });
-    $(document.body).on("click",".to-detail",function(e){
+    ul.on("click",".to-detail",function(e){
         var ts = $(this);
         var id = ts.data("id");
         if($(e.target).hasClass("to-launch")){toLaunch(id,ts.data("name")); return}

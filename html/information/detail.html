@@ -31,6 +31,10 @@
         .bottom.focus .ic{display:none;}
         .bottom.focus .send{display:block; height:32px; line-height:32px; padding:0 8px;}
 
+        .text-box{position:absolute; bottom:0; left:0; right:0; padding:10px 10px 18px; border-top:1px solid #f6f7f8; background:#ffffff; z-index:999;}
+        .text-box .iptbtn{padding:5px 8px; height:20px; line-height:20px; border-radius:4px;}
+        .text-box .textarea{background:#f6f7f8; border-radius:8px; line-height:20px; height:80px; box-sizing:border-box; padding:10px; resize:none;}
+
         .mask.animate .cont{animation:upshow 0.3s linear; -webkit-animation:upshow 0.3s linear;}
         @keyframes upshow{0%{bottom:-120px;}100% {bottom:0;}}
         @-webkit-keyframes upshow {0%{bottom:-120px;}100%{bottom:0;}}
@@ -43,7 +47,7 @@
     </style>
 </head>
 <body class="df df-c">
-    <div class="fc pr">
+    <div id="content" class="fc pr">
         <div class="htmlscroll">
             <div id="title" class="title fs-24 margin"></div>
             <div id="info" class="info mt-12 df ai-c margin">
@@ -58,14 +62,23 @@
         </div>
     </div>
     <div id="bottom" class="bottom df ai-c">
-        <!-- <input id="plinput" type="text" class="fc ipt" placeholder="我来说两句"/> -->
         <div class="fc ipt">
-            <textarea id="plinput" name="name" rows="1" class="textarea" placeholder="我来说两句"></textarea>
+            <input id="plinput" readonly="true" class="textarea" placeholder="我来说两句"></textarea>
         </div>
         <div class="send fs-16" onclick="comment()">发送</div>
         <div class="ic ic-comment" onclick="openComment()"><i id="plnum" class="badge" data-num=""></i></div>
         <div id="save" class="ic ic-save"></div>
         <div class="ic ic-share" onclick="openMask()"></div>
+    </div>
+    <div id="textbox" class="mask hide">
+        <div class="bg" onclick="closeComment()"></div>
+        <div class="text-box df df-c">
+            <div class="df ai-c just-c-bet">
+                <span class="iptbtn iptbtn-esc fs-16" tapmode="touch-style" onclick="closeComment()">取消</span>
+                <span class="iptbtn iptbtn-ok fs-16 c-red" tapmode="touch-style">发送</span>
+            </div>
+            <textarea class="textarea mt-8" rows="3" placeholder="我来说两句"></textarea>
+        </div>
     </div>
     <div id="mask" class="mask hide">
         <div class="bg" onclick="closeMask()"></div>
@@ -101,13 +114,19 @@ apiready = function(){
 }
 function setEvent(){
     api.addEventListener({name: 'loginok'},getData);
-    $("#bottom .textarea").on("focus",function(){
-        $(this).parents(".bottom").addClass("focus");
-    }).on("blur",function(){
-        var ts = $(this);
-        setTimeout(function(){
-            ts.parents(".bottom").removeClass("focus");
-        },300);
+
+    var textbox = $("#textbox");
+    var bottom = $("#bottom");
+    bottom.find(".textarea").on("click",function(){
+        bottom.addClass("hide");
+        textbox.removeClass("hide").find("textarea").focus();
+    });
+    textbox.find(".iptbtn-ok").on("click",function(){
+        if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+        var val = textbox.find(".textarea").val();
+        if(!val){api.toast({msg:"请输入评论内容"});return}
+        closeComment();
+        comment(val);
     });
     $("#save").on("click",function(){
         if(!hasData){api.toast({msg:"error"}); return}
@@ -123,7 +142,7 @@ function setEvent(){
                 ts[data.scsta==1?'addClass':'removeClass']("active scale-animate");
                 api.toast({msg: data.scsta==1?"已收藏":"已取消收藏"});
             }
-        })
+        });
     });
 
     $("#info").on("click",function(e){
@@ -148,7 +167,7 @@ function setEvent(){
         openExpertDetail(false,authorid);
     });
     // 点击显示图片
-    $("#html").on("click","img",function(){myApp.showImg(this.src)});
+    $("#content").on("click","#html img",function(){myApp.showImg(this.src)});
 }
 function getData(){
     myApp.ajax({
@@ -195,10 +214,7 @@ function openComment(){
     });
 }
 // 评论
-function comment(){
-    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
-    var val = $("#plinput").val();
-    if(!val){setTimeout(function(){api.toast({msg:"请输入评论内容"})},300);return}
+function comment(val){
     myApp.ajax({
         url: "/api/news/news/newspl",
         method: "post",
@@ -207,7 +223,7 @@ function comment(){
             if(data.errcode!=0 && data.errcode!=200){return}
             setTimeout(function(){
                 api.toast({msg: '评论成功'});
-                $("#plinput").val("");
+                $("#textbox .textarea").val("");
                 var plum = $("#plnum");
                 var num = Number(plum.data('num')) + 1;
                 plum.removeClass("hide").html(num).data("num",num);
@@ -253,6 +269,11 @@ function openMask(){$("#mask").removeClass("hide").addClass("animate")}
 function closeMask(){$("#mask").addClass("hide").removeClass("animate")}
 // 专家详情
 function openExpertDetail(id,uid){myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{id:id, uid:uid}})}
+// 关闭评论
+function closeComment(){
+    $("#textbox").addClass("hide");
+    $("#bottom").removeClass("hide");
+}
 </script>
 </body>
 </html>
