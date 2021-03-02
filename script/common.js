@@ -25,7 +25,12 @@ myApp.ajax = function(obj){
         api.hideProgress();
         if(ret){
             if(obj.alert!==false && ret.errcode!=200 && ret.errcode!=0 ){api.toast({msg:ret.msg, global:true});}
-            if(ret.errcode==1001){setTimeout(function(){myApp.openWin({title:"实名认证", needLogin:true, url:"/html/personal/realname.html"})},300)}
+            if(ret.errcode==1001){setTimeout(function(){
+                myApp.openWin({title:"实名认证", needLogin:true, url:"/html/personal/realname.html"});
+            },300)}
+            if(data.errcode==201){setTimeout(function(){
+                myApp.openWin({title:"我的钱包", needLogin:true, url:"/html/personal/wallet.html", headColor:"#f6f7f8"});
+            },300)}
             obj.success && obj.success(ret);
         }else{
             api.toast({msg: '请求失败,稍后再试'});

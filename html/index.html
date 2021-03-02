@@ -168,8 +168,11 @@ function setEvent(){
         var val = activityArr[ts.data('id')].value;
         if(!val || typeof val!="object"){return}
         if(val.type && val.url){
-            if(val.type == 'window'){api.openWin({name: val.data.match(/([^/]+\/[^/]+)(.html)$/)[1].replace("/","_"), url:val.url}); return}
-            if(val.type == 'frame'){myApp.openFrame(val); return}
+            if(val.type == 'window'){
+                api.openWin({name: val.data.match(/([^/]+\/[^/]+)(.html)$/)[1].replace("/","_"), url:val.url});
+                myApp.openWin({title:val.title, url:val.url, hadeAll:val.hadeAll});
+                return;
+            }
             myApp.openBanner(val.type, val.url);
         }
     });
@@ -400,6 +403,8 @@ function openJournalDetail(id){myApp.openWin({title:"报刊介绍", url: "/html/
 function openMoreJournal(){myApp.openWin({title:"更多报刊", url:"/html/journal/more.html"})}
 // 学习平台
 function openStudy(id){
+    myApp.alert({content:"! ! !"});
+    return;
     var o = {title:id?"课程":"学习视频", url:"/html/study/"+(id?"list":"index")+".html", headColor:id?"#f6f7f8":"#ffffff", pageParam:{id:id}};
     myApp.openWin(o);
 }

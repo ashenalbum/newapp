@@ -156,7 +156,10 @@ function getData(){
         method: 'get',
         data: {id: api.pageParam.id},
         success(data){
-            if(data.errcode!=0 && data.errcode!=200){return}
+            if(data.errcode!=0 && data.errcode!=200){
+                setTimeout(function(){api.closeWin()},600);
+                return
+            }
             hasData = true;
             if(Number(data.count)>0){
                 var num = Number(data.count);

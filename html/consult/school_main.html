@@ -38,7 +38,10 @@ function getData(){
         method: "get",
         data: {id:api.pageParam.id},
         success(data){
-            if(data.errcode!=0 && data.errcode!=200){return}
+            if(data.errcode!=0 && data.errcode!=200){
+                setTimeout(function(){api.closeWin()},600);
+                return;
+            }
             if(data.data && data.data.title){
                 schoolName = data.data.title;
                 api.execScript({name:api.winName, script: 'changeTitle("'+ data.data.title +'");'});

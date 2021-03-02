@@ -106,6 +106,7 @@ function getData(){
         method: "get",
         data: {type:3, type2:type2},
         success(data){
+            // console.log(JSON.stringify(data))
             loading = false;
             api.refreshHeaderLoadDone();
             if(Number(page)<=1){ul.empty();dataList=[];}
@@ -136,16 +137,16 @@ function getData(){
             }else{
                 for(var i in data.list){
                     var o = data.list[i];
-                    ul.append('<div class="li df ">'+
-                        '<img src="../../image/common/test.jpg" class="img" alt="" />'+
-                        '<div class="df df-c just-c-bet">'+
-                            '<div class="two-hide">9月7号专科批志愿线上填报9月7号专科批志愿线上填报</div>'+
-                            '<div class="df ai-c just-c-bet fs-12 c-red b">'+
-                                '<span>订购成功</span>'+
-                                '<span class="price">123贝</span>'+
-                            '</div>'+
-                        '</div>'+
-                    '</div>');
+                    // ul.append('<div class="li df ">'+
+                    //     '<img src="../../image/common/test.jpg" class="img" alt="" />'+
+                    //     '<div class="df df-c just-c-bet">'+
+                    //         '<div class="two-hide">9月7号专科批志愿线上填报9月7号专科批志愿线上填报</div>'+
+                    //         '<div class="df ai-c just-c-bet fs-12 c-red b">'+
+                    //             '<span>订购成功</span>'+
+                    //             '<span class="price">123贝</span>'+
+                    //         '</div>'+
+                    //     '</div>'+
+                    // '</div>');
                 }
             }
         }
@@ -155,7 +156,7 @@ function getData(){
 function getStatus(status){
     switch(Number(status)){
         case 0: return "未完成";
-        case 1: return "待评价";
+        case 1: return "已完成";
         case 2: return "已完成";
     }
     return "";

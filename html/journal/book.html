@@ -278,7 +278,7 @@ function subscribe(id,type,money,callback){
         method: "get",
         data:{id:id, type:type, money:money},
         success(data){
-            if(data.errcode==201){setTimeout(openWallet,300)}
+            // if(data.errcode==201){setTimeout(openWallet,300)}
             if(data.errcode!=200 && data.errcode!=0){return}
             var orderId = data.data.id;
             myApp.inputPayPwd(function(password){

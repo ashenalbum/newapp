@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="../../css/input.css"/>
     <style>
         body{box-sizing:border-box; padding:10px 16px; background:#f6f7f8;}
-        .card{position:relative; height:140px; padding:0 30px; background:#FF3942; border-radius:10px; overflow:hidden;}
+        .card{position:relative; height:140px; padding:0 26px; background:#FF3942; border-radius:10px; overflow:hidden;}
         .card::before{content:" "; position:absolute; width:200px; height:200px; border-radius:50%; right:-30px; top:-80px; background:linear-gradient(rgba(255,255,255,1), rgba(255,255,255,0)); opacity:0.6;}
         .card>*{position:relative; z-index:1;}
         .card .bei{display:block; width:18px; height:18px; margin-right:14px;}
@@ -149,7 +149,7 @@ function getData(){
     myApp.ajax({
         url: "/api/member/member/getmoney",
         method: "get",
-        loading: false,
+        // loading: false,i
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             if(data.money){$("#yue").html(data.money)}

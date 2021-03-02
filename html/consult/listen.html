@@ -88,7 +88,7 @@ function createOrder(){
         method: "get",
         data: {id:api.pageParam.id},
         success(data){
-            if(data.errcode==201){setTimeout(openWallet,300)}
+            // if(data.errcode==201){setTimeout(openWallet,300)}
             if(data.errcode!=0 && data.errcode!=200){return}
             pay(data.data.id);
         }
