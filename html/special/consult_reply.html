@@ -14,6 +14,7 @@
         .lh-18{line-height:18px;}
         .textarea{display:block; padding:10px 8px; font-size:14px; line-height:1.4; background:#f6f7f8; border-radius:4px; resize:none;}
         .submit{width:100%; height:40px; border-radius:4px; background:#FF3942;}
+        .img{display:block; max-width:100%;}
     </style>
 </head>
 <body class="df df-c">
@@ -33,6 +34,10 @@ apiready = function(){
 }
 function setEvent(){
     api.setStatusBarStyle({style: 'dark'});
+    $("#cont").on("click",".img",function(){
+        var src = $(this).attr("src");
+        myApp.showImg(this.src);
+    });
 }
 function getData(){
     myApp.ajax({

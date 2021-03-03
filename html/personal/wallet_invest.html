@@ -144,16 +144,19 @@ function getOrder(obj){
 }
 // 微信支付 1049
 function wxPay(orderObj){
+    console.log(JSON.stringify(orderObj))
     wxPayPlus.payOrder({
         apiKey: orderObj.appid,
         orderId: orderObj.prepayid,
-        mchId: "1483571312",
+        mchId: orderObj.partnerid,
         nonceStr: orderObj.noncestr,
         timeStamp: orderObj.timestamp,
         package: orderObj.package,
         sign: orderObj.sign
-    }, function(retp, err) {
-        if (retp && retp.status) {
+    }, function(ret, err) {
+        alert(JSON.stringify(ret))
+        alert(JSON.stringify(err))
+        if (ret && ret.status) {
             api.toast({msg:'支付成功', global:true});
             api.closeWin();
         } else {

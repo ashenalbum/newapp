@@ -47,7 +47,7 @@
     <div id="header">
         <div class="header header1 df ai-c just-c-ct">
             <span class="fs-16 b c-33">山西教育综合门户</span>
-            <i id="buyurl" class="ic"></i>
+            <i class="ic" onclick="toShopUrl()"></i>
         </div>
         <div class="header header2 df ai-c just-c-ct hide"><span class="fs-16 b c-33">即刻</span></div>
         <div class="header header3 df ai-c just-c-ct hide"><span class="fs-16 b c-33">消息</span></div>
@@ -69,6 +69,8 @@
 <script type="text/javascript" src="script/common.js"></script>
 <script type="text/javascript" src="script/rong.js"></script>
 <script type="text/javascript">
+var shopUrl = "";
+
 apiready = function () {
     api.setStatusBarStyle({style:'dark', color:'transparent'});
     $api.fixTabBar($api.byId('footer'));
@@ -82,7 +84,7 @@ apiready = function () {
 function setEvent(){
     // 状态栏颜色
     api.addEventListener({name:'viewappear'},function(){api.setStatusBarStyle({style: 'dark'})});
-
+    api.addEventListener({ name: 'setShopUrl' }, function(ret, err){ shopUrl = ret && ret.value && ret.value.url });
     if(myApp.isLogin()){
         RY.init(true);
         RY.login(function(){
@@ -181,7 +183,10 @@ function setGroupSize(){
     });
 }
 // 首页跳转url
-function setShopUrl(url){$("#buyurl").on("click",function(){myApp.openUrl(url)})}
+function toShopUrl(){
+    if(!shopUrl){return}
+    myApp.openUrl(shopUrl);
+}
 // 退出app
 function exitApp(){
     api.addEventListener({

@@ -98,6 +98,10 @@ function setEvent(){
 }
 function getData(){
     var type2 = type;
+    if(type2==2){
+        myApp.alert({content:"课程功能开发中"});
+        return;
+    }
     if(loading || over){return}
     loading = true;
     loadmore.removeClass("over").addClass("load");
@@ -120,7 +124,7 @@ function getData(){
             if(type2==1){
                 for(var i in data.list){
                     var o = data.list[i];
-                    ul.append('<div class="kanwu df">'+
+                    ul.append('<div class="kanwu df" data-sataus="">'+
                         '<img src="'+ o.zimg +'" class="img" />'+
                         '<div class="txts f1 df df-c just-c-bet">'+
                             '<div>'+

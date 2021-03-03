@@ -208,7 +208,8 @@ function getData(){
         success(data){
             api.refreshHeaderLoadDone();
             if(data.errcode!=200){return}
-            if(data.shop){api.execScript({ name:'root', script:'setShopUrl("'+data.shop+'")'})}
+            if(data.shop){ api.sendEvent({name: 'setShopUrl', extra: {url:data.shop}}) }
+
             var dom = $("#types>.li");
             for(var i in data.data){
                 var li = dom.eq(i);
@@ -417,7 +418,11 @@ function openConsult(id,title){
     }
 }
 // 视频
-function openVideo(id){myApp.openWin({ hideHead:true, url:'/html/study/detail.html', pageParam:{id:id}})}
+function openVideo(id){
+    myApp.alert({content:"! ! !"});
+    return;
+    myApp.openWin({ hideHead:true, url:'/html/study/detail.html', pageParam:{id:id}})
+}
 // 旁听
 function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
 </script>

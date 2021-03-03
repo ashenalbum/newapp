@@ -147,51 +147,87 @@ myApp.inputPayPwd = function(callback,title){
         });
         return;
     }
-    var paymentDialog = api.require('paymentDialog');
-    var param = {styles:{titleText:title||"请输入支付密码", titleTextSize:20, forgetText:" "}};
-    paymentDialog.show(param,function(ret){
-        paymentDialog.hide();
-        if(ret.event != 'onFinish'){return}
-        callback && callback(ret.content);
-    });
+    var reqPaymentDialog = api.require('paymentDialog');
+    if(reqPaymentDialog && api.systemType=="android"){
+        var param = {styles:{titleText:title||"请输入支付密码", titleTextSize:20, forgetText:" "}};
+        reqPaymentDialog.show(param,function(ret){
+            reqPaymentDialog.hide();
+            if(ret.event != 'onFinish'){return}
+            callback && callback(ret.content);
+        });
+    }else{
+        myApp.getStyle("/css/paymentDialog.css");
+        myApp.getScript("/script/paymentDialog.js",function(){
+            var paydialog = new paymentDialog(function (ret,err) {
+                var pwd = ret.password;
+                paydialog.close();
+                callback && callback(pwd);
+            });
+            paydialog.open();
+        });
+    }
 }
 // 设置支付密码
 myApp.setPayPwd = function(callback){
     if(!this.login()){return}
     var pwd = "";
     var qrpwd = "";
-    var paymentDialog = api.require('paymentDialog');
     var param = {styles:{titleText:"请设置支付密码", titleTextSize:20, forgetText:" "}};
-    paymentDialog.show(param,function(ret){
-        paymentDialog.hide();
-        if(ret.event != 'onFinish'){return}
-        pwd = ret.content;
-        param.styles.titleText = "请再次确认密码";
-        setTimeout(function(){
-            paymentDialog.show(param,function(ret){
-                paymentDialog.hide();
-                if(ret.event != 'onFinish'){return}
-                qrpwd = ret.content;
-                if(pwd!=qrpwd){api.toast({msg:"设置失败，两次密码不一致", duration:2600});return}
-                myApp.ajax({
-                    url: "/api/home/Common/setpaypwd",
-                    method: "get",
-                    data: {password: pwd},
-                    success(data){
-                        if(data.errcode!=0 && data.errcode!=200){return}
-                        api.toast({msg:"设置成功，请牢记密码！", global:true});
-
-                        var userData = myApp.getUserData();
-                        userData.uinfo.paypwd = true;
-                        $api.rmStorage('userData');
-                        $api.setStorage('userData', userData);
-
-                        callback && callback();
-                    },
-                    error(){api.toast({msg:"error"})}
+    var reqPaymentDialog = api.require('paymentDialog'); // 1049
+    if(reqPaymentDialog && api.systemType=="android"){
+        reqPaymentDialog.show(param,function(ret){
+            reqPaymentDialog.hide();
+            if(ret.event != 'onFinish'){return}
+            pwd = ret.content;
+            param.styles.titleText = "请再次确认密码";
+            setTimeout(function(){
+                reqPaymentDialog.show(param,function(ret){
+                    reqPaymentDialog.hide();
+                    if(ret.event != 'onFinish'){return}
+                    qrpwd = ret.content;
+                    if(pwd!=qrpwd){api.toast({msg:"设置失败，两次密码不一致", duration:2600});return}
+                    myApp.setPayPwdRequest(pwd, callback);
                 });
-            });
-        },50);
+            },50);
+        });
+    }else{
+        myApp.getStyle("/css/paymentDialog.css");
+        myApp.getScript("/script/paymentDialog.js",function(){
+            var paydialog = new paymentDialog(function (ret,err) {
+                pwd = ret.password;
+                paydialog.close();
+                setTimeout(function(){
+                    var paydialog2 = new paymentDialog(function (ret,err) {
+                        qrpwd = ret.password;
+                        paydialog2.close();
+                        if(pwd!=qrpwd){api.toast({msg:"设置失败，两次密码不一致", duration:2600});return}
+                        myApp.setPayPwdRequest(pwd, callback);
+                    });
+                    paydialog2.open("请再次确认密码");
+                },50);
+            },window.paymentDialog);
+            paydialog.open("请设置支付密码");
+        }, window.paymentDialog);
+    }
+}
+// 设置密码
+myApp.setPayPwdRequest = function(pwd, callback){
+    myApp.ajax({
+        url: "/api/home/Common/setpaypwd",
+        method: "get",
+        data: {password: pwd},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            api.toast({msg:"设置成功，请牢记密码！", global:true});
+
+            var userData = myApp.getUserData();
+            userData.uinfo.paypwd = true;
+            $api.rmStorage('userData');
+            $api.setStorage('userData', userData);
+
+            callback && callback();
+        },
+        error(){api.toast({msg:"error"})}
     });
 }
 // 上传图片
@@ -383,4 +419,25 @@ myApp.confirm = function(obj){
         myApp.dialogBox.close({dialogName: 'alert'});
         obj.callback && obj.callback((ret&&ret.eventType!='left')?1:0);
     });
+}
+// 加载js
+myApp.getScript = function(url, callback, obj) {
+    if(obj){
+        console.log("no need load");
+        callback && callback(); return}
+    var head = document.getElementsByTagName('head')[0],
+    js = document.createElement('script');
+    js.setAttribute('type', 'text/javascript');
+    js.setAttribute('src', api.wgtRootDir + url);
+    head.appendChild(js);
+    js.onload = function() { callback && callback();}
+}
+// 加载css
+myApp.getStyle = function(path){
+    var head = document.getElementsByTagName('head')[0];
+    var link = document.createElement('link');
+    link.href = api.wgtRootDir + path;
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    head.appendChild(link);
 }

@@ -135,7 +135,10 @@ function getData(){
         method: "get",
         data: {id:api.pageParam.id},
         success(data){
-            if(data.errcode!=0 && data.errcode!=200){return}
+            if(data.errcode!=0 && data.errcode!=200){
+                setTimeout(function(){api.closeWin()},600);
+                return
+            }
             bookList = data.list;
             nowPage = api.pageParam.pid || 1;
             sliderInit();
