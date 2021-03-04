@@ -113,6 +113,7 @@ function getData(){
     myApp.ajax({
         url: "/api/zixun/member/dayidetails",
         method: "get",
+        loading: page==1,
         data: {hfuid:api.pageParam.hfuid, type:api.pageParam.type},
         success(data){
             // console.log(JSON.stringify(data));

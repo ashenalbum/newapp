@@ -249,12 +249,13 @@ function getData(){
                         if(data.id == searchYear){return}
                         page = 1;
                         over = false;
-                        searchYear = data.id;
+                        searchYear = data[0].id;
                         getList();
                     }
                 });
             }
             page = 1;
+            over = false;
             getList();
         }//,
         // error(e){console.log(JSON.stringify(e))}

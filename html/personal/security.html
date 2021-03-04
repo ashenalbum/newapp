@@ -17,19 +17,23 @@
 </head>
 <body>
     <div class="ul fs-16 c-33">
-        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="toChangePhone()">
+        <div id="chengphone" class="item df ai-c just-c-bet" tapmode="touch-style">
             <span>更换手机号</span>
             <img src="../../image/common/more.png" class="arrow" alt="" />
         </div>
-        <div class="item df ai-c just-c-bet" tapmode="touch-style" onclick="setPayPwd()">
+        <div id="setpaypwd" class="item df ai-c just-c-bet" tapmode="touch-style">
             <span>设置支付密码</span>
             <img src="../../image/common/more.png" class="arrow" alt="" />
         </div>
     </div>
 <script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
 <script type="text/javascript" src="../../script/common.js"></script>
 <script type="text/javascript">
-apiready = function(){}
+apiready = function(){
+    $("#setpaypwd").on("click",setPayPwd);
+    $("#chengphone").on("click",toChangePhone);
+}
 // 设置密码
 function setPayPwd(){myApp.setPayPwd()}
 // 更换手机号

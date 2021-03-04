@@ -147,68 +147,25 @@ myApp.inputPayPwd = function(callback,title){
         });
         return;
     }
-    var reqPaymentDialog = api.require('paymentDialog');
-    if(reqPaymentDialog && api.systemType=="android"){
-        var param = {styles:{titleText:title||"请输入支付密码", titleTextSize:20, forgetText:" "}};
-        reqPaymentDialog.show(param,function(ret){
-            reqPaymentDialog.hide();
-            if(ret.event != 'onFinish'){return}
-            callback && callback(ret.content);
-        });
-    }else{
-        myApp.getStyle("/css/paymentDialog.css");
-        myApp.getScript("/script/paymentDialog.js",function(){
-            var paydialog = new paymentDialog(function (ret,err) {
-                var pwd = ret.password;
-                paydialog.close();
-                callback && callback(pwd);
-            });
-            paydialog.open();
-        });
-    }
+    myApp.inputPwd({title:title||"请输入支付密码"}, function(pwdval){
+        callback && callback(pwdval);
+    });
 }
 // 设置支付密码
 myApp.setPayPwd = function(callback){
     if(!this.login()){return}
     var pwd = "";
     var qrpwd = "";
-    var param = {styles:{titleText:"请设置支付密码", titleTextSize:20, forgetText:" "}};
-    var reqPaymentDialog = api.require('paymentDialog'); // 1049
-    if(reqPaymentDialog && api.systemType=="android"){
-        reqPaymentDialog.show(param,function(ret){
-            reqPaymentDialog.hide();
-            if(ret.event != 'onFinish'){return}
-            pwd = ret.content;
-            param.styles.titleText = "请再次确认密码";
-            setTimeout(function(){
-                reqPaymentDialog.show(param,function(ret){
-                    reqPaymentDialog.hide();
-                    if(ret.event != 'onFinish'){return}
-                    qrpwd = ret.content;
-                    if(pwd!=qrpwd){api.toast({msg:"设置失败，两次密码不一致", duration:2600});return}
-                    myApp.setPayPwdRequest(pwd, callback);
-                });
-            },50);
-        });
-    }else{
-        myApp.getStyle("/css/paymentDialog.css");
-        myApp.getScript("/script/paymentDialog.js",function(){
-            var paydialog = new paymentDialog(function (ret,err) {
-                pwd = ret.password;
-                paydialog.close();
-                setTimeout(function(){
-                    var paydialog2 = new paymentDialog(function (ret,err) {
-                        qrpwd = ret.password;
-                        paydialog2.close();
-                        if(pwd!=qrpwd){api.toast({msg:"设置失败，两次密码不一致", duration:2600});return}
-                        myApp.setPayPwdRequest(pwd, callback);
-                    });
-                    paydialog2.open("请再次确认密码");
-                },50);
-            },window.paymentDialog);
-            paydialog.open("请设置支付密码");
-        }, window.paymentDialog);
-    }
+    myApp.inputPwd({title:"请设置支付密码"}, function(pwdval){
+        pwd = pwdval;
+        setTimeout(function(){
+            myApp.inputPwd({title:"请再次确认密码"}, function(qrpwdval){
+                qrpwd = qrpwdval;
+                if(pwd!=qrpwd){api.toast({msg:"设置失败，两次密码不一致", duration:2600});return}
+                myApp.setPayPwdRequest(pwd, callback);
+            });
+        },50);
+    });
 }
 // 设置密码
 myApp.setPayPwdRequest = function(pwd, callback){
@@ -290,26 +247,23 @@ myApp.upImg = function(obj,callback,error){
         var url = udata.uinfo.uid+"/";
         var imgName = Date.now()+imgUrl.match(/^.*\/([^\/]+)$/)[1];
         myApp.showLoading("上传中","请稍候...");
-        var oss = api.require('aliCloudOss'); // 阿里云测试 1049
+        var oss = api.require('aliCloudOss');
         oss.init();
         oss.putObject({
-            bucket: "xktgz",
-            objectKey: url+imgName,
+            bucket: "sxjyapps",
+            objectKey: 'sxjy/' + url + imgName,
             filePath: imgUrl
         }, function(ret, err){
             if( ret ){
                 if(ret.eventType == "onComplete"){
                     myApp.hideLoading();
-                    var imgsrc = 'https://xktgz.oss-cn-beijing.aliyuncs.com/'+'sxjy/'+url+imgName;
+                    var imgsrc = 'https://sxjyapps.oss-cn-beijing.aliyuncs.com/'+'sxjy/'+ url + imgName;
                     callback && callback(imgsrc);
                 }else if(ret.eventType == "onProgress"){
                     myApp.showLoading(parseInt(ret.currentSize/ret.totalSize*100)+"%");
                 }else if(ret.eventType == "onError"){
                     myApp.hideLoading();
                     api.toast({msg:"error"});
-                    // 1049
-                    callback(imgUrl);
-                    // error && error();
                 }
             }else if (err) {
                 myApp.hideLoading();
@@ -420,24 +374,85 @@ myApp.confirm = function(obj){
         obj.callback && obj.callback((ret&&ret.eventType!='left')?1:0);
     });
 }
-// 加载js
-myApp.getScript = function(url, callback, obj) {
-    if(obj){
-        console.log("no need load");
-        callback && callback(); return}
-    var head = document.getElementsByTagName('head')[0],
-    js = document.createElement('script');
-    js.setAttribute('type', 'text/javascript');
-    js.setAttribute('src', api.wgtRootDir + url);
-    head.appendChild(js);
-    js.onload = function() { callback && callback();}
-}
-// 加载css
-myApp.getStyle = function(path){
-    var head = document.getElementsByTagName('head')[0];
-    var link = document.createElement('link');
-    link.href = api.wgtRootDir + path;
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    head.appendChild(link);
+// 密码输入
+myApp.inputPwd = function(obj, callback){
+    // obj: {title:"请输入密码"}
+    var myinputpwdbox = $("#myinputpwdbox");
+    var pwd = [];
+    if(!myinputpwdbox.length){
+        myinputpwdbox = $('<div id="myinputpwdbox" class="mask hide">'+
+            '<div class="bg"></div>'+
+            '<div class="paypwdbox">'+
+                '<div class="title fs-18 txt-c">'+
+                    '<span class="txt">请输入支付密码</span>'+
+                    '<div class="cls">&times;</div>'+
+                '</div>'+
+                '<div class="pwdbox">'+
+                    '<div class="iptbox df">'+
+                        '<div class="num fc"></div>'+
+                        '<div class="num fc"></div>'+
+                        '<div class="num fc"></div>'+
+                        '<div class="num fc"></div>'+
+                        '<div class="num fc"></div>'+
+                        '<div class="num fc"></div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="keybord">'+
+                    '<div class="row df">'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="1" tapmode="touch-style">1</div>'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="2" tapmode="touch-style">2</div>'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="3" tapmode="touch-style">3</div>'+
+                    '</div>'+
+                    '<div class="row df">'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="4" tapmode="touch-style">4</div>'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="5" tapmode="touch-style">5</div>'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="6" tapmode="touch-style">6</div>'+
+                    '</div>'+
+                    '<div class="row df">'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="7" tapmode="touch-style">7</div>'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="8" tapmode="touch-style">8</div>'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="9" tapmode="touch-style">9</div>'+
+                    '</div>'+
+                    '<div class="row df">'+
+                        '<div class="key space fc df ai-c just-c-ct"></div>'+
+                        '<div class="key keynum fc df ai-c just-c-ct" data-id="0" tapmode="touch-style">0</div>'+
+                        '<div class="key back space fc df ai-c just-c-ct c-66">←</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>');
+        $(document.body).append(myinputpwdbox);
+        api.parseTapmode();
+
+        myinputpwdbox.children(".bg").on("click",function(){
+            myinputpwdbox.addClass("hide").find(".num").removeClass("active");
+            myinputpwdbox.find(".title .txt").html("请输入密码");
+            pwd = [];
+        });
+        myinputpwdbox.find(".title .cls").on("click",function(){
+            myinputpwdbox.addClass("hide").find(".num").removeClass("active");
+            myinputpwdbox.find(".title .txt").html("请输入密码");
+            pwd = [];
+        });
+        myinputpwdbox.find(".back").on("click",function(){
+            if(!pwd.length){return}
+            pwd.splice(pwd.length-1,1);
+            myinputpwdbox.find(".iptbox .num").eq(pwd.length).removeClass("active");
+        });
+    }
+    myinputpwdbox.find(".keynum").unbind().on("click",function(){
+        if(pwd.length>=6){return}
+        var num = Number($(this).data('id'));
+        pwd.push(num);
+        myinputpwdbox.find(".iptbox .num").eq(pwd.length-1).addClass("active");
+        if(pwd.length==6){
+            var pwdstr = Number(pwd.join(""));
+            myinputpwdbox.addClass("hide").find(".num").removeClass("active");
+            myinputpwdbox.find(".title .txt").html("请输入密码");
+            pwd = [];
+            callback(pwdstr);
+        }
+    });
+    myinputpwdbox.find(".title .txt").html(obj.title || "请输入密码");
+    myinputpwdbox.removeClass("hide");
 }

@@ -13,7 +13,7 @@
     </style>
 </head>
 <body class="df df-c">
-    <div id="ul" class="kanwulist com-box"></div>
+    <div id="ul" class="kanwulist com-box hide"></div>
     <!-- 加载提示 -->
     <div id="loadmore" class="load-more mt-6 df ai-c just-c-ct c-99 fs-14">
         <img src="../../image/common/loading_more.gif" class="img" alt="" />
@@ -81,6 +81,7 @@ function getData(){
                 over = true;
                 loadmore.addClass("over");
             }
+            if(data.data && data.data.length){ul.removeClass("hide")}
             for(var i in data.data){
                 var o = data.data[i];
                 ul.append('<div class="kanwu df" data-id="'+ o.qid+'" data-title="'+ o.ztitle +'" data-pid="'+ o.page +'">'+
@@ -97,6 +98,9 @@ function getData(){
                     '</div>'+
                 '</div>');
             }
+        },
+        error(err){
+            console.log(JSON.stringify(err))
         }
     })
 }

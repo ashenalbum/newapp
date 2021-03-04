@@ -104,7 +104,7 @@ function submit(){
     if(!obj.school){api.toast({msg:"请输入所在单位"});return}
     if(!obj.zhiwu){api.toast({msg:"请输入担任职务"});return}
     if(!obj.message){api.toast({msg:"请输入个人简介"});return}
-    obj.fmUrl = fmUrl;
+    obj.fmurl = fmUrl;
     myApp.ajax({
         url: "/api/zixun/member/applyzhuanjia",
         method: "post",

@@ -404,7 +404,7 @@ function openJournalDetail(id){myApp.openWin({title:"报刊介绍", url: "/html/
 function openMoreJournal(){myApp.openWin({title:"更多报刊", url:"/html/journal/more.html"})}
 // 学习平台
 function openStudy(id){
-    myApp.alert({content:"! ! !"});
+    myApp.alert({content:"开发中"});
     return;
     var o = {title:id?"课程":"学习视频", url:"/html/study/"+(id?"list":"index")+".html", headColor:id?"#f6f7f8":"#ffffff", pageParam:{id:id}};
     myApp.openWin(o);
@@ -419,7 +419,7 @@ function openConsult(id,title){
 }
 // 视频
 function openVideo(id){
-    myApp.alert({content:"! ! !"});
+    myApp.alert({content:"开发中"});
     return;
     myApp.openWin({ hideHead:true, url:'/html/study/detail.html', pageParam:{id:id}})
 }

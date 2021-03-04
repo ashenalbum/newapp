@@ -254,7 +254,7 @@ function getList(){
                         '<div class="title two-hide">'+ obj.content +'</div>'+
                         '<div class="df ai-c just-c-bet">'+
                             '<span class="fs-12 c-aa">'+ obj.tounum +'人旁听</span>'+
-                            '<div class="listen c-red b bei">'+ obj.money +'旁听</div>'+
+                            '<div class="listen c-red b bei">'+ (obj.money && Number(obj.money)!=0?obj.money:'') +'旁听</div>'+
                         '</div>'+
                     '</div>')
                 } else {
@@ -323,9 +323,8 @@ function guanzhu(dom){
                 ts.removeClass("active").html("+ 关注");
             }
             api.sendEvent({name: 'informationReloadData'});
-
         }
-    })
+    });
 }
 // 旁听
 function openListen(id){myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:id}})}
@@ -334,7 +333,7 @@ function openNews(id){myApp.openWin({title:"教育资讯", url:'/html/informatio
 // 发起咨询
 function openLaunch(){myApp.openWin({hideHead:true, needLogin:true, needLogin:true, url:"/html/consult/launch.html", pageParam:{type:"expert", uid:api.pageParam.uid, name:expertName, money:money}})}
 // 评论列表
-function openEvaluate(){myApp.openWin({title:"评价", url:"/html/consult/expert_evaluate_list.html", pageParam:{uid:api.pageParam.uid}})}
+function openEvaluate(){myApp.openWin({title:"评价", needLogin:true, url:"/html/consult/expert_evaluate_list.html", pageParam:{uid:api.pageParam.uid}})}
 // 预约
 function openMaa(){myApp.openWin({title:"预约咨询", needLogin:true, url:"/html/consult/expert_maa.html", pageParam:{uid:api.pageParam.uid}})};
 </script>

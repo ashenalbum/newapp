@@ -258,9 +258,20 @@ function fenxiang(scene){
 function wxfx(data){
     wxPlus.shareWebpage(data, function(ret, err) {
         if (ret.status) {
-            myApp.alert({content:"分享成功"});
+            api.toast({content:"分享成功"});
+            closeMask();
         } else {
-            myApp.alert({content:err.code});
+            var str = err.code;
+            switch(str){
+                case -1: str = "（未知错误）";
+                case 1: str = "（apiKey非法）";
+                case 2: str = "（用户取消）";
+                case 3: str = "（发送失败）";
+                case 4: str = "（授权拒绝）";
+                case 5: str = "（微信服务器返回的不支持错误）";
+                case 7: str = " (注册SDK失败)";
+            }
+            api.toast({msg:str});
         }
     });
 }

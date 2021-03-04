@@ -88,6 +88,7 @@ function setEvent(){
             api.refreshHeaderLoadDone();
         }
     });
+    api.addEventListener({name:'viewappear'},function(){getData()});
     api.setRefreshHeaderInfo({
         bgColor: '#f0f0f0',
         textColor: '#666666',

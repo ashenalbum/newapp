@@ -195,6 +195,11 @@ apiready = function(){
 }
 function setEvent(){
     api.addEventListener({name: 'setWaitconsult'},setWaitconsult);
+    api.addEventListener({name:'viewappear'},function(){
+        if(!myApp.isLogin()){api.sendEvent({name: 'personalTestLogin'}); return}
+        setWaitconsult();
+        api.execScript({name:'root', script:'getUserData();'});
+    });
     api.addEventListener({name:'personalTestLogin'}, function(){
         setTimeout(function(){api.refreshHeaderLoadDone()},200);
         getData();
@@ -244,7 +249,7 @@ function setEvent(){
         textUp: '松开刷新...'
     }, function(ret, err) {
         if(!myApp.isLogin()){api.sendEvent({name: 'personalTestLogin'}); return}
-        api.addEventListener({name: 'setWaitconsult'},setWaitconsult);
+        setWaitconsult();
         api.execScript({name:'root', script:'getUserData();'});
     });
 }

@@ -74,7 +74,7 @@
             <div class="df just-c-bet ul df-w-w"></div>
         </div>
         <div class="mt-10 df just-c-ct">
-            <button class="com-button c-red b ques-btn fs-12" onclick="openConsult()">发起资讯</button>
+            <button class="com-button c-red b ques-btn fs-12" onclick="openConsult()">发起咨询</button>
         </div>
     </div>
     <!-- 热门视频 -->
@@ -134,6 +134,8 @@ apiready = function(){
 
 function setEvent(){
     api.addEventListener({name: 'loginok'}, function(){getData()});
+    api.addEventListener({name:'viewappear'},function(){getData()});
+
     api.setRefreshHeaderInfo({
         bgColor: '#f0f0f0',
         textColor: '#666666',

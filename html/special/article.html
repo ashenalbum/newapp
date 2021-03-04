@@ -129,6 +129,7 @@ function getList(){
         loading: false,
         data: {page:page, sta:searchId},
         success(data){
+            // console.log(JSON.stringify(data))
             loading = false;
             api.refreshHeaderLoadDone();
             if(Number(page)<=1){ul.empty();dataList=[];}

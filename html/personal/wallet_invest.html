@@ -144,7 +144,6 @@ function getOrder(obj){
 }
 // 微信支付 1049
 function wxPay(orderObj){
-    console.log(JSON.stringify(orderObj))
     wxPayPlus.payOrder({
         apiKey: orderObj.appid,
         orderId: orderObj.prepayid,
@@ -154,8 +153,6 @@ function wxPay(orderObj){
         package: orderObj.package,
         sign: orderObj.sign
     }, function(ret, err) {
-        alert(JSON.stringify(ret))
-        alert(JSON.stringify(err))
         if (ret && ret.status) {
             api.toast({msg:'支付成功', global:true});
             api.closeWin();
