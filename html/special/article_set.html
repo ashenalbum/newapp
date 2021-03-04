@@ -145,7 +145,6 @@ function getData(){
         },
         error(){fullData()}
     });
-
 }
 // 原数据
 function fullData(){
@@ -196,7 +195,7 @@ function submit(){
     myApp.ajax({
         url: "/api/zixun/member/addnews",
         method: "post",
-        data: {data:{title:title, show_mode:type, catid:catid, images:imgArr.join(), content:html, id:api.pageParam.id||''}},
+        data: {data:{title:title, show_mode:type, catid:catid, images:imgArr, content:html, id:api.pageParam.id||''}},
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             api.toast({msg:"发布成功",global:true});

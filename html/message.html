@@ -41,7 +41,7 @@
             <div class="mt-6 fs-14">活动消息</div>
         </div>
     </div>
-    <div class="cont mt-16">
+    <div class="cont mt-20">
         <div id="scroll">
             <div id="ul"></div>
         </div>
@@ -88,7 +88,11 @@ function setEvent(){
             api.refreshHeaderLoadDone();
         }
     });
-    api.addEventListener({name:'viewappear'},function(){getData()});
+    api.addEventListener({name:'viewappear'},function(){
+        page = 1;
+        over = false;
+        getData()
+    });
     api.setRefreshHeaderInfo({
         bgColor: '#f0f0f0',
         textColor: '#666666',
@@ -110,6 +114,7 @@ function setEvent(){
     });
 }
 function getData(){
+    if(!myApp.isLogin()){return}
     if(loading || over){return}
     loading = true;
     loadmore.removeClass("over").addClass("load");

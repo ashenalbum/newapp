@@ -57,7 +57,7 @@
     <div id="footer" class="border-t">
         <ul class="df">
             <li tapmode="hover" onclick="randomSwitchBtn(this,0);" class="fc active" >首页</li>
-            <li tapmode="hover" onclick="randomSwitchBtn(this,1);" class="fc" >即刻</li>
+            <!-- <li tapmode="hover" onclick="randomSwitchBtn(this,1);" class="fc" >即刻</li> -->
             <li tapmode="hover" onclick="randomSwitchBtn(this,2);" class="fc" >消息</li>
             <li tapmode="hover" onclick="randomSwitchBtn(this,3);" class="fc" >我的</li>
         </ul>
@@ -159,7 +159,8 @@ function randomSwitchBtn( tag , id) {
     if(id==1){myApp.alert({content:"开发中"}); return}
     if(tag == $api.dom('#footer li.active')){return};
     $('#header .header').eq(id).removeClass('hide').siblings().addClass('hide');
-    $('#footer li').eq(id).addClass('active').siblings().removeClass('active');
+    $('#footer li').removeClass('active');
+    $(tag).addClass('active');
     api.setFrameGroupIndex({name:'group', index:id});
     setGroupSize();
 }

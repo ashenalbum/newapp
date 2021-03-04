@@ -233,11 +233,12 @@ function comment(val){
 }
 // 分享
 function fenxiang(scene){
-    if(!fxdata){api.toast({msg:"error"});return}
+    if(!fxdata){api.toast({msg:"未获取到分享数据"});return}
     if(!wxPlus){wxPlus = api.require('wxPlus')}
     wxPlus.isInstalled(function(ret, err) {
         if (!ret.installed) {api.toast({msg:"请先安装微信"});return}
         if(fxdata.imgsrc){
+            api.showProgress();
             var name = fxdata.imgsrc.match(/^.*\/([^\/]+)$/)[1];
             api.download({
                 url:fxdata.imgsrc,
@@ -246,7 +247,11 @@ function fenxiang(scene){
                 cache: true,
                 allowResume: true
             },function(ret, err){
-                if(!ret || ret.state!=1){api.toast({msg:"error"});return}
+                api.hideProgress();
+                if(!ret || ret.state!=1){
+                    wxfx({scene:scene, title:fxdata.title, description:fxdata.message, contentUrl:fxdata.url});
+                    return
+                }
                 wxfx({scene:scene, title:fxdata.title, description:fxdata.message, thumb: 'fs://download/'+name, contentUrl:fxdata.url});
             });
         } else {
@@ -257,12 +262,12 @@ function fenxiang(scene){
 // 微信分享
 function wxfx(data){
     wxPlus.shareWebpage(data, function(ret, err) {
-        if (ret.status) {
-            api.toast({content:"分享成功"});
+        if (ret && ret.status) {
+            api.toast({msg:"分享成功"});
             closeMask();
         } else {
-            var str = err.code;
-            switch(str){
+            var str = "";
+            switch(err.code){
                 case -1: str = "（未知错误）";
                 case 1: str = "（apiKey非法）";
                 case 2: str = "（用户取消）";
@@ -271,7 +276,8 @@ function wxfx(data){
                 case 5: str = "（微信服务器返回的不支持错误）";
                 case 7: str = " (注册SDK失败)";
             }
-            api.toast({msg:str});
+            str && api.toast({msg:str});
+            closeMask();
         }
     });
 }

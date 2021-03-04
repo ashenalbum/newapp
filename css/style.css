@@ -52,6 +52,9 @@ span{display:inline;}
 .c-cc{color:#cccccc;}
 .c-ff{color:#ffffff;}
 
+
+.ml-6{margin-left:6px;}
+
 .mt-2{margin-top:2px;}
 .mt-4{margin-top:4px;}
 .mt-6{margin-top:6px;}
@@ -113,9 +116,6 @@ span{display:inline;}
 .as-dialog .as-dialog-btn:active{background-color:#f7f8fa;}
 
 .com-box{padding:14px 12px; border-radius:8px; background:#ffffff;}
-@media (prefers-color-scheme:light) {
-    .com-box{box-shadow: 0px 0px 8px 0px rgba(187, 187, 187, 0.2);}
-}
 .com-title{height:20px; line-height:20px;}
 .com-title .more{display:inline-block; height:20px; line-height:20px; padding:0 14px 0 10px; background:url(../image/common/more.png) no-repeat right center; background-size:12px 12px; border-radius:2px;}
 
@@ -132,7 +132,7 @@ span{display:inline;}
 .school-title{padding-left:32px; background:url(../image/instantly/scroll.png) no-repeat 4px center; background-size:20px 20px;}
 .detail-title{padding-left:32px; background:url(../image/common/detail.png) no-repeat 4px center; background-size:20px 20px;}
 
-.question .item{box-sizing:border-box; height:100px; padding:10px; border:1px solid #EBEBEB; border-radius:6px; }
+.question .item{box-sizing:border-box; height:100px; padding:10px; border:1px solid #f5f6f7; border-radius:6px; }
 .question .item .title{font-size:14px; line-height:18px;}
 .question .item .listen{height:28px; line-height:28px; background:#F6F7F8; padding:0 12px; border-radius:6px;}
 .question .item .listen.bei::before{content:" "; display:inline-block; margin-right:4px; width:18px; height:18px; background:url(../image/common/bei.png); background-size:100% 100%; vertical-align:text-bottom;}

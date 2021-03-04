@@ -67,6 +67,26 @@ apiready = function(){
 }
 function init(){
     if(!myApp.login()){api.toast({msg:"请先登录", global:true});return}
+    myApp.ajax({
+        url: "/api/member/member/getudata",
+        method: "get",
+        // loading: false,
+        alert: false,
+        success(data){
+            if(data && data.udata){
+                $api.rmStorage('userData');
+                $api.setStorage('userData', data.udata);
+                api.sendEvent({name: 'instantlyTestLogin'});
+                api.sendEvent({name: 'personalTestLogin'});
+            }
+            testRealName();
+        },
+        error(){
+            testRealName();
+        }
+    });
+}
+function testRealName(){
     var userData = myApp.getUserData().uinfo;
     if(userData.smshsta==1){
         myApp.alert({

@@ -189,13 +189,14 @@ function addConsult(list){
 function addNews(list){
     for(var i in list){
         var obj = list[i];
-        var label = obj.label?'<span class="hot mt-8">'+ obj.label +'</span>':'';
-        var from = obj.laiyuan?'<span class="fs-12 lh-1 c-aa mt-8">'+ obj.laiyuan +'</span>':'';
+        var label = obj.label?'<span class="hot">'+ obj.label +'</span>':'';
+        var time = obj.addtime?'<span class="fs-12 c-aa">'+ obj.addtime +'</span>':'';
+        var from = '<span class="fs-12 c-aa ml-6">'+ (obj.laiyuan || obj.zuoze || '') +'</span>';
         if(obj.show_mode=="1"){
             ul.append('<div class="li news type1 df" onclick="openNews('+obj.id+')">'+
                 '<div class="df df-c just-c-bet f1">'+
                     '<div class="two-hide">'+ obj.title +'</div>'+
-                    '<div class="df ai-s">'+label+from+'</div>'+
+                    '<div class="df ai-e">'+ label + time + from +'</div>'+
                 '</div>'+
                 '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
             '</div>');
@@ -203,7 +204,7 @@ function addNews(list){
             ul.append('<div class="li news type3" onclick="openNews('+obj.id+')">'+
                 '<div class="two-hide">'+ obj.title +'</div>'+
                 '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
-                '<div class="df ai-s">'+label+from+'</div>'+
+                '<div class="df ai-e">'+ label + time + from +'</div>'+
             '</div>');
         }else if(obj.show_mode=="3"){
             var img = "";
@@ -216,12 +217,12 @@ function addNews(list){
             ul.append('<div class="li news type2" onclick="openNews('+obj.id+')">'+
                 '<div class="one-hide">'+ obj.title +'</div>'+
                 '<div class="df mt-6">'+ img +'</div>'+
-                '<div class="df ai-s">'+label+from+'</div>'+
+                '<div class="df ai-e">'+ label + time + from +'</div>'+
             '</div>');
         }else{
             ul.append('<div class="li news type3" onclick="openNews('+obj.id+')">'+
                 '<div class="two-hide">'+ obj.title +'</div>'+
-                '<div class="df ai-s">'+label+from+'</div>'+
+                '<div class="df ai-e">'+ label + time + from +'</div>'+
             '</div>');
         }
     }

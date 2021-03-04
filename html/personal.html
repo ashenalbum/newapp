@@ -12,18 +12,15 @@
 
         .com-box{padding:12px; margin-left:16px; margin-right:16px;}
 
-        .top{height:160px;}
-        .top.svip{background:#F7D9A6 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03)); box-shadow: 0px 0px 6px 0px rgba(187, 187, 187, 0.8);}
+        .top{height:154px;}
+        .top.svip{background:#F7D9A6 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
         .top .info{height:92px; padding:0 16px;}
         .top .info .icon{display:block; width:50px; height:50px; margin-right:16px; border-radius:50%; background:#f6f7f8;}
         .top .info .vipicon{margin-left:6px; width:18px; height:18px; background:url(../image/instantly/vip.png) no-repeat center center; background-size:100% 100%;}
         .top.svip .vipicon{background-image:url(../image/instantly/svip.png)}
         .top .more{display:inline-block; height:20px; line-height:22px; padding:0 14px 0 10px; background:url(../image/common/more.png) no-repeat right center; background-size:12px 12px;}
-        .top .vipbox{position:relative; height:68px; margin:0 16px; padding:0 16px; border-radius:10px 10px 0 0; background:#474967 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03));}
-        .top .vipbox::before{position:absolute; right:100%; bottom:0; content:" "; padding:5px; background:#cccccc; border-radius:6px 0 0 6px;}
-        .top .vipbox::after{position:absolute; left:100%; bottom:0; content:" "; padding:5px; background:#cccccc; border-radius:0 6px 6px 0;}
-        .top.svip .vipbox::before,
-        .top.svip .vipbox::after{display:none;}
+        .top .vipbox{position:relative; height:68px; margin:0 16px; padding:0 16px; background:url(../image/personal/vipbg.png) no-repeat center bottom; background-size:100% 100%;}
+        .top .vipbox .viptxt{height:20px; margin-right:8px;}
         .top .tovipbtn{padding:0 4px; background:#FBF1D5 linear-gradient(90deg, #FBF1D5 0%, #F6DEB6 100%);}
         .top.svip .tovipbtn{background:transparent; color:#F6D8A4;}
         .top.svip .tovipbtn .more{background-image:url(../image/common/more_w.png);}
@@ -69,13 +66,16 @@
         </div>
         <div class="vipbox df ai-c just-c-bet" onclick="openVip()">
             <div class="fc df df-c just-c-bet c-ff">
-                <div class="b fs-14">VIP 尊享会员</div>
+                <div class="b fs-14 df ai-e">
+                    <img src="../image/personal/vip.png" class="viptxt" />
+                    <span>尊享会员</span>
+                </div>
                 <div class="viptxt mt-6 fs-12 c-aa">开通课程VIP  购买课程更多优惠</div>
             </div>
             <button class="com-button tovipbtn fs-12"><span class="vipbtn more b">立即开通<span></button>
         </div>
     </div>
-    <div class="mt-12 com-box">
+    <div class="mt-16 com-box">
         <div class="com-title df ai-c just-c-bet">
             <span class="fs-14 c-33 b">我的订单</span>
             <span class="more fs-12 c-77" onclick="openOrder(0)">全部</span>
@@ -165,7 +165,7 @@
             <div class="mt-6">我的关注</div>
         </div>
         <div class="expert-hide item df df-c ai-c" tapmode="touch-style" >
-            <img src="../image/personal/ic5.png" class="img" alt="" />
+            <img src="../image/personal/ic6.png" class="img" alt="" />
             <div class="mt-6">异常申请</div>
         </div>
         <div class="expert-hide item df df-c ai-c" tapmode="touch-style" onclick="openExpertApply()">
@@ -181,7 +181,7 @@
             <div class="mt-6">粉丝评价</div>
         </div>
         <div class="item df df-c ai-c" tapmode="touch-style" onclick="openSystem()">
-            <img src="../image/personal/ic6.png" class="img" alt="" />
+            <img src="../image/personal/ic5.png" class="img" alt="" />
             <div class="mt-6">设置</div>
         </div>
     </div>
@@ -279,6 +279,7 @@ function getData(){
     });
 }
 function setWaitconsult(){
+    if(!myApp.isLogin()){return}
     myApp.ajax({
         url: "/api/zixun/zhuanjiadayi/getdayilist",
         method: "get",

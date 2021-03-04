@@ -33,18 +33,18 @@
         .types .li{margin-top:6px;}
         .types .li .headline{box-sizing:border-box; width:160px; height:60px; font-weight:400; padding:10px 14px; border-radius:8px 0 0 8px; line-height:16px; background:url() no-repeat 118px center; background-size:28px 28px;}
         .types .li:nth-child(4n+1) .headline{background-color:#F6F0E4;background-image:url(../image/index/type1.png);}
-        .types .li:nth-child(4n+2) .headline{background-color:#E4DEE9;background-image:url(../image/index/type2.png);}
+        .types .li:nth-child(4n+2) .headline{background-color:#E9E9EE;background-image:url(../image/index/type2.png);}
         .types .li:nth-child(4n+3) .headline{background-color:#DAE6EB;background-image:url(../image/index/type3.png);}
         .types .li:nth-child(4n+4) .headline{background-color:#E8DAD5;background-image:url(../image/index/type4.png);}
         .types .li .itm{position:relative; margin-left:6px; background-color:#f5f5f5; display:flex; align-items:center; justify-content:center; overflow:hidden;}
         .types .li .itm:last-child{border-radius:0 8px 8px 0;}
         .types .li .itm.hot::after{content:"HOT"; position:absolute; width:28px; height:14px; line-height:14px; border-radius:0 0 0 8px; text-align:center; font-size:10px; right:0; top:0; background:#ff6a77 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03)); color:#ffffff;}
 
-        .swiperbox{margin-top:12px; height:152px;}
-        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative;}
+        .swiperbox{margin-top:12px;}
+        .swiperbox .swiper-container{border-radius:8px; overflow:hidden; position:relative;}
         .swiperbox .swiper-container .swiper-slide{box-sizing:border-box; display:flex; align-items:center; justify-content:center;}
-        .swiperbox .swiper-container .swiper-slide .img{display:block; width:100%; height:100%;}
-        .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
+        .swiperbox .swiper-container .swiper-slide .img{display:block; width:100%;}
+        .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:rgba(255,255,255,0.3); }
         .swiperbox .swiper-container .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
 
         .activity .swiper-container .swiper-slide{max-width:100px; width:auto; margin:0 8px;}
@@ -109,7 +109,7 @@
         </div>
     </div>
     <!-- 热门视频 -->
-    <div id="hotvideo" class="hotvideo com-box mt-10">
+    <!-- <div id="hotvideo" class="hotvideo com-box mt-10">
         <div class="com-title df just-c-bet ai-c">
             <span class="c-33 fs-16 b">热门视频</span>
             <span class="fs-12 c-77 more" onclick="openStudy()">更多</span>
@@ -119,7 +119,7 @@
                 <div class="swiper-wrapper fs-12 c-33"></div>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- 热门资讯 -->
     <div id="zixun" class="hotnews com-box mt-10">
         <div class="com-title df just-c-bet ai-c">
@@ -214,6 +214,7 @@ function getData(){
             for(var i in data.data){
                 var li = dom.eq(i);
                 var obj = data.data[i];
+                if(obj.is_open==0){li.addClass("hide"); continue}
                 var fun = ['openInformation','openConsult','openStudy','openJournal'][i];
                 li.find(".name").text(obj.name);
                 li.find(".txt").text(obj.synopsis);
@@ -232,7 +233,7 @@ function getData(){
                 if(obj.is_open!="1"){continue}
                 switch (i) {
                     case '0': setDayi(obj.sun);break;
-                    case '1': setVideo(obj.sun);break;
+                    // case '1': setVideo(obj.sun);break;
                     case '2': setZixun(obj.sun);break;
                     case '3': setKanwu(obj.sun);break;
                 }
@@ -296,12 +297,13 @@ function setZixun(arr){
     for(var i in arr){
         var obj = arr[i];
         var label = obj.label?'<span class="hot">'+ obj.label +'</span>':'';
-        var laiyuan = obj.laiyuan?'<span class="fs-12 c-aa">'+ obj.laiyuan +'</span>':'';
+        var time = obj.addtime?'<span class="fs-12 c-aa">'+ obj.addtime +'</span>':'';
+        var laiyuan = '<span class="fs-12 c-aa ml-6">'+ (obj.laiyuan || obj.zuoze || '') +'</span>';
         if(obj.show_mode=="1"){
             ul.append('<div class="news type1 df" onclick="openNews('+obj.id+')">'+
                 '<div class="df df-c just-c-bet f1">'+
                     '<div class="two-hide">'+ obj.title +'</div>'+
-                    '<div class="df ai-c">'+label+laiyuan+'</div>'+
+                    '<div class="df ai-e">'+ label + time + laiyuan +'</div>'+
                 '</div>'+
                 '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
             '</div>');
@@ -309,7 +311,7 @@ function setZixun(arr){
             ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
                 '<div class="two-hide">'+ obj.title +'</div>'+
                 '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
-                '<div class="df ai-c mt-6">'+label+laiyuan+'</div>'+
+                '<div class="df ai-e mt-6">'+ label + time + laiyuan +'</div>'+
             '</div>');
         }else if(obj.show_mode=="3"){
             var img = "";
@@ -322,12 +324,12 @@ function setZixun(arr){
             ul.append('<div class="news type2" onclick="openNews('+obj.id+')">'+
                 '<div class="one-hide">'+ obj.title +'</div>'+
                 '<div class="df mt-6">'+ img +'</div>'+
-                '<div class="df ai-c mt-6">'+label+laiyuan+'</div>'+
+                '<div class="df ai-e mt-6">'+ label + time + laiyuan +'</div>'+
             '</div>');
         }else{
             ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
                 '<div class="two-hide">'+ obj.title +'</div>'+
-                '<div class="df ai-c mt-6">'+label+laiyuan+'</div>'+
+                '<div class="df ai-e mt-6">'+ label + time + laiyuan +'</div>'+
             '</div>');
         }
     }
@@ -342,7 +344,7 @@ function setKanwu(arr){
             '<div class="txts f1 df df-c just-c-bet">'+
                 '<div>'+
                     '<div class="one-hide fs-16 b">'+ obj.ztitle +'</div>'+
-                    '<div class="mt-10 three-hide c-99 fs-12">'+ obj.zdescribe +'</div>'+
+                    '<div class="mt-10 two-hide c-99 fs-12">'+ obj.zdescribe +'</div>'+
                 '</div>'+
                 '<div class="df ai-c just-c-bet">'+
                     '<span class="tab c-aa fs-10"><span>'+ obj.zbuynum +'人购买</span><span>'+ obj.zlooknum +'人查看</span></span>'+
@@ -385,6 +387,7 @@ function setSwiper(arr){
     if(swiperSwiper){swiperSwiper.destroy(false)}
     swiperSwiper = new Swiper('#swiper', {
         autoplay: {delay:4000, stopOnLastSlide:false, disableOnInteraction:true},
+        autoHeight: true,
         loop : true,
         on: {slideChange: function(swiper){ domwrap.style.left = swiper.realIndex*(100/arr.length)+"%";}}
     });

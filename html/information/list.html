@@ -11,11 +11,10 @@
     <style>
         body{box-sizing:border-box; background:#f6f7f8; padding:10px;}
 
-        .swiperbox{height:152px;}
-        .swiperbox .swiper-container{height:100%; border-radius:8px; overflow:hidden; position:relative;}
+        .swiperbox .swiper-container{border-radius:8px; overflow:hidden; position:relative;}
         .swiperbox .swiper-container .swiper-slide{box-sizing:border-box; display:flex; align-items:center; justify-content:center;}
-        .swiperbox .swiper-container .swiper-slide .img{display:block; width:100%; height:100%;}
-        .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:#ffffff; }
+        .swiperbox .swiper-container .swiper-slide .img{display:block; width:100%;}
+        .swiperbox .swiper-container .dom-wrap{position:absolute; z-index:2; left:0; right:0; bottom:8px; margin:auto; width:50px; border:1px solid #c3c3c3; height:4px; border-radius:3px; background:rgba(255,255,255,0.3); }
         .swiperbox .swiper-container .dom-wrap i{position:absolute; left:0; width:100%; height:4px; border-radius:2px; background:#FF3942; transition:left 0.3s;}
 
         .expert .swiper-slide{box-sizing:border-box; padding:10px; width:112px; height:164px; margin:0 6px; background:#ffffff; border-radius:6px;}
@@ -35,7 +34,7 @@
         .menu .i{position:absolute; left:0; bottom:1px; width:0; height:6px; background:url(../../image/instantly/active.png) no-repeat center bottom; background-size: 16px 6px; transition:left 0.3s;}
 
         .newsbox.fixed{margin-top:54px;}
-        .newest .li{padding:10px 0 10px 5px; border-bottom:thin solid #dddddd;}
+        .newest .li{padding:10px 0 10px 5px; border-bottom:thin solid #EBEBEB;}
         .newest .li:last-child{border-bottom:none;}
         .newest .tab{padding:0 2px; line-height:14px; border-radius:2px; border:1px solid; margin-right:12px;}
 
@@ -224,6 +223,7 @@ function setSwiper(arr){
     swiperSwiper = new Swiper('#swiper', {
         autoplay: {delay:4000, stopOnLastSlide:false, disableOnInteraction:true},
         loop : true,
+        autoHeight: true,
         on: {slideChange: function(swiper){domwrap.css({left:swiper.realIndex*(100/arr.length)+"%"})}}
     });
 }
@@ -233,6 +233,7 @@ function setMenu(arr){
     if(!arr.length){return false}
     var wrap = $("#menuswiper .swiper-wrapper").empty();
     for(var i in arr){
+        if(!searchId && i=="0"){searchId = arr[i].id;}
         wrap.append('<div class="swiper-slide '+(i=='0'?'active':'')+'" data-id="'+ arr[i].id +'">'+ myApp.htmlEscape(arr[i].name) +'</div>');
     }
     wrap.append('<div class="i"></div>');
@@ -275,13 +276,14 @@ function getList(){
             }
             for(var i in data.list){
                 var obj = data.list[i];
-                var label = obj.label?'<span class="hot mt-8">'+ obj.label +'</span>':'';
-                var from = obj.laiyuan?'<span class="fs-12 lh-1 c-aa mt-8">'+ obj.laiyuan +'</span>':'';
+                var label = obj.label?'<span class="hot">'+ obj.label +'</span>':'';
+                var time = obj.addtime?'<span class="fs-12 c-aa">'+ obj.addtime +'</span>':'';
+                var from = '<span class="fs-12 c-aa ml-6">'+ (obj.laiyuan || obj.zuoze || '') +'</span>';
                 if(obj.show_mode=="1"){
                     ul.append('<div class="news type1 df" onclick="openNews('+obj.id+')">'+
                         '<div class="df df-c just-c-bet f1">'+
                             '<div class="two-hide">'+ obj.title +'</div>'+
-                            '<div class="df ai-s">'+label+from+'</div>'+
+                            '<div class="df ai-e">'+ label + time + from +'</div>'+
                         '</div>'+
                         '<img src="'+ (obj.images && obj.images[0]) +'" class="img" alt="" />'+
                     '</div>');
@@ -289,7 +291,7 @@ function getList(){
                     ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
                         '<div class="two-hide">'+ obj.title +'</div>'+
                         '<img src="'+ (obj.images && obj.images[0]) +'" class="img mt-6" alt="" />'+
-                        '<div class="df ai-s">'+label+from+'</div>'+
+                        '<div class="df ai-e">'+ label + time + from +'</div>'+
                     '</div>');
                 }else if(obj.show_mode=="3"){
                     var img = "";
@@ -302,12 +304,12 @@ function getList(){
                     ul.append('<div class="news type2" onclick="openNews('+obj.id+')">'+
                         '<div class="one-hide">'+ obj.title +'</div>'+
                         '<div class="df mt-6">'+ img +'</div>'+
-                        '<div class="df ai-s">'+label+from+'</div>'+
+                        '<div class="df ai-e">'+ label + time + from +'</div>'+
                     '</div>');
                 }else{
                     ul.append('<div class="news type3" onclick="openNews('+obj.id+')">'+
                         '<div class="two-hide">'+ obj.title +'</div>'+
-                        '<div class="df ai-s">'+label+from+'</div>'+
+                        '<div class="df ai-e">'+ label + time + from +'</div>'+
                     '</div>');
                 }
             }

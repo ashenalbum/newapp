@@ -43,6 +43,23 @@ apiready = function(){
 }
 function setEvent(){
     api.setStatusBarStyle({style: 'dark'});
+    api.addEventListener({
+        name: 'scrolltobottom',
+        extra: {threshold: 20}
+    }, function(ret, err) {
+        if(over||loading){return}
+        getData();
+    });
+    api.setRefreshHeaderInfo({
+        bgColor: '#f0f0f0',
+        textColor: '#666666',
+        textDown: '下拉刷新...',
+        textUp: '松开刷新...'
+    }, function(ret, err) {
+        over = false;
+        page = 1;
+        getData();
+    });
     ul.on("click",".item",function(){
         var id = $(this).data("id");
         myApp.openWin({
