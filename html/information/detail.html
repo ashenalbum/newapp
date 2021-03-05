@@ -192,7 +192,11 @@ function getData(){
             $("#icon").attr({src:data.data.author.avatar});
             $("#author").text(data.data.author.nickname);
             $("#addtime").text(data.data.addtime);
-            $("#html").html(data.data.content);
+            $("#html").html(data.data.content).find("a").on("click",function(){
+                var url = $(this).attr("href");
+                myApp.openUrl(url);
+                return false;
+            });
             groupid = data.data.author.groupid;
             authorid = data.data.author.uid;
             fxdata = data.data.fxdata;

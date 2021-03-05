@@ -134,7 +134,10 @@ apiready = function(){
 
 function setEvent(){
     api.addEventListener({name: 'loginok'}, function(){getData()});
-    api.addEventListener({name:'viewappear'},function(){getData()});
+    api.addEventListener({name:'viewappear'},function(){
+        reload = true;
+        getData();
+    });
 
     api.setRefreshHeaderInfo({
         bgColor: '#f0f0f0',
@@ -174,7 +177,7 @@ function getData(){
     myApp.ajax({
         url: "/api/zazhi/zazhi/homepage",
         method: "get",
-        loading: !reload,
+        loading: false,
         success(data){
             api.refreshHeaderLoadDone();
             if(data.errcode!=0 && data.errcode!=200){return}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{background:#f6f7f8;}
+        .com-box{border-radius:0; padding-top:30px; padding-bottom:40px;}
+        .ipt-box{height:40px; border-bottom:1px solid #333;}
+        .ipt-box .danwei{height:40px; line-height:40px;}
+        .ipt-box .input{box-sizing:border-box; width:100px; height:40px; line-height:40px; padding:0 12px; border:none; outline:none;}
+        .ipt-box .input:focus{outline:none;}
+        .ipt-box .all{height:40px; line-height:40px; padding:0 10px; opacity:0.8;}
+        .submit{width:100%; height:44px; line-height:44px; font-size:16px; background:#FF3942;}
+    </style>
+</head>
+<body>
+    <div class="com-box">
+        <div class="df ai-c just-c-bet">
+            <div class="fs-16 b">我的佣金</div>
+            <div id="showall" class="all fs-12 c-99"></div>
+        </div>
+        <div class="df ipt-box mt-30">
+            <div class="danwei fs-20 b">￥</div>
+            <input id="input" class="input fc fs-18 c-66" type="number" placeholder="请输入金额" />
+            <div id="all" class="all fs-16 c-red">全部提现</div>
+        </div>
+        <button class="com-button submit mt-30 c-ff" onclick="submit()">申请提现</button>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+var moneyAll = 0;
+
+apiready = function(){
+    setEvent();
+    getData();
+}
+function setEvent(){
+    $("#all").on("click",function(){
+        moneyAll && $("#input").val(moneyAll);
+    });
+}
+function getData(){
+    myApp.ajax({
+        url: "/api/member/member/getmoney",
+        method: "get",
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(data.experience){
+                moneyAll = Number(data.experience);
+                $("#showall").html("可提现余额"+ data.experience +"元")
+            }
+        }
+    });
+}
+function submit(){
+    var money = $("#input").val();
+    if(!money){api.toast({msg:"请输入提现金额"}); return}
+    if(money > moneyAll){api.toast({msg:"提现金额不能大于佣金"}); return}
+
+    var data = JSON.stringify({money:money});
+
+    myApp.ajax({
+        url: "/api/member/member/addtixian",
+        method: "post",
+        data: {data: data},
+        success(data){
+            if(data.errcode!=0 && data.errcode!=200){return}
+            api.toast({msg:"提现申请已提交,请耐心等候", global:true});
+            api.closeWin();
+        },
+        error(e){
+            // console.log(JSON.stringify(e))
+        }
+    });
+}
+</script>
+</body>
+</html>

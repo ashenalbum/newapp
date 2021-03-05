@@ -88,7 +88,7 @@ function getData(){
         // loading: false,
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
-            if(data.money){$("#yue").html(data.experience)}
+            if(data.experience){$("#yue").html(data.experience)}
             page = 1;
             over = false;
             getList();
@@ -105,6 +105,7 @@ function getList(){
         loading: false,
         data: {page:page},
         success(data){
+            // console.log(JSON.stringify(data))
             loading = false;
             api.refreshHeaderLoadDone();
             var ul = $("#list");
@@ -120,7 +121,7 @@ function getList(){
                 var o = data.list[i];
                 ul.append('<div class="li">'+
                     '<div class="df just-c-bet">'+
-                        '<div class="fc three-hide c-33">'+ o.note +'</div>'+
+                        '<div class="fc three-hide c-33">'+ (o.mark?o.mark+"：":"") + o.note +'</div>'+
                         '<div class="num add b">'+ (Number(o.type)==0?'+':'-') + o.value +'</div>'+
                     '</div>'+
                     '<div class="mt-6 fs-12">'+ o.addtime +'</div>'+
@@ -131,7 +132,7 @@ function getList(){
     });
 }
 function tixian(){
-    api.toast({msg:"开发中"})
+    myApp.openWin({title:"申请提现", needLogin:true, url:"/html/special/commission_tixian.html"});
 }
 </script>
 </body>

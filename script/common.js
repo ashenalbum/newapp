@@ -434,17 +434,14 @@ myApp.inputPwd = function(obj, callback){
             myinputpwdbox.find(".title .txt").html("请输入密码");
             pwd = [];
         });
-        myinputpwdbox.find(".back").on("click",function(){
-            if(!pwd.length){return}
-            pwd.splice(pwd.length-1,1);
-            myinputpwdbox.find(".iptbox .num").eq(pwd.length).removeClass("active");
-        });
     }
-    myinputpwdbox.find(".keynum").unbind().on("click",function(){
-        if(pwd.length>=6){
-            console.log("length")
-            return
-        }
+    myinputpwdbox.find(".back").unbind().on("click",function(){
+        if(!pwd.length){return}
+        pwd.splice(pwd.length-1,1);
+        myinputpwdbox.find(".iptbox .num").eq(pwd.length).removeClass("active");
+    });
+    myinputpwdbox.find(".keynum").unbind().on("mousedown",function(){
+        if(pwd.length>=6){return}
         var num = Number($(this).data('id'));
         pwd.push(num);
         myinputpwdbox.find(".iptbox .num").eq(pwd.length-1).addClass("active");
