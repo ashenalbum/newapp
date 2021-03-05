@@ -2,7 +2,7 @@ var RY = {};
 RY.uinfo = {userId:null};
 RY.requestPermission = function(){
     myApp.hasPermission(['camera','microphone','storage'],false,function(){
-        api.toast({msg: '缺少权限会影响正常通话功能'});
+        api.toast({msg: '缺少权限会影响咨询通话功能'});
         setTimeout(RY.requestPermission, 2000);
     });
 }
@@ -25,7 +25,6 @@ RY.init = function(init) {
     return rong;
 };
 RY.login = function(callback){
-
     var udata = myApp.getUserData();
     var token = udata && udata.uinfo && udata.uinfo.rytoken;
     if(!token){api.toast({msg:"通话模块登录失败",global:true});return;}

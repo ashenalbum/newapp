@@ -29,12 +29,12 @@
         #footer ul li.active{ color:#FF3942; }
         #footer ul li:nth-child(1){ background-image: url(./image/common/tab1.png); }
         #footer ul li:nth-child(2){ background-image: url(./image/common/tab2.png); }
-        #footer ul li:nth-child(3){ background-image: url(./image/common/tab3.png); }
-        #footer ul li:nth-child(4){ background-image: url(./image/common/tab4.png); }
+        /*#footer ul li:nth-child(3){ background-image: url(./image/common/tab3.png); }*/
+        #footer ul li:nth-child(3){ background-image: url(./image/common/tab4.png); }
         #footer ul li:nth-child(1).active{ background-image: url(./image/common/tabact1.png); }
         #footer ul li:nth-child(2).active{ background-image: url(./image/common/tabact2.png); }
-        #footer ul li:nth-child(3).active{ background-image: url(./image/common/tabact3.png); }
-        #footer ul li:nth-child(4).active{ background-image: url(./image/common/tabact4.png); }
+        /*#footer ul li:nth-child(3).active{ background-image: url(./image/common/tabact3.png); }*/
+        #footer ul li:nth-child(3).active{ background-image: url(./image/common/tabact4.png); }
 
         .fc{overflow: auto}
         .border-t,.border-b{position:relative;}
@@ -85,9 +85,15 @@ function setEvent(){
     // 状态栏颜色
     api.addEventListener({name:'viewappear'},function(){api.setStatusBarStyle({style: 'dark'})});
     api.addEventListener({ name: 'setShopUrl' }, function(ret, err){ shopUrl = ret && ret.value && ret.value.url });
+    api.addEventListener({name: 'loginRongyun'}, listenEvent);
+
+    listenEvent();
+}
+function listenEvent(){
     if(myApp.isLogin()){
         RY.init(true);
         RY.login(function(){
+            // api.toast({msg:"已监听咨询预约"});
             // 来电
             api.addEventListener({name: 'rongaccept'}, function(ret, err){
                 api.notification({

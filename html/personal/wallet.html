@@ -149,7 +149,7 @@ function getData(){
     myApp.ajax({
         url: "/api/member/member/getmoney",
         method: "get",
-        // loading: false,i
+        // loading: false,
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             if(data.money){$("#yue").html(data.money)}

@@ -98,9 +98,9 @@ apiready = function(){
                 api.sendEvent({name: 'instantlyTestLogin'});
                 api.sendEvent({name: 'messageTestLogin'});
                 api.sendEvent({name: 'personalTestLogin'});
+                api.sendEvent({name: 'loginRongyun'});
+
                 api.toast({msg: '登录成功', global:true});
-                RY.init(true);
-                RY.login();
                 api.closeWin({name: 'personal_login'});
             }
         })

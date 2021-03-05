@@ -32,7 +32,7 @@
             <span id="yue" class="num fs-30 b">--</span>
             <span class="fs-12 mt-6">教育贝</span>
         </div>
-        <button class="com-button recharge c-yellow fs-14">提现</div>
+        <button id="tixian" class="com-button recharge c-yellow fs-14">提现</div>
     </div>
     <div class="df df-c details com-box mt-16">
         <div class="com-title detail-title">交易明细</div>
@@ -60,6 +60,8 @@ apiready = function(){
     getData();
 }
 function setEvent(){
+    $("#tixian").on("click",tixian);
+
     api.addEventListener({
         name: 'scrolltobottom',
         extra: {threshold: 20}
@@ -126,7 +128,10 @@ function getList(){
             }
         },
         error(){api.refreshHeaderLoadDone()}
-    })
+    });
+}
+function tixian(){
+    api.toast({msg:"开发中"})
 }
 </script>
 </body>

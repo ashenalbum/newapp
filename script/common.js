@@ -441,7 +441,10 @@ myApp.inputPwd = function(obj, callback){
         });
     }
     myinputpwdbox.find(".keynum").unbind().on("click",function(){
-        if(pwd.length>=6){return}
+        if(pwd.length>=6){
+            console.log("length")
+            return
+        }
         var num = Number($(this).data('id'));
         pwd.push(num);
         myinputpwdbox.find(".iptbox .num").eq(pwd.length-1).addClass("active");

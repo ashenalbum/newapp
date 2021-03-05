@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="../css/api.css"/>
     <link rel="stylesheet" type="text/css" href="../css/style.css"/>
     <style>
-        body{background:#f6f7f8;}
+        body{background:#f6f7f8; padding-bottom:10px;}
         .top{height:86px; padding:8px; background:#ffffff;}
         .top .item{margin:0 16px; padding:8px; border-radius:6px;}
         .top .item .img{width:44px; height:44px; border-radius:50%;}
@@ -121,7 +121,7 @@ function getData(){
     myApp.ajax({
         url: "/api/zixun/member/dayilist",
         method: "get",
-        loading: page==1,
+        loading: false,
         data: {page:page},
         success(data){
             loading = false;

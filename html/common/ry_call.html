@@ -104,7 +104,9 @@ function startTime(){
     },1000);
 }
 // 挂断
-function off(){RY.rong.hangup()}
+function off(){
+    RY.rong.hangup();
+}
 // 静音
 function setMuted(){
     RY.rong.setMuted({muted:sound},function(ret){});

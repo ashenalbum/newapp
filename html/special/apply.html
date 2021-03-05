@@ -27,14 +27,14 @@
 </head>
 <body>
     <form id="form" class="ul fs-16 c-33">
-        <div class="item df ai-c just-c-bet" tapmode="touch-style">
+        <!-- <div class="item df ai-c just-c-bet" tapmode="touch-style">
             <span>真实姓名</span>
             <input type="text" name="name" class="ipt fc txt-r" placeholder="请输入真实姓名" />
         </div>
         <div class="item df ai-c just-c-bet" tapmode="touch-style">
             <span>身份证号</span>
             <input type="text" name="idcard" class="ipt fc txt-r" placeholder="请输入身份证号" />
-        </div>
+        </div> -->
         <div class="item df ai-c just-c-bet" tapmode="touch-style">
             <span>所在单位</span>
             <input type="text" name="school" class="ipt fc txt-r" placeholder="请输入所在单位" />
@@ -107,9 +107,9 @@ function submit(){
         }
     }
     obj.catid = obj.catid.join();
-    if(!obj.name){api.toast({msg:"请输入真实姓名"});return}
-    if(!obj.idcard){api.toast({msg:"请输入身份证号"});return}
-    if(!/^\d{17}(\d|x|X)$/.test(obj.idcard)){api.toast({msg:"身份证号格式有误"}); return}
+    // if(!obj.name){api.toast({msg:"请输入真实姓名"});return}
+    // if(!obj.idcard){api.toast({msg:"请输入身份证号"});return}
+    // if(!/^\d{17}(\d|x|X)$/.test(obj.idcard)){api.toast({msg:"身份证号格式有误"}); return}
     if(!obj.school){api.toast({msg:"请输入所在单位"});return}
     if(!obj.zhiwu){api.toast({msg:"请输入担任职务"});return}
     if(!obj.message){api.toast({msg:"请输入个人简介"});return}

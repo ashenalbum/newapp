@@ -23,7 +23,7 @@
         .top .vipbox .viptxt{height:20px; margin-right:8px;}
         .top .tovipbtn{padding:0 4px; background:#FBF1D5 linear-gradient(90deg, #FBF1D5 0%, #F6DEB6 100%);}
         .top.svip .tovipbtn{background:transparent; color:#F6D8A4;}
-        .top.svip .tovipbtn .more{background-image:url(../image/common/more_w.png);}
+        .top.svip .tovipbtn .more{background-image:url(../image/common/more_y.png);}
 
         .orderls .itm{padding:4px 0; border-radius:6px;}
         .orderls .icon{display:block; width:30px; height:30px;}
@@ -267,6 +267,7 @@ function getData(){
         url: "/api/member/member/getmoney",
         method: "get",
         loading: false,
+        alert: false,
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             var yue = $("#yue");
