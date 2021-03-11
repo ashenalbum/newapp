@@ -440,7 +440,7 @@ myApp.inputPwd = function(obj, callback){
         pwd.splice(pwd.length-1,1);
         myinputpwdbox.find(".iptbox .num").eq(pwd.length).removeClass("active");
     });
-    myinputpwdbox.find(".keynum").unbind().on("mousedown",function(){
+    myinputpwdbox.find(".keynum").unbind().on("touchend",function(){
         if(pwd.length>=6){return}
         var num = Number($(this).data('id'));
         pwd.push(num);

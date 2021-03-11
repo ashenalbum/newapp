@@ -27,14 +27,14 @@ RY.init = function(init) {
 RY.login = function(callback){
     var udata = myApp.getUserData();
     var token = udata && udata.uinfo && udata.uinfo.rytoken;
-    if(!token){api.toast({msg:"通话模块登录失败",global:true});return;}
+    if(!token){api.toast({msg:"通话模块登录失败", global:true});return;}
     RY.rong.connect({ token: token }, function(ret, err) {
         if (ret.status == 'success') {
             RY.uinfo.userId = ret.result.userId;
             callback && callback();
         }else{
             if(err && err.code==31006){return}
-            api.toast({msg:"通话模块连接异常"});
+            api.toast({msg:"音视频通话模块连接异常", duration:3000});
             // RY.logout();
             // setTimeout(function(){RY.login()},10000);
         }

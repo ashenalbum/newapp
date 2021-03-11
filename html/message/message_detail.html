@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
     <style>
         body{box-sizing:border-box; background:#f6f7f8; padding:10px 10px 76px;}
-        .card .img{display:block; width:40px; height:40px; border-radius:50%; margin-right:16px;}
+        .card .img{width:40px; height:40px; border-radius:50%; margin-right:16px;}
         .card .star-num{line-height:14px; padding-left:18px; margin-left:8px; background:url(../../image/common/star.png) no-repeat left center; background-size:14px 14px;}
 
         .dialog-box .item{margin-top:20px;}
@@ -29,7 +29,7 @@
 </head>
 <body class="df df-c">
     <div id="card" class="card com-box df" onclick="toExpert()">
-        <img src="" class="img" />
+        <img src="" class="img hide" />
         <div class="fc">
             <div class="name fs-14 b"></div>
             <div class="df ai-c mt-4">
@@ -133,7 +133,7 @@ function getData(){
                 consultName = data.auth.name;
                 consultType = data.auth.type==1?"school":"expert";
                 var card = $("#card");
-                card.find(".img").attr("src",data.auth.avatar);
+                card.find(".img").attr("src",data.auth.avatar).removeClass('hide');
                 card.find(".name").text(data.auth.name);
                 card.find(".zxnum").text(data.auth.dyznum+"次咨询");
                 card.find(".star-num").text(data.auth.pinmum==0?"暂无评分":data.auth.pinmum);

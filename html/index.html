@@ -30,15 +30,17 @@
             100% {transform: rotate(360deg);}
         }
 
-        .types .li{margin-top:6px;}
-        .types .li .headline{box-sizing:border-box; width:160px; height:60px; font-weight:400; padding:10px 14px; border-radius:8px 0 0 8px; line-height:16px; background:url() no-repeat 118px center; background-size:28px 28px;}
+        .types .li{width:100%; margin-top:6px; overflow:hidden; border-radius:8px;}
+        .types .li .headline{box-sizing:border-box; width:140px; height:60px; font-weight:400; padding:10px 14px; border-radius:8px 0 0 8px; line-height:16px; background:url() no-repeat 100px center; background-size:28px 28px; flex-shrink:0;}
         .types .li:nth-child(4n+1) .headline{background-color:#F6F0E4;background-image:url(../image/index/type1.png);}
         .types .li:nth-child(4n+2) .headline{background-color:#E9E9EE;background-image:url(../image/index/type2.png);}
         .types .li:nth-child(4n+3) .headline{background-color:#DAE6EB;background-image:url(../image/index/type3.png);}
         .types .li:nth-child(4n+4) .headline{background-color:#E8DAD5;background-image:url(../image/index/type4.png);}
-        .types .li .itm{position:relative; margin-left:6px; background-color:#f5f5f5; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+        .types .li .itm{position:relative; box-sizing:border-box; min-width:80px; padding:0 3px; margin-left:6px; background-color:#f5f5f5; display:flex; align-items:center; justify-content:center; overflow:hidden;}
         .types .li .itm:last-child{border-radius:0 8px 8px 0;}
         .types .li .itm.hot::after{content:"HOT"; position:absolute; width:28px; height:14px; line-height:14px; border-radius:0 0 0 8px; text-align:center; font-size:10px; right:0; top:0; background:#ff6a77 linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.03)); color:#ffffff;}
+        .types .li .swiper-container{height:100%;}
+        .types .li .swiper-container .swiper-slide{width:auto;}
 
         .swiperbox{margin-top:12px;}
         .swiperbox .swiper-container{border-radius:8px; overflow:hidden; position:relative;}
@@ -66,7 +68,14 @@
                 <div class="name one-hide c-33">答疑咨询</div>
                 <div class="txt one-hide fs-10 c-66"></div>
             </div>
-            <div class="itm fc" tapmode="touch-style1" onclick="openConsult()">更多</div>
+            <!-- <div class="itm fc" tapmode="touch-style1" onclick="openConsult()">更多</div> -->
+            <div class="aa fc" style="width:100px;">
+                <div id="dayiswiper" class="dayi-swiper swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="itm fc" tapmode="touch-style1" onclick="openConsult()">更多</div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="li df">
             <div class="headline df df-c just-c-bet" onclick="openStudy()">
@@ -142,6 +151,7 @@
 <script type="text/javascript" src="../script/swiper.min.js"></script>
 <script type="text/javascript">
 var reload = false;
+var dayiswiper = null;
 var swiperSwiper = null;
 var videosSwiper = null;
 var activityswiperSwiper = null;
@@ -220,10 +230,22 @@ function getData(){
                 li.find(".txt").text(obj.synopsis);
                 if(!obj.value.length){li.append('<div class="itm fc" tapmode="touch-style1" onclick="'+fun+'()">更多</div>');continue}
                 li.find(".itm").remove();
-                for(var v in obj.value){
-                    if(v>2){break}
-                    var ov = obj.value[v];
-                    li.append('<div class="itm fc" tapmode="touch-style1" onclick="'+fun+'('+ ov.id +',\''+ ov.name +'\')">'+ myApp.htmlEscape(ov.name) +'</div>');
+                if(i=='1'){
+                    var swiper = li.find(".swiper-wrapper").empty();
+                    for(var v in obj.value){
+                        var ov = obj.value[v];
+                        swiper.append('<div class="itm swiper-slide" onclick="'+fun+'('+ ov.id +',\''+ ov.name +'\')">'+
+                            myApp.htmlEscape(ov.name)+
+                        '</div>');
+                    }
+                    if(dayiswiper){dayiswiper.destroy(false)}
+                    dayiswiper = new Swiper('#dayiswiper', {slidesPerView :'auto'});
+                }else{
+                    for(var v in obj.value){
+                        if(v>2){break}
+                        var ov = obj.value[v];
+                        li.append('<div class="itm fc" tapmode="touch-style1" onclick="'+fun+'('+ ov.id +',\''+ ov.name +'\')">'+ myApp.htmlEscape(ov.name) +'</div>');
+                    }
                 }
             }
             for(var i in data.modular){

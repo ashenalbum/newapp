@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        body{box-sizing:border-box; padding:10px 10px 10px; background:#f6f7f8;}
+        .statusicon{display:block; width:24px; height:24px; margin-right:12px;}
+        .cont .type-box{padding-bottom:10px; border-bottom:thin solid #E1E1E1;}
+        .cont .type-box .type{position:relative;}
+        .cont .img-box .img{display:block; width:30%;}
+    </style>
+</head>
+<body class="df df-c">
+    <div class="com-box df ai-c">
+        <img src="../../image/personal/ic6.png" class="statusicon" />
+        <div class="statustxt"></div>
+    </div>
+    <div class="mt-10 cont com-box df df-c">
+        <div class="df ai-c just-c-bet type-box">
+            <div class="fs-16 b">异常类型</div>
+            <div class="type"></div>
+        </div>
+
+        <div class="mt-10 fs-16 b">描述异常</div>
+        <div class="mt-10 fs-14 textarea"></div>
+        <div class="mt-10 df ai-s img-box"></div>
+    </div>
+    <div class="bhbox mt-10 com-box hide">
+        <div class="fs-16 b">驳回原因</div>
+        <div class="mt-10 bhtxt"></div>
+    </div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/zepto.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/mobileSelect.js"></script>
+<script>
+apiready = function(){
+    $(".img-box").on("click",".img",function(){
+        var src = $(this).attr("src");
+        myApp.showImg(src);
+    })
+    myApp.ajax({
+        url: "/api/zixun/member/errordie",
+        method: "get",
+        data: {id:api.pageParam.id},
+        success(data){
+            // console.log(JSON.stringify(data))
+            if(data.errcode!=0 && data.errcode!=200){return}
+            if(!data.list){return}
+            getStatustxt(data.list.status);
+            $(".type").text(data.list.type);
+            $(".textarea").text(data.list.content);
+            var imgbox = $(".img-box");
+            for(var i in data.list.img){
+                imgbox.append('<img src="'+ data.list.img[i] +'" class="img" />');
+            }
+            if(data.list.status==2 && data.list.reason){
+                $(".bhbox").removeClass("hide");
+                $(".bhtxt").text(data.list.reason);
+            }
+        }
+    })
+}
+function getStatustxt(status){
+    var dom = $(".statustxt");
+    switch(Number(status)){
+        case 0:dom.text("正在申诉中，我们尽快为您处理").addClass("c-yellow"); break;
+        case 1:dom.text("申诉成功"); break;
+        case 2:dom.text("申诉失败").addClass("c-red"); break;
+    }
+}
+</script>
+</body>
+</html>

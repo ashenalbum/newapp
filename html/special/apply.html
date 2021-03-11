@@ -70,15 +70,6 @@ apiready = function(){
 }
 // 添加标签
 function init(){
-    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
-    var userData = myApp.getUserData().uinfo;
-    if(userData.smshsta!=1){
-        myApp.alert({
-            content: "您还未通过实名审核",
-            callback(){api.closeWin()}
-        });
-        return;
-    }
     myApp.ajax({
         url: "/api/zixun/member/getcatid",
         method: "get",

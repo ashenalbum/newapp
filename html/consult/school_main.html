@@ -85,13 +85,14 @@ function menuClick(id,name){
 }
 // 图标
 function getIcon(id){
-    var img = "s4";
+    var img = "ic9";
     switch (true) {
         case id=="1": img = "s1"; break;
         case id=="2": img = "s2"; break;
         case id=="3": img = "s3"; break;
         case id=="4": img = "s5"; break;
         case id=="5": img = "s6"; break;
+        case id=="0": img = "s4"; break;
     }
     return '<img src="../../image/consult/'+ img +'.png" class="img" />';
 }

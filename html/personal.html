@@ -164,7 +164,7 @@
             <img src="../image/personal/ic4.png" class="img" alt="" />
             <div class="mt-6">我的关注</div>
         </div>
-        <div class="expert-hide item df df-c ai-c" tapmode="touch-style" >
+        <div class="expert-hide item df df-c ai-c" tapmode="touch-style" onclick="abnormal()" >
             <img src="../image/personal/ic6.png" class="img" alt="" />
             <div class="mt-6">异常申请</div>
         </div>
@@ -340,11 +340,24 @@ function openArticle(){myApp.openWin({title:"创作文章", needLogin:true, head
 // 咨询预约详情（专家）
 function openConsult(tab){myApp.openWin({title:"咨询预约", backWhite:true, url:"/html/special/consult.html", needLogin:true, headTxtColor:"#ffffff", headColor:"#474967 linear-gradient(to right, #474967, #20203B)", pageParam:{tab:tab}})}
 // 申请专家
-function openExpertApply(){myApp.openWin({title:"申请专家", needLogin:true, url:"/html/special/apply.html"})}
+function openExpertApply(){
+    if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
+    var userData = myApp.getUserData().uinfo;
+    if(userData.smshsta!=1){
+        api.toast({msg:"您还未实名认证,请先实名认证", global:true});
+        setTimeout(function(){
+            myApp.openWin({title:"实名认证", needLogin:true, url:"/html/personal/realname.html"});
+        },500);
+        return;
+    }
+    myApp.openWin({title:"申请专家", needLogin:true, url:"/html/special/apply.html"});
+}
 // 我的粉丝
 function openMyFans(){myApp.openWin({title:"我的粉丝", url:"/html/special/my_fans.html", needLogin:"true"})}
 // 我的评价
 function openMyEvaluate(){myApp.isLogin() && myApp.openWin({title:"评价", needLogin:true, url:"/html/consult/expert_evaluate_list.html", pageParam:{uid:myApp.getUserData().uinfo.uid}})}
+// 异常申请
+function abnormal(){myApp.openWin({title:"异常申请", url:"/html/personal/abnormal_list.html", needLogin:true})}
 </script>
 </body>
 </html>

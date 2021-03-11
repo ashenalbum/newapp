@@ -110,11 +110,11 @@ var iap = null;
 
 apiready = function(){
     wxPayPlus = api.require('wxPayPlus');
-    api.addEventListener({name: 'viewappear'},getData);
     setEvent();
     getData();
 }
 function setEvent(){
+    api.addEventListener({name: 'viewappear'},getData);
     api.addEventListener({
         name: 'scrolltobottom',
         extra: {threshold: 20}
@@ -149,7 +149,7 @@ function getData(){
     myApp.ajax({
         url: "/api/member/member/getmoney",
         method: "get",
-        // loading: false,
+        loading: false,
         success(data){
             if(data.errcode!=0 && data.errcode!=200){return}
             if(data.money){$("#yue").html(data.money)}

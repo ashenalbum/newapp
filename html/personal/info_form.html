@@ -46,6 +46,8 @@
 <script type="text/javascript" src="../../script/common.js"></script>
 <script>
 var icon = "";
+var changeicon = true;
+
 apiready = function(){
     setEvent();
     getData();
@@ -53,8 +55,13 @@ apiready = function(){
 function setEvent(){
     $("#icon").on("click",function(){
         var ts = $(this);
-        myApp.upImg({clip:true},function(src){ts.attr("src",src); icon = src;})
+        myApp.upImg({clip:true},function(src){
+            ts.attr("src",src);
+            icon = src;
+            changeicon = true;
+        })
     });
+    // api.addEventListener({name:'keyback'}, function(ret, err){});
     $("#submit").on("click",function(){
         var data = {
             avatar: icon,

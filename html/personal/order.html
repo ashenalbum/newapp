@@ -24,7 +24,9 @@
         .ul .li .order-title{ font-size:16px; padding-bottom:6px; border-bottom:1px solid #f1f1f1;}
         .ul .li:last-child{margin-bottom:0;}
         .ul .li .price{display:block; padding-left:20px; height:18px; line-height:18px; background:url(../../image/common/bei.png) no-repeat left center; background-size:18px 18px;}
-        .ul .li .btn-box .btn{background:#FF3942; color:#ffffff; padding:0 16px;}
+        .ul .li .btn-box .btn,
+        .ul .li .redbtn{background:#FF3942; color:#ffffff; padding:0 16px;}
+        .ul .li .redbtn{margin-left:10px;}
         .ul .li.study .img{display:block; width:120px; height:84px; border-radius:6px; margin-right:10px;}
         .ul .li.study .two-hide{line-height:18px;}
 
@@ -297,30 +299,11 @@ function addVideo(o){
             '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
         '</div>';
     }
-    ul.append('<div class="li video" '+ (o.getid==3 && o.yyid?'onclick="toPingjia('+ o.yyid +')"':'') +'>'+
-        getTitle(o.type)+
-        '<div class="df df-c pd-8">'+
-            '<div class="df ai-c just-c-bet c-66">'+
-                '<div class="df ai-c">'+
-                    '<img src="'+ o.info.avatar +'" class="img"/>'+
-                    '<span>'+ myApp.htmlEscape(o.info.name) +'</span>'+
-                '</div>'+
-                '<span class="fs-12 c-99">时间:'+ o.info.time +'</span>'+
-            '</div>'+
-            '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
-                '<span>'+ orderStatus(o.status) +'</span>'+
-                '<span class="price b">'+ o.jiage +'</span>'+
-            '</div>'+
-        '</div>'+ pay +
-    '</div>');
-}
-// 音频订单
-function addAudio(o){
-    var pay = '';
-    if(o.ispay==0){
-        pay = '<div class="btn-box df just-c-end mt-2" >'+
-            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
-        '</div>';
+    var ycsq = '';
+    if(o.getid==3||o.getid==4||o.getid==0){
+        if((o.status==3||o.status==1)&&o.yczt!=1){
+            ycsq = '<button class="com-button btn redbtn fs-12" type="button" name="button" onclick="abnormal('+ o.id +')">异常申请</button>';
+        }
     }
     ul.append('<div class="li video" '+ (o.getid==3 && o.yyid?'onclick="toPingjia('+ o.yyid +')"':'') +'>'+
         getTitle(o.type)+
@@ -334,7 +317,44 @@ function addAudio(o){
             '</div>'+
             '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
                 '<span>'+ orderStatus(o.status) +'</span>'+
-                '<span class="price b">'+ o.jiage +'</span>'+
+                '<div class="df ai-c">'+
+                    '<span class="price b">'+ o.jiage +'</span>'+
+                    ycsq+
+                '</div>'+
+            '</div>'+
+        '</div>'+ pay +
+    '</div>');
+}
+// 音频订单
+function addAudio(o){
+    var pay = '';
+    if(o.ispay==0){
+        pay = '<div class="btn-box df just-c-end mt-2" >'+
+            '<button class="com-button btn fs-12" type="button" name="button" data-orderid="'+ o.id +'"  onclick="toPay(this)">去支付</button>'+
+        '</div>';
+    }
+    var ycsq = '';
+    if(o.getid==3||o.getid==4||o.getid==0){
+        if((o.status==3||o.status==1)&&o.yczt!=1){
+            ycsq = '<button class="com-button btn redbtn fs-12" type="button" name="button" onclick="abnormal('+ o.id +')">异常申请</button>';
+        }
+    }
+    ul.append('<div class="li video" '+ (o.getid==3 && o.yyid?'onclick="toPingjia('+ o.yyid +')"':'') +'>'+
+        getTitle(o.type)+
+        '<div class="df df-c pd-8">'+
+            '<div class="df ai-c just-c-bet c-66">'+
+                '<div class="df ai-c">'+
+                    '<img src="'+ o.info.avatar +'" class="img"/>'+
+                    '<span>'+ myApp.htmlEscape(o.info.name) +'</span>'+
+                '</div>'+
+                '<span class="fs-12 c-99">时间:'+ o.info.time +'</span>'+
+            '</div>'+
+            '<div class="df mt-6 ai-c just-c-bet fs-12 c-red">'+
+                '<span>'+ orderStatus(o.status) +'</span>'+
+                '<div class="df ai-c">'+
+                    '<span class="price b">'+ o.jiage +'</span>'+
+                    ycsq+
+                '</div>'+
             '</div>'+
         '</div>'+ pay +
     '</div>');
@@ -423,6 +443,8 @@ function toBook(e){
 }
 // 评价
 function toPingjia(yyid){myApp.openWin({title:"评价", url: "/html/consult/expert_evaluate.html", pageParam: {yyid:yyid}})}
+// 异常申请
+function abnormal(id){myApp.openWin({title:"异常申请", url:"/html/personal/abnormal.html", pageParam:{id:id}})}
 </script>
 </body>
 </html>
