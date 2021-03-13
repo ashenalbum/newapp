@@ -17,6 +17,8 @@
         .book{width:100%; height:100%;}
         .book .page{position:relative; display:flex; align-items:center; justify-content:center; background:#f6f7f8 url(../../image/common/loading_more.gif) no-repeat center center; background-size:32px 32px;}
         .book .page .img{display:block; max-width:100%; max-height:100%; background:#ffffff;}
+        .book .page.needpay{background-image:none;}
+        .book .page .buybtn{width:160px; height:40px; background:#FF3942; border-radius:6px;}
 
         .help{position:fixed; top:0; left:0; z-index:9999; width:100%; height:100%; background:rgba(0,0,0,0.5);}
         .help .fc{border-right:2px solid rgba(255,255,255,0.5);}
@@ -111,8 +113,13 @@
 var bookList = [];
 var flipbook = null;
 var nowPage = 1;
+var tryRead = false;
 
 apiready = function(){
+    if(api.pageParam.tryRead){
+        tryRead = true;
+        api.toast({msg:"开始试读"});
+    }
     setEvent();
     getData();
 }
@@ -127,11 +134,40 @@ function setEvent(){
     // 分享
     api.execScript({name:api.winName, script: 'setTopBtn({img:"../../image/information/share.png", event:"bookShare"});'});
     api.addEventListener({name: 'bookShare'}, share);
+
+    $("#bookbox").on("click",function(e){
+        var p = parseInt(e.clientX / api.frameWidth * 3);
+        switch(p){
+            case 0:prev();break;
+            case 1:showMenu();break;
+            case 2:next();break;
+        }
+    });
+    $("#flipbook").on("click",".needpay",function(e){
+        if($(e.target).hasClass("buybtn")){
+            buyQk(api.pageParam.id, 2, false, function(){
+                tryRead = false;
+                getData();
+            });
+        }
+        return false;
+    });
+    $('#fdbtn').on("click",function(){
+        var bookbox = $("#bookbox");
+        if (bookbox.hasClass("zoom")) {
+            $(this).removeClass("zoom");
+            bookbox.removeClass("zoom").zoom("zoomOut");
+        } else {
+            $(this).addClass("zoom");
+            bookbox.addClass("zoom").zoom("zoomIn");
+        }
+    });
 }
 // 初始
 function getData(){
+    var url = tryRead?"/api/zazhi/qikan/read":"/api/zazhi/page/baokanpagelist";
     myApp.ajax({
-        url: "/api/zazhi/page/baokanpagelist",
+        url: url,
         method: "get",
         data: {id:api.pageParam.id},
         success(data){
@@ -139,23 +175,29 @@ function getData(){
                 setTimeout(function(){api.closeWin()},600);
                 return
             }
-            bookList = data.list;
+            bookList = data.list || [];
+            // 试读
+            if(tryRead){
+                bookList.push({needPay:true})
+            }
             nowPage = api.pageParam.pid || 1;
             sliderInit();
             bookInit();
         },
-        error(e){console.log(JSON.stringify(e))}
+        error(e){
+            // console.log(JSON.stringify(e))
+        }
     });
 }
 // 初始化
 function bookInit(){
     if(flipbook){flipbook.turn("destroy")}
     flipbook = $("#flipbook");
-
     for(var i=0; i<10; i++){
         if(!bookList[i]){break}
         flipbook.append(creatPage(bookList[i]));
     }
+    if(!bookList.length){api.toast({msg:"暂无数据"}); return}
     flipbook.turn({
         display: "single",
         width: api.frameWidth,
@@ -169,22 +211,6 @@ function bookInit(){
         for (var i = 0; i < pages.length; i++) {
             var index = pages[i];
             flipbook.turn("addPage", creatPage(bookList[index-1]), index);
-        }
-    }).on("click",function(e){
-        var p = parseInt(e.clientX / api.frameWidth * 3);
-        switch(p){
-            case 0:prev();break;
-            case 1:showMenu();break;
-            case 2:next();break;
-        }
-    });
-    $('#fdbtn').on("click",function(){
-        if (bookbox.hasClass("zoom")) {
-            $(this).removeClass("zoom");
-            bookbox.removeClass("zoom").zoom("zoomOut");
-        } else {
-            $(this).addClass("zoom");
-            bookbox.addClass("zoom").zoom("zoomIn");
         }
     });
 
@@ -201,6 +227,35 @@ function bookInit(){
         changeSlider();
     }
 }
+// 购买期刊
+function subscribe(id,type,money,callback){
+    if(!myApp.login()){api.toast({msg:"请先登录账号",global:true});return}
+    myApp.ajax({
+        url: "/api/zazhi/zazhi/addbaokanorder",
+        method: "get",
+        data:{id:id, type:type, money:money},
+        success(data){
+            // if(data.errcode==201){setTimeout(openWallet,300)}
+            if(data.errcode!=200 && data.errcode!=0){return}
+            var orderId = data.data.id;
+            myApp.inputPayPwd(function(password){
+                myApp.ajax({
+                    url: "/api/member/member/payorder",
+                    method: "get",
+                    data: {id:orderId, paypwd:password},
+                    success(data){
+                        if(data.errcode!=200 && data.errcode!=0){return}
+                        api.toast({msg: '支付成功', global:true});
+                        api.sendEvent({name: 'moneyChange'});
+                        callback && callback();
+                    },
+                    error(){api.toast({msg:"请求发生错误，请稍候重试"})}
+                })
+            });
+        },
+        error(){api.toast({msg:"error"})}
+    })
+}
 // 保存进度
 function saveProgress(){
     myApp.ajax({
@@ -213,12 +268,21 @@ function saveProgress(){
 }
 // 创建页面
 function creatPage(obj){
+    if(obj.needPay){
+        return $('<div class="page needpay df df-c ai-c just-c-ct fs-16">'+
+            '<div class="txt-c">试读结束<br/>查看后续内容需购买期刊</div>'+
+            '<div class="mt-30 df just-c-ct">'+
+                '<button class="com-button buybtn c-ff fs-14">购买期刊</button>'+
+            '</div>'+
+        '</div>');
+    }
     return $('<div class="page">'+
         '<img src="'+ obj.pimg +'" class="img fc" alt=""/>'+
     '</div>');
 }
 // 下一页
 function next(){
+    if(!bookList.length){return}
     if(nowPage==bookList.length){api.toast({msg:"已经是最后一页了",duration:1500});return}
     flipbook && flipbook.turn("next");
 }
@@ -242,6 +306,7 @@ function showMenu(){
 }
 // 点击下载
 function downLoad(){
+    if(!bookList.length){return}
     var page = bookList[nowPage-1];
     if(page.stuta==1){
         saveAlbum(page.id);
@@ -275,7 +340,7 @@ function saveAlbum(id){
     })
 }
 // 购买
-function subscribe(id,type,money,callback){
+function buyQk(id,type,money,callback){
     if(!myApp.login()){api.toast({msg:"请先登录", global:true}); return}
     myApp.ajax({
         url: "/api/zazhi/zazhi/addbaokanorder",
@@ -315,6 +380,7 @@ function sliderInit(){
 }
 // 显示进度
 function showSlider(){
+    if(!bookList.length){return}
     $("#slidbox").removeClass("hide").addClass("animate");
 }
 // 修改进度

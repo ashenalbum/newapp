@@ -126,6 +126,7 @@ myApp.openBanner = function(type, data, param){
         case type=="school": myApp.openWin({title:"院校", url:'/html/consult/school_main.html', pageParam:{id:data}}); break;
         case type=="consult": myApp.openWin({hideAll:true, url:"/html/consult/expert_detail.html", pageParam:{uid:data}}); break;
         case type=="journal": myApp.openWin({title:"报刊介绍", url: "/html/journal/detail.html", headColor: "#E8DAD5", pageParam:{id:data}}); break;
+        case type=="book": myApp.openWin({title:param.title||'', url: "/html/journal/book.html", pageParam:{id:param.id, tryRead:param.try}}); break;
         case type=="listen": myApp.openWin({title:"旁听", needLogin:true, url:"/html/consult/listen.html", pageParam:{id:data}}); break;
     }
 }
@@ -440,7 +441,7 @@ myApp.inputPwd = function(obj, callback){
         pwd.splice(pwd.length-1,1);
         myinputpwdbox.find(".iptbox .num").eq(pwd.length).removeClass("active");
     });
-    myinputpwdbox.find(".keynum").unbind().on("touchend",function(){
+    myinputpwdbox.find(".keynum").unbind().on("click",function(){
         if(pwd.length>=6){return}
         var num = Number($(this).data('id'));
         pwd.push(num);

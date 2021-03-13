@@ -39,12 +39,15 @@
         .detail .content{position:relative; min-height:300px;}
         .detail .content .scroll{position:absolute; top:0; left:0; right:0; bottom:0; overflow:auto;}
         .detail .html{font-size:14px; line-height:24px;}
-        .detail .mulu .li{padding:8px 0 8px 4px;}
+        .detail .mulu .li .conttxt{padding:8px 4px;}
         .detail .mulu .li .num{box-sizing:border-box; width:64px; padding-right:10px;}
         .detail .mulu .li.line{border-bottom:1px solid #EEEEEE;}
-        .detail .mulu .li .lock{display:block; width:18px; height:18px; padding:4px; background:url(../../image/journal/lock.png) no-repeat center center; background-size:18px 18px;}
-        .detail .mulu .li.tobook .lock{display:none;}
-        .detail .mulu .li .tryread{padding:6px 8px; line-height:14px; background:#f6f7f8; border-radius:12px;}
+        .detail .mulu .li .tread{width:40px; height:40px; border-radius:6px; background:url(../../image/journal/read.png) no-repeat center center; background-size:20px 20px;}
+        .detail .mulu .li .lock{width:40px; height:40px; border-radius:6px; background:url(../../image/journal/lock.png) no-repeat center center; background-size:20px 20px;}
+        .detail .mulu .li .next{width:40px; height:40px; border-radius:6px; background:url(../../image/journal/next.png) no-repeat center center; background-size:20px 20px;}
+        /*.detail .mulu .li .lock{display:block; width:18px; height:18px; padding:4px; background:url(../../image/journal/lock.png) no-repeat center center; background-size:18px 18px;}*/
+        /*.detail .mulu .li.tobook .lock{display:none;}*/
+        /*.detail .mulu .li .tryread{padding:6px 8px; line-height:14px; background:#f6f7f8; border-radius:12px;}*/
 
         .mask.animate .cont{animation:upshow 0.3s linear; -webkit-animation:upshow 0.3s linear;}
         @keyframes upshow{0%{bottom:-120px;}100% {bottom:0;}}
@@ -140,7 +143,7 @@
 <script type="text/javascript" src="../../script/common.js"></script>
 <script type="text/javascript" src="../../script/mobileSelect.js"></script>
 <script type="text/javascript">
-var baseData = {};
+var baseData = null;
 var searchYear = new Date().getFullYear();
 var page = 1;
 var loading = false;
@@ -156,6 +159,14 @@ apiready = function(){
 }
 function setEvent(){
     api.addEventListener({name: 'loginok'}, function(){getData()});
+    api.addEventListener({name: 'viewappear'}, function(ret, err){
+        if(baseData){
+            page = 1;
+            over = false;
+            getList();
+        }
+    });
+
     // 分享
     api.execScript({name:api.winName, script: 'setTopBtn({img:"../../image/information/share.png", event:"journalShare"});'});
     api.addEventListener({name: 'journalShare'}, share);
@@ -188,21 +199,26 @@ function setEvent(){
         });
     });
     // 点击期刊
-    $("#detail .mulu").on("click",".tobook",function(){
-        var ts = $(this);
+    $("#detail .mulu").on("click",".tobook,.next",function(){
+        var ts = $(this).parents(".li");
         toBook(ts.data('id'),ts.data('title'),ts.data('pid'));
-    }).on("click",".needpay",function(){
-        var ts = $(this);
-        // toBook(ts.data('id'),ts.data('title'),ts.data('pid'));
+        return false;
+    }).on("click",".needpay,.lock",function(){
+        var ts = $(this).parents(".li");
         var money = ts.data("money");
         myApp.confirm({
             title: "此期刊未购买",
-            content: '要花费'+money+'教育贝购买此期刊吗',
+            content: '要花费'+ money +'教育贝购买此期刊吗',
             callback(btnIndex){
                 if(btnIndex!=1){return}
                 dyQikan(ts);
             }
         });
+        return false;
+    }).on("click",".tread",function(){
+        var ts = $(this).parents(".li");
+        toTryBook(ts.data('id'),ts.data('title'));
+        return false;
     });
 }
 
@@ -283,12 +299,20 @@ function getList(){
             }
             for(var i in data.list){
                 var obj = data.list[i];
-                ul.append('<div class="li line df ai-c '+ (obj.qstuct==1?'tobook':'needpay') +'" data-id="'+obj.id+'" data-title="'+ obj.qtitle +'" data-money="'+ obj.qmonery +'"  tapmode="touch-style">'+
-                    '<div class="df df-c fc">'+
+                var btn = "";
+                if(obj.qstuct==1){
+                    btn = '<div class="next" tapmode="touch-style"></div>'
+                }else if(obj.mfpage && Number(obj.mfpage)>0){
+                    btn = '<div class="tread" tapmode="touch-style"></div>'
+                }else{
+                    btn = '<div class="lock" tapmode="touch-style"></div>'
+                }
+                ul.append('<div class="li line ai-c df " data-id="'+obj.id+'" data-title="'+ obj.qtitle +'" data-money="'+ obj.qmonery +'">'+
+                    '<div class="conttxt df df-c fc '+ (obj.qstuct==1?'tobook':'needpay') +'" tapmode="touch-style">'+
                         '<div class="two-hide">'+ obj.qtitle +'</div>'+
                         '<div class="mt-6 c-99">'+ obj.qstart +'</div>'+
                     '</div>'+
-                    (obj.qstuct==1?"":'<div class="lock fs-12 c-66"></div>')+
+                    '<div class="qkbtnbox df ai-c just-c-ct">'+ btn +'</div>'+
                 '</div>')
             }
             api.parseTapmode();
@@ -321,7 +345,9 @@ function dyQikan(dom){
     var id = dom.data("id");
     var money = dom.data("money");
     subscribe(id,2,Number(money),function(){
-        dom.removeClass("needpay").addClass("tobook");
+        dom.find(".needpay").removeClass("needpay").addClass("tobook");
+        dom.find(".tread").removeClass("tread").addClass("next");
+        dom.find(".lock").removeClass("lock").addClass("next");
     });
 }
 // 订阅全部
@@ -394,6 +420,8 @@ function fenxiang(scene){
 function openWallet(){myApp.openWin({title:"我的钱包", needLogin:true, url:"/html/personal/wallet.html", headColor:"#f6f7f8"})}
 // 刊物阅读
 function toBook(id,title,pid){myApp.openWin({title:title, url:"/html/journal/book.html", pageParam:{id:id, pid:pid||0}})}
+// 试读
+function toTryBook(id,title){myApp.openWin({title:title, url:"/html/journal/book.html", pageParam:{id:id, tryRead:true}})}
 // 显示分享
 function share(){$("#mask").removeClass("hide").addClass("animate")}
 function closeMask(){$("#mask").addClass("hide").removeClass("animate")}
